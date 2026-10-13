@@ -19,7 +19,8 @@ const api: LaguApi = {
     addUrl: (url: string) => ipcRenderer.invoke(IPC.libraryAddUrl, url),
     remove: (trackIds: string[]) => ipcRenderer.invoke(IPC.libraryRemoveTracks, trackIds),
     trash: (trackIds: string[]) => ipcRenderer.invoke(IPC.libraryTrash, trackIds),
-    restoreHidden: () => ipcRenderer.invoke(IPC.libraryRestoreHidden)
+    restoreHidden: () => ipcRenderer.invoke(IPC.libraryRestoreHidden),
+    clearLyricsCache: () => ipcRenderer.invoke(IPC.cacheClearLyrics)
   },
   track: {
     artworkUrl: (trackId: string) => ipcRenderer.invoke(IPC.trackArtwork, trackId),
@@ -30,7 +31,8 @@ const api: LaguApi = {
   },
   settings: {
     get: () => ipcRenderer.invoke(IPC.settingsGet),
-    set: (patch: Partial<AppSettings>) => ipcRenderer.invoke(IPC.settingsSet, patch)
+    set: (patch: Partial<AppSettings>) => ipcRenderer.invoke(IPC.settingsSet, patch),
+    reset: () => ipcRenderer.invoke(IPC.settingsReset)
   },
   queue: {
     load: () => ipcRenderer.invoke(IPC.queueGet),
@@ -39,7 +41,8 @@ const api: LaguApi = {
   artwork: {
     fetch: (trackId: string) => ipcRenderer.invoke(IPC.artworkFetch, trackId),
     fetchMissing: () => ipcRenderer.invoke(IPC.artworkFetchMissing),
-    artistImage: (name: string) => ipcRenderer.invoke(IPC.artworkArtistImage, name)
+    artistImage: (name: string) => ipcRenderer.invoke(IPC.artworkArtistImage, name),
+    clearCache: () => ipcRenderer.invoke(IPC.cacheClearArtwork)
   },
   pins: {
     get: () => ipcRenderer.invoke(IPC.pinsGet),

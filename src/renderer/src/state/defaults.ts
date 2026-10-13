@@ -21,10 +21,15 @@ export const defaultSettings: AppSettings = {
   autoLyrics: false,
   lyricsOffset: 0,
   sidebarWidth: 212,
+  queueWidth: 300,
   fetchArtworkOnline: false,
   albumSort: 'artist',
   albumSortDesc: false,
-  zoom: 0
+  zoom: 0,
+  lyricsFontSize: 15,
+  lyricsAlign: 'center',
+  showTrackNumbers: true,
+  scanOnStartup: true
 }
 
 export const ACCENT_PRESETS: { name: string; value: string }[] = [

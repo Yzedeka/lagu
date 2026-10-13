@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useLibrary } from '@renderer/state/useLibrary'
 import { useSettings } from '@renderer/state/useSettings'
 import { usePlayer } from '@renderer/state/usePlayer'
@@ -31,7 +31,7 @@ const api = window.lagu
 
 export function App() {
   const library = useLibrary()
-  const { settings, update, loaded } = useSettings()
+  const { settings, update, reload, loaded } = useSettings()
 
   const resolve = useCallback((id: string) => library.byId.get(id), [library.byId])
   const player = usePlayer(resolve, settings, update)
@@ -44,6 +44,7 @@ export function App() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [zoom, setZoom] = useState(0)
   const [sidebarWidth, setSidebarWidth] = useState(212)
+  const [queueWidth, setQueueWidth] = useState(300)
   const [lyricsRevision, setLyricsRevision] = useState(0)
   const [lyricsDialog, setLyricsDialog] = useState(false)
   const [browseFocus, setBrowseFocus] = useState<{ kind: 'album' | 'artist'; ref: string; token: number } | null>(null)
@@ -93,6 +94,10 @@ export function App() {
   useEffect(() => {
     if (loaded) setSidebarWidth(settings.sidebarWidth)
   }, [loaded, settings.sidebarWidth])
+
+  useEffect(() => {
+    if (loaded) setQueueWidth(settings.queueWidth)
+  }, [loaded, settings.queueWidth])
 
   const onZoom = useCallback((delta: number) => {
     void api.window.zoom(delta).then(setZoom)
@@ -383,14 +388,18 @@ export function App() {
     'app',
     settings.showSidebar ? '' : 'app--no-sidebar',
     settings.showQueue ? '' : 'app--no-queue',
+    settings.showTrackNumbers ? '' : 'app--no-track-numbers',
+    settings.lyricsAlign === 'left' ? 'app--lyrics-left' : '',
     immersive ? 'app--immersive' : '',
     immersive && !barRevealed ? 'app--bar-hidden' : ''
   ]
     .filter(Boolean)
     .join(' ')
 
+  const appStyle = { '--lyrics-size': `${settings.lyricsFontSize}px` } as CSSProperties
+
   return (
-    <div className={className}>
+    <div className={className} style={appStyle}>
       <div className="workspace">
         {settings.showSidebar && (
           <Sidebar
@@ -459,6 +468,10 @@ export function App() {
               onFetchMissingArtwork={() => void library.fetchMissingArtwork()}
               hiddenCount={library.hiddenCount}
               onRestoreHidden={() => void library.restoreHidden()}
+              onResetSettings={async () => {
+                await api.settings.reset()
+                await reload()
+              }}
             />
           )}
 
@@ -497,6 +510,9 @@ export function App() {
           <QueuePanel
             queue={player.queue}
             resolve={resolve}
+            width={queueWidth}
+            onResize={setQueueWidth}
+            onResizeEnd={(w) => update({ queueWidth: w })}
             onJump={player.jumpTo}
             onRemove={player.removeFromQueue}
             onMove={player.moveInQueue}

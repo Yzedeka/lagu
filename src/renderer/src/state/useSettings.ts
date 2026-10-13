@@ -7,6 +7,7 @@ const api = window.lagu
 export interface SettingsModel {
   settings: AppSettings
   update: (patch: Partial<AppSettings>) => void
+  reload: () => Promise<void>
   loaded: boolean
 }
 
@@ -31,5 +32,9 @@ export function useSettings(): SettingsModel {
     void api.settings.set(patch)
   }, [])
 
-  return { settings, update, loaded }
+  const reload = useCallback(async () => {
+    setSettings(await api.settings.get())
+  }, [])
+
+  return { settings, update, reload, loaded }
 }

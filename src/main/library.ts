@@ -6,7 +6,7 @@ import type {
   LibraryBatch,
   LibraryDone
 } from '@shared/ipc'
-import type { LibraryFolder, PinnedItem, ScanProgress, Track, TrackOverride, UnsupportedFile, MetadataPatch } from '@shared/types'
+import type { LibraryFolder, AppSettings, PinnedItem, ScanProgress, Track, TrackOverride, UnsupportedFile, MetadataPatch } from '@shared/types'
 import { compareTracks } from '@shared/sort'
 import type { Store } from './store'
 import { extensionOf, readTrack, SUPPORTED_EXTENSIONS, KNOWN_UNSUPPORTED_EXTENSIONS, trackFromUrl, clearMetadataCaches } from './metadata'
@@ -561,6 +561,37 @@ export class LibraryService {
 
   getArtistBio(name: string): string {
     return this.store.getArtistBio(name)
+  }
+
+  resetSettings(): AppSettings {
+    return this.store.resetSettings()
+  }
+
+  private async clearDir(dir: string): Promise<number> {
+    let removed = 0
+    try {
+      const entries = await fs.readdir(dir)
+      for (const entry of entries) {
+        try {
+          await fs.rm(path.join(dir, entry), { recursive: true, force: true })
+          removed += 1
+        } catch {
+          /* skip locked files */
+        }
+      }
+    } catch {
+      /* directory missing */
+    }
+    return removed
+  }
+
+  clearArtworkCache(): Promise<number> {
+    clearMetadataCaches()
+    return this.clearDir(this.store.artworkDir)
+  }
+
+  clearLyricsCache(): Promise<number> {
+    return this.clearDir(this.store.lyricsDir)
   }
 
   getAllArtistBios(): Record<string, string> {

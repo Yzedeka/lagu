@@ -48,6 +48,9 @@ export const IPC = {
   metadataSetLyricsOffset: 'metadata:set-lyrics-offset',
   settingsGet: 'settings:get',
   settingsSet: 'settings:set',
+  settingsReset: 'settings:reset',
+  cacheClearArtwork: 'cache:clear-artwork',
+  cacheClearLyrics: 'cache:clear-lyrics',
   queueGet: 'queue:get',
   queueSave: 'queue:save',
   windowZoom: 'window:zoom',
@@ -95,6 +98,8 @@ export interface LaguApi {
     trash(trackIds: string[]): Promise<number>
     /** Restore all hidden tracks and rescan. */
     restoreHidden(): Promise<void>
+    /** Delete every cached lyrics file; returns how many were removed. */
+    clearLyricsCache(): Promise<number>
   }
   track: {
     artworkUrl(trackId: string): Promise<string | null>
@@ -109,6 +114,8 @@ export interface LaguApi {
   settings: {
     get(): Promise<AppSettings>
     set(patch: Partial<AppSettings>): Promise<AppSettings>
+    /** Restore every setting to its default value. */
+    reset(): Promise<AppSettings>
   }
   queue: {
     load(): Promise<QueueState>
@@ -121,6 +128,8 @@ export interface LaguApi {
     fetchMissing(): Promise<number>
     /** Cached (or freshly fetched) artist profile image URL, or null. */
     artistImage(name: string): Promise<string | null>
+    /** Delete every cached cover image; returns how many were removed. */
+    clearCache(): Promise<number>
   }
   pins: {
     get(): Promise<PinnedItem[]>

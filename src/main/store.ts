@@ -33,10 +33,15 @@ export const defaultSettings: AppSettings = {
   autoLyrics: false,
   lyricsOffset: 0,
   sidebarWidth: 212,
+  queueWidth: 300,
   fetchArtworkOnline: false,
   albumSort: 'artist',
   albumSortDesc: false,
-  zoom: 0
+  zoom: 0,
+  lyricsFontSize: 15,
+  lyricsAlign: 'center',
+  showTrackNumbers: true,
+  scanOnStartup: true
 }
 
 function emptyState(): PersistedState {
@@ -324,6 +329,12 @@ export class Store {
 
   updateSettings(patch: Partial<AppSettings>): AppSettings {
     this.state.settings = { ...this.state.settings, ...patch }
+    this.scheduleSave()
+    return this.state.settings
+  }
+
+  resetSettings(): AppSettings {
+    this.state.settings = { ...defaultSettings }
     this.scheduleSave()
     return this.state.settings
   }

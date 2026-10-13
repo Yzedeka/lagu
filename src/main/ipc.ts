@@ -183,6 +183,12 @@ export function registerIpc(
     return store.updateSettings(patch ?? {})
   })
 
+  ipcMain.handle(IPC.settingsReset, () => library.resetSettings())
+
+  ipcMain.handle(IPC.cacheClearArtwork, () => library.clearArtworkCache())
+
+  ipcMain.handle(IPC.cacheClearLyrics, () => library.clearLyricsCache())
+
   ipcMain.handle(IPC.queueGet, () => store.queue)
 
   ipcMain.handle(IPC.queueSave, (_e, queue: QueueState) => {

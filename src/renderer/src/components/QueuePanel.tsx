@@ -1,4 +1,4 @@
-import { useState, type DragEvent } from 'react'
+import { useRef, useState, type DragEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import type { QueueState, Track } from '@shared/types'
 import { AlbumArt } from './AlbumArt'
 import { CloseIcon, GripIcon, QueueIcon, TrashIcon } from '@renderer/icons'
@@ -7,6 +7,9 @@ import { formatTime, formatTotalDuration } from '@renderer/lib/format'
 interface QueuePanelProps {
   queue: QueueState
   resolve: (id: string) => Track | undefined
+  width: number
+  onResize: (width: number) => void
+  onResizeEnd: (width: number) => void
   onJump: (index: number) => void
   onRemove: (index: number) => void
   onMove: (from: number, to: number) => void
@@ -14,9 +17,40 @@ interface QueuePanelProps {
   onClose: () => void
 }
 
-export function QueuePanel({ queue, resolve, onJump, onRemove, onMove, onClear, onClose }: QueuePanelProps) {
+export function QueuePanel({
+  queue,
+  resolve,
+  width,
+  onResize,
+  onResizeEnd,
+  onJump,
+  onRemove,
+  onMove,
+  onClear,
+  onClose
+}: QueuePanelProps) {
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [overIndex, setOverIndex] = useState<number | null>(null)
+  const startX = useRef(0)
+  const startWidth = useRef(width)
+
+  const clamp = (value: number): number => Math.min(560, Math.max(148, value))
+
+  const beginResize = (e: ReactPointerEvent): void => {
+    e.preventDefault()
+    startX.current = e.clientX
+    startWidth.current = width
+    const move = (ev: PointerEvent): void => {
+      onResize(clamp(startWidth.current - (ev.clientX - startX.current)))
+    }
+    const up = (ev: PointerEvent): void => {
+      window.removeEventListener('pointermove', move)
+      window.removeEventListener('pointerup', up)
+      onResizeEnd(clamp(startWidth.current - (ev.clientX - startX.current)))
+    }
+    window.addEventListener('pointermove', move)
+    window.addEventListener('pointerup', up)
+  }
 
   const items = queue.order
     .map((id, index) => ({ id, index, track: resolve(id) }))
@@ -32,7 +66,14 @@ export function QueuePanel({ queue, resolve, onJump, onRemove, onMove, onClear, 
   }
 
   return (
-    <aside className="queue">
+    <aside className="queue" style={{ width }}>
+      <div
+        className="queue__resizer"
+        title="Drag to resize"
+        onPointerDown={beginResize}
+        role="separator"
+        aria-orientation="vertical"
+      />
       <header className="queue__header">
         <span className="queue__title">
           <QueueIcon size={14} /> Up Next
@@ -97,9 +138,7 @@ export function QueuePanel({ queue, resolve, onJump, onRemove, onMove, onClear, 
         })}
       </div>
 
-      <footer className="queue__footer">
-        {items.length} track{items.length === 1 ? '' : 's'} · {formatTotalDuration(total)}
-      </footer>
+      <footer className="queue__footer">{formatTotalDuration(total)}</footer>
     </aside>
   )
 }

@@ -125,6 +125,8 @@ export interface AppSettings {
   lyricsOffset: number
   /** Left sidebar width in px (user-resizable). */
   sidebarWidth: number
+  /** Right queue panel width in px (user-resizable). */
+  queueWidth: number
   /** Look up missing album art online (opt-in network feature). */
   fetchArtworkOnline: boolean
   /** Album grid sort field. */
@@ -133,7 +135,17 @@ export interface AppSettings {
   albumSortDesc: boolean
   /** Persisted renderer zoom level (Electron zoom level, 0 = 100%). */
   zoom: number
+  /** Lyrics text size in px. */
+  lyricsFontSize: number
+  /** Lyrics text alignment. */
+  lyricsAlign: LyricsAlign
+  /** Show the track number column in track lists. */
+  showTrackNumbers: boolean
+  /** Rescan library folders automatically on launch. */
+  scanOnStartup: boolean
 }
+
+export type LyricsAlign = 'center' | 'left'
 
 export interface QueueState {
   /** Track ids in play order. */

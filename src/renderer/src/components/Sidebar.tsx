@@ -55,8 +55,7 @@ interface SidebarProps {
 const NAV: { id: BrowseSection; label: string; icon: typeof GraphicEqIcon }[] = [
   { id: 'library', label: 'Library', icon: LibraryIcon },
   { id: 'albums', label: 'Albums', icon: AlbumIcon },
-  { id: 'artists', label: 'Artists', icon: ArtistIcon },
-  { id: 'folders', label: 'Folders', icon: FolderIcon }
+  { id: 'artists', label: 'Artists', icon: ArtistIcon }
 ]
 
 export function Sidebar({
@@ -218,6 +217,14 @@ export function Sidebar({
             onSetVolume={onSetVolume}
             onToggleMute={onToggleMute}
           />
+          <button
+            type="button"
+            className={`icon-btn ${selection === 'folders' ? 'icon-btn--active' : ''}`}
+            title="Folders"
+            onClick={() => onSelect('folders')}
+          >
+            <FolderIcon size={16} />
+          </button>
         </div>
       </div>
     </aside>

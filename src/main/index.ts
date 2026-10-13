@@ -96,6 +96,11 @@ app.whenReady().then(async () => {
   createWindow()
   initUpdater(getWindow)
 
+  // Optionally rescan the library folders on launch.
+  if (store.settings.scanOnStartup && store.folders.length > 0) {
+    void library.scan()
+  }
+
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
