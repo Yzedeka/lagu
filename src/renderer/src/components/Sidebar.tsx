@@ -19,6 +19,7 @@ import {
   VolumeMuteIcon
 } from '@renderer/icons'
 import { AlbumArt } from './AlbumArt'
+import { ContextMenu } from './ContextMenu'
 import { Range } from './Range'
 import appIconUrl from '@renderer/icons/app_icon.png'
 import { folderName } from '@renderer/lib/format'
@@ -86,6 +87,7 @@ export function Sidebar({
   const startX = useRef(0)
   const startWidth = useRef(width)
   const [foldersOpen, setFoldersOpen] = useState(true)
+  const [folderMenu, setFolderMenu] = useState<{ x: number; y: number } | null>(null)
 
   const clamp = (value: number): number => Math.min(440, Math.max(150, value))
 
@@ -106,7 +108,7 @@ export function Sidebar({
   }
 
   return (
-    <aside className="sidebar" style={{ width }}>
+    <aside className={`sidebar ${width < 180 ? 'sidebar--slim' : ''}`} style={{ width }}>
       <div
         className="sidebar__resizer"
         title="Drag to resize"
@@ -123,7 +125,7 @@ export function Sidebar({
           onClick={() => onSelect('now')}
         >
           <GraphicEqIcon size={16} />
-          <span>Now Playing</span>
+          <span className="brand-now__label">Now Playing</span>
         </button>
       </div>
 
@@ -170,22 +172,8 @@ export function Sidebar({
             size={14}
             className={`sidebar__caret ${foldersOpen ? '' : 'sidebar__caret--closed'}`}
           />
-          <span>Folders</span>
+          <span className="sidebar__section-toggle-label">Folders</span>
         </button>
-        <div className="sidebar__label-actions">
-          <button type="button" className="icon-btn" title="Add folder" onClick={onAddFolder}>
-            <CreateFolderIcon size={16} />
-          </button>
-          <button
-            type="button"
-            className="icon-btn"
-            title="Rescan library"
-            onClick={onRescan}
-            disabled={scanning || folders.length === 0}
-          >
-            <RefreshIcon size={16} />
-          </button>
-        </div>
       </div>
 
       {foldersOpen && (
@@ -233,7 +221,10 @@ export function Sidebar({
             type="button"
             className={`icon-btn ${selection === 'folders' ? 'icon-btn--active' : ''}`}
             title="Folders"
-            onClick={() => onSelect('folders')}
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect()
+              setFolderMenu({ x: rect.left, y: rect.bottom + 4 })
+            }}
           >
             <FolderIcon size={16} />
           </button>
@@ -242,6 +233,32 @@ export function Sidebar({
           </button>
         </div>
       </div>
+
+      {folderMenu && (
+        <ContextMenu
+          x={folderMenu.x}
+          y={folderMenu.y}
+          onClose={() => setFolderMenu(null)}
+          items={[
+            {
+              label: 'Go to Folders',
+              icon: <FolderIcon size={15} />,
+              onClick: () => onSelect('folders')
+            },
+            {
+              label: 'Add folder…',
+              icon: <CreateFolderIcon size={15} />,
+              onClick: onAddFolder
+            },
+            {
+              label: 'Rescan library',
+              icon: <RefreshIcon size={15} />,
+              disabled: scanning || folders.length === 0,
+              onClick: onRescan
+            }
+          ]}
+        />
+      )}
     </aside>
   )
 }

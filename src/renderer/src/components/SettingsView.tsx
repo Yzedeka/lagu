@@ -323,7 +323,7 @@ export function SettingsView({
       <div className="settings__slider">
         <Range
           value={settings.queueWidth}
-          min={120}
+          min={64}
           max={560}
           onChange={(v) => update({ queueWidth: Math.round(v) })}
           ariaLabel="Queue width"

@@ -294,7 +294,6 @@ button,
   background: var(--bg-panel);
   border-right: 1px solid var(--border);
   overflow: hidden;
-  container-type: inline-size;
   animation: slideFromLeft 0.26s var(--ease);
 }
 
@@ -391,11 +390,26 @@ button,
   text-align: left;
 }
 
-.brand-now > span {
+.brand-now__label {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Slim sidebar: wrap "Now Playing" onto two lines with a smaller font. */
+.sidebar--slim .brand-now {
+  gap: 8px;
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+.sidebar--slim .brand-now__label {
+  white-space: normal;
+  line-height: 1.15;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .brand-now .material-symbols-rounded {
@@ -458,7 +472,7 @@ button,
   color: var(--text-dim);
 }
 
-.sidebar__section-toggle > span {
+.sidebar__section-toggle-label {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1597,6 +1611,28 @@ button,
   gap: 6px;
 }
 
+/* Tiny: keep only the drag handle and the cover. */
+.queue--tiny .queue-main,
+.queue--tiny .queue-row .icon-btn {
+  display: none;
+}
+
+.queue--tiny .queue-row {
+  gap: 4px;
+  padding: 0 4px;
+}
+
+/* Mini: no longer enough room for the word "Queue". */
+.queue--mini .queue__title-text {
+  display: none;
+}
+
+.queue--mini .queue__header {
+  justify-content: center;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
 .queue-row:hover {
   background: var(--bg-hover);
 }
@@ -1707,6 +1743,7 @@ button,
 .bb-play {
   width: 44px;
   height: 44px;
+  box-shadow: none;
 }
 
 .bb-art {
@@ -2462,16 +2499,14 @@ button,
 }
 
 /* When the sidebar is slim, shrink the footer tools so they still fit. */
-@container (max-width: 176px) {
-  .footer-tools {
-    margin-left: 36px;
-    gap: 0;
-  }
+.sidebar--slim .footer-tools {
+  margin-left: 36px;
+  gap: 0;
+}
 
-  .footer-tools .icon-btn {
-    width: 24px;
-    height: 24px;
-  }
+.sidebar--slim .footer-tools .icon-btn {
+  width: 24px;
+  height: 24px;
 }
 
 .volume {

@@ -30,7 +30,7 @@ export function QueuePanel({
   const startX = useRef(0)
   const startWidth = useRef(width)
 
-  const clamp = (value: number): number => Math.min(560, Math.max(120, value))
+  const clamp = (value: number): number => Math.min(560, Math.max(64, value))
 
   const beginResize = (e: ReactPointerEvent): void => {
     e.preventDefault()
@@ -62,7 +62,17 @@ export function QueuePanel({
   }
 
   return (
-    <aside className={`queue ${width < 220 ? 'queue--slim' : ''}`} style={{ width }}>
+    <aside
+      className={[
+        'queue',
+        width < 220 ? 'queue--slim' : '',
+        width < 150 ? 'queue--tiny' : '',
+        width < 100 ? 'queue--mini' : ''
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      style={{ width }}
+    >
       <div
         className="queue__resizer"
         title="Drag to resize"
@@ -72,7 +82,7 @@ export function QueuePanel({
       />
       <header className="queue__header">
         <span className="queue__title">
-          <QueueIcon size={14} /> Queue
+          <QueueIcon size={14} /> <span className="queue__title-text">Queue</span>
         </span>
       </header>
 
