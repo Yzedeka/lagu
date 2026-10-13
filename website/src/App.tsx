@@ -2,6 +2,7 @@ import { useRoute } from '@/lib/useRoute'
 import { DownloadProvider } from '@/lib/DownloadContext'
 import { Hero } from '@/components/Hero'
 import { Features } from '@/components/Features'
+import { Slideshow } from '@/components/Slideshow'
 import { Footer, Nav, Shortcuts } from '@/components/Info'
 import { DownloadPage } from '@/components/DownloadPage'
 import { LinuxDownloads } from '@/components/LinuxDownloads'
@@ -19,6 +20,7 @@ export function App() {
           {route.name === 'home' && (
             <>
               <Hero />
+              <Slideshow />
               <Features />
               <Shortcuts />
             </>

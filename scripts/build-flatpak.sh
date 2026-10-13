@@ -8,6 +8,8 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+VERSION="$(node -p "require('./package.json').version")"
+
 echo "==> Building the app (unpacked Linux)"
 npm run build
 npx electron-builder --linux dir
@@ -29,7 +31,7 @@ echo "==> Building the Flatpak"
   flatpak/build-dir \
   flatpak/com.lagu.musicplayer.yml
 
-echo "==> Bundling build/Lagu-0.1.0.flatpak"
+echo "==> Bundling build/Lagu-${VERSION}.flatpak"
 mkdir -p build
-flatpak build-bundle flatpak/repo build/Lagu-0.1.0.flatpak com.lagu.musicplayer
-echo "Done: build/Lagu-0.1.0.flatpak"
+flatpak build-bundle flatpak/repo "build/Lagu-${VERSION}.flatpak" com.lagu.musicplayer
+echo "Done: build/Lagu-${VERSION}.flatpak"

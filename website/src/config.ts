@@ -1,8 +1,8 @@
 export const APP = {
   name: 'Lagu',
-  version: '0.1.0',
+  version: '0.2.0',
   /** Display label (the 'b' marks the beta). */
-  versionLabel: 'v0.1.0b',
+  versionLabel: 'v0.2.0b',
   beta: true,
   tagline: 'A minimalist desktop player for your local music library.'
 } as const
@@ -25,46 +25,40 @@ export const DOWNLOADS: Download[] = [
     os: 'windows',
     label: 'Windows',
     file: `Lagu-${APP.version}-setup.exe`,
-    size: 118101874,
+    size: 118295401,
     primary: true
   },
   {
     os: 'macos',
     label: 'macOS',
     file: `Lagu-${APP.version}-mac.zip`,
-    size: 388908748,
+    size: 389155731,
     primary: true
   },
   {
     os: 'linux',
     label: 'AppImage',
     file: `Lagu-${APP.version}.AppImage`,
-    size: 131202414,
+    size: 131472982,
     primary: true
   },
   {
     os: 'linux',
     label: '.deb',
     file: `lagu-music-player_${APP.version}_amd64.deb`,
-    size: 105667048
+    size: 105794132
   },
   {
     os: 'linux',
     label: '.rpm',
     file: `lagu-music-player-${APP.version}.x86_64.rpm`,
-    size: 94398412
-  },
-  {
-    os: 'linux',
-    label: 'Flatpak',
-    file: `Lagu-${APP.version}.flatpak`,
-    size: 96302872
+    size: 94587784
   },
   {
     os: 'linux',
     label: 'Portable tar.gz',
     file: `lagu-music-player-${APP.version}.tar.gz`,
-    size: 125171226
+    size: 125417541
   }
 ]
 
