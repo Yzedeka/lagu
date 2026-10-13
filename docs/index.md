@@ -8,7 +8,7 @@ cover tint the interface with its own accent colours.
 It is not a Spotify clone and not a web dashboard. It is a small, practical tool
 for people who keep their music on disk.
 
-> Version 0.1.0 - source available - built with Electron, React and TypeScript.
+> Version 0.2.0 - source available - built with Electron, React and TypeScript.
 
 ## What it does
 
@@ -16,7 +16,9 @@ for people who keep their music on disk.
   Library, Albums, Artists and Folders. Your files are never moved, renamed or
   modified.
 - **Real playback** - play/pause, previous/next, seek, volume, a persistent
-  **Up Next** queue you can reorder, plus shuffle and repeat.
+  **Queue** you can reorder, plus shuffle and repeat.
+- **Custom keybinds** - rebind any keyboard action, or flick on **Performance
+  mode** to strip every animation.
 - **Dynamic theming** - the dominant colours of the current artwork become the
   interface accent. Four themes (Dark, Light, Grey, Black) and a fixed-accent
   option.

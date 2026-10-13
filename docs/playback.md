@@ -2,14 +2,16 @@
 
 ## The queue
 
-Playing a track from any list loads that list into the **Up Next** queue and
+Playing a track from any list loads that list into the **Queue** and
 starts at the chosen track. The queue is a real, editable list:
 
 - **Reorder** by dragging a row.
-- **Remove** a row with its close button, or **clear** the whole queue.
+- **Remove** a row with its close button.
 - **Play next** / **Add to queue** from any track's right-click menu or row
   hover buttons.
 - The queue and your position in it are **restored between sessions**.
+- Drag its left edge to resize; when it gets slim it hides row timestamps, then
+  titles, then its own label - down to just the cover and drag handle.
 
 ## Shuffle and repeat
 
