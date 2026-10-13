@@ -10,6 +10,10 @@ import { initUpdater } from './updater'
 
 app.setName('Lagu Music Player')
 
+// Pin the X11 WM_CLASS so a pinned taskbar/menu entry binds to the installed
+// desktop file (StartupWMClass=lagu) rather than the AppImage's mount path.
+app.commandLine.appendSwitch('class', 'lagu')
+
 registerMediaScheme()
 
 /** Resolve the app icon from the source tree (or a packaged resource). */
