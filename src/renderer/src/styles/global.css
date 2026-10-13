@@ -433,6 +433,37 @@ button,
   white-space: nowrap;
 }
 
+.sidebar__section-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  color: var(--text-faint);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: color 0.15s var(--ease);
+}
+
+.sidebar__section-toggle:hover {
+  color: var(--text-dim);
+}
+
+.sidebar__section-toggle > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar__caret {
+  transition: transform 0.2s var(--ease);
+}
+
+.sidebar__caret--closed {
+  transform: rotate(-90deg);
+}
+
 .sidebar__label-actions .icon-btn {
   width: 24px;
   height: 24px;
@@ -525,6 +556,7 @@ button,
   display: flex;
   align-items: center;
   height: 50px;
+  margin-top: auto;
   padding: 8px;
   border-top: 1px solid var(--border);
 }
@@ -1510,7 +1542,7 @@ button,
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 15px 14px 11px;
+  padding: 10px 12px 8px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -2102,8 +2134,44 @@ button,
   opacity: 1;
 }
 
+.settings-view__search {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 0 12px;
+}
+
 .settings-view__search .search {
-  width: 240px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.keybind {
+  min-width: 96px;
+  padding: 6px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  transition: border-color 0.15s var(--ease), background-color 0.15s var(--ease),
+    transform 0.12s var(--ease);
+}
+
+.keybind:hover {
+  border-color: var(--accent);
+}
+
+.keybind:active {
+  transform: scale(0.97);
+}
+
+.keybind--recording {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-bright);
 }
 
 .settings-note {
@@ -3079,3 +3147,136 @@ button,
   color: var(--accent);
 }
 
+
+/* Extra motion ------------------------------------------------------- */
+.icon-btn,
+.play-btn,
+.ghost-btn,
+.primary-btn,
+.nav-item,
+.tab {
+  transition: background-color 0.16s var(--ease), color 0.16s var(--ease),
+    border-color 0.16s var(--ease), transform 0.14s var(--ease);
+}
+
+.icon-btn:active:not(:disabled),
+.play-btn:active:not(:disabled),
+.ghost-btn:active:not(:disabled),
+.primary-btn:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.nav-item:active {
+  transform: scale(0.985);
+}
+
+.album-tile {
+  transition: transform 0.2s var(--ease);
+}
+
+.album-tile:hover {
+  transform: translateY(-3px) scale(1.012);
+}
+
+.artist-card__art {
+  transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease);
+}
+
+.artist-card:hover .artist-card__art {
+  transform: translateY(-3px) scale(1.03);
+}
+
+.swatch {
+  transition: transform 0.14s var(--ease), box-shadow 0.14s var(--ease);
+}
+
+.swatch:hover {
+  transform: scale(1.12);
+}
+
+.settings-nav__item {
+  transition: background-color 0.16s var(--ease), color 0.16s var(--ease),
+    transform 0.14s var(--ease);
+}
+
+.settings-nav__item:active {
+  transform: scale(0.98);
+}
+
+.settings-nav__item--active {
+  position: relative;
+}
+
+.settings-nav__item--active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform-origin: center;
+  animation: accentBar 0.24s var(--ease);
+}
+
+@keyframes accentBar {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes nowPulse {
+  0%,
+  100% {
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  50% {
+    box-shadow: inset 3px 0 0 transparent;
+  }
+}
+
+.queue-row--current {
+  animation: nowPulse 2.2s var(--ease) infinite;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.settings__section {
+  animation: fadeUp 0.3s var(--ease) backwards;
+}
+
+/* Performance mode --------------------------------------------------- */
+[data-performance='on'] *,
+[data-performance='on'] *::before,
+[data-performance='on'] *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+[data-performance='on'] .bb-visualizer,
+[data-performance='on'] .np-visualizer {
+  display: none !important;
+}
+
+[data-performance='on'] .modal-backdrop {
+  backdrop-filter: none !important;
+}
+
+[data-performance='on'] .album-tile:hover,
+[data-performance='on'] .song-tile:hover .song-tile__art,
+[data-performance='on'] .artist-card:hover .artist-card__art {
+  transform: none !important;
+}

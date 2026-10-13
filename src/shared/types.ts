@@ -143,6 +143,10 @@ export interface AppSettings {
   showTrackNumbers: boolean
   /** Rescan library folders automatically on launch. */
   scanOnStartup: boolean
+  /** User-configurable keyboard bindings (action id -> key). */
+  keybindings: Record<string, string>
+  /** Performance mode: strip animations, transitions and visual extras. */
+  performanceMode: boolean
 }
 
 export type LyricsAlign = 'center' | 'left'

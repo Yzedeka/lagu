@@ -112,6 +112,8 @@ export const ZoomInIcon = (p: IconProps) => <Icon name="zoom_in" {...p} />
 export const ZoomOutIcon = (p: IconProps) => <Icon name="zoom_out" {...p} />
 export const GridIcon = (p: IconProps) => <Icon name="grid_view" {...p} />
 export const ListIcon = (p: IconProps) => <Icon name="view_list" {...p} />
+export const ChevronDownIcon = (p: IconProps) => <Icon name="expand_more" {...p} />
+export const AddUrlIcon = (p: IconProps) => <Icon name="add_link" {...p} />
 
 // --- Lyrics ---------------------------------------------------------------
 export const LyricsIcon = (p: IconProps) => <Icon name="lyrics" {...p} />

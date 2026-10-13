@@ -193,6 +193,7 @@ export interface ApplyThemeOptions {
   radius: number
   density: Density
   animations: boolean
+  performance: boolean
   palette: Palette
 }
 
@@ -202,12 +203,14 @@ export function applyTheme({
   radius,
   density,
   animations,
+  performance,
   palette
 }: ApplyThemeOptions): void {
   const root = document.documentElement
   root.dataset.theme = theme
   root.dataset.density = density
   root.dataset.animations = animations ? 'on' : 'off'
+  root.dataset.performance = performance ? 'on' : 'off'
   root.style.setProperty('--radius', `${radius}px`)
   root.style.setProperty('--accent', palette.accent)
   root.style.setProperty('--accent-bright', palette.accentBright)

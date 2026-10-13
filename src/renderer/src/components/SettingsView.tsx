@@ -8,6 +8,7 @@ import {
   GraphicEqIcon,
   ImageIcon,
   KeyboardIcon,
+  LayersIcon,
   LibraryIcon,
   LyricsIcon,
   PaletteIcon,
@@ -16,6 +17,7 @@ import {
 } from '@renderer/icons'
 import { Range } from './Range'
 import { SearchBar } from './SearchBar'
+import { KEYBIND_ACTIONS, defaultBindings, keyLabel, normalizeKey } from '@renderer/lib/keybinds'
 
 interface SettingsViewProps {
   settings: AppSettings
@@ -39,6 +41,7 @@ type CategoryId =
   | 'lyrics'
   | 'library'
   | 'artwork'
+  | 'keybinds'
   | 'data'
   | 'help'
 
@@ -62,10 +65,11 @@ const CATEGORIES: { id: CategoryId; label: string; icon: typeof PaletteIcon }[] 
   { id: 'panels', label: 'Panels', icon: AnimationIcon },
   { id: 'playback', label: 'Playback', icon: GraphicEqIcon },
   { id: 'lyrics', label: 'Lyrics', icon: LyricsIcon },
-  { id: 'library', label: 'Library', icon: LibraryIcon },
+  { id: 'library', label: 'Songs', icon: LibraryIcon },
   { id: 'artwork', label: 'Artwork', icon: ImageIcon },
+  { id: 'keybinds', label: 'Keybinds', icon: KeyboardIcon },
   { id: 'data', label: 'Data', icon: FolderIcon },
-  { id: 'help', label: 'Help', icon: KeyboardIcon }
+  { id: 'help', label: 'Help', icon: LayersIcon }
 ]
 
 interface RowDef {
@@ -252,6 +256,17 @@ export function SettingsView({
     ),
     row(
       'appearance',
+      'performance',
+      'Performance mode',
+      <Switch
+        on={settings.performanceMode}
+        onChange={(performanceMode) => update({ performanceMode })}
+      />,
+      'Disable every animation, transition and visual extra for the smoothest experience.',
+      'motion reduce speed low end'
+    ),
+    row(
+      'appearance',
       'zoom',
       'Interface zoom',
       <div className="swatches">
@@ -308,7 +323,7 @@ export function SettingsView({
       <div className="settings__slider">
         <Range
           value={settings.queueWidth}
-          min={148}
+          min={120}
           max={560}
           onChange={(v) => update({ queueWidth: Math.round(v) })}
           ariaLabel="Queue width"
@@ -536,6 +551,37 @@ export function SettingsView({
       'Look up artwork for every track that has none. Runs gently in the background.'
     ),
 
+    // --- Keybinds ---------------------------------------------------------
+    ...KEYBIND_ACTIONS.map((action) =>
+      row(
+        'keybinds',
+        `key-${action.id}`,
+        action.label,
+        <KeybindRecorder
+          value={settings.keybindings[action.id] ?? ''}
+          onChange={(key) =>
+            update({ keybindings: { ...settings.keybindings, [action.id]: key } })
+          }
+        />,
+        action.group,
+        'keybind shortcut hotkey key'
+      )
+    ),
+    row(
+      'keybinds',
+      'key-reset',
+      'Reset keybinds',
+      <button
+        type="button"
+        className="ghost-btn"
+        onClick={() => update({ keybindings: defaultBindings() })}
+      >
+        Reset
+      </button>,
+      'Restore every shortcut to its default key.',
+      'defaults'
+    ),
+
     // --- Data -------------------------------------------------------------
     row(
       'data',
@@ -642,9 +688,9 @@ export function SettingsView({
 
   return (
     <div className="settings-view">
-      <header className="browse__header">
+      <header className="browse__header settings-view__header">
         <h2 className="browse__title">Settings</h2>
-        <div className="browse__actions settings-view__search">
+        <div className="settings-view__search">
           <SearchBar
             value={query}
             placeholder="Search settings…"
@@ -721,4 +767,35 @@ function page(
       ))}
     </section>
   ))
+}
+
+function KeybindRecorder({ value, onChange }: { value: string; onChange: (key: string) => void }) {
+  const [recording, setRecording] = useState(false)
+
+  useEffect(() => {
+    if (!recording) return
+    const onKey = (e: KeyboardEvent): void => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (e.key === 'Escape') {
+        setRecording(false)
+        return
+      }
+      onChange(normalizeKey(e.key))
+      setRecording(false)
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [recording, onChange])
+
+  return (
+    <button
+      type="button"
+      className={`keybind ${recording ? 'keybind--recording' : ''}`}
+      title="Click, then press a key"
+      onClick={() => setRecording((v) => !v)}
+    >
+      {recording ? 'Press a key…' : keyLabel(value)}
+    </button>
+  )
 }

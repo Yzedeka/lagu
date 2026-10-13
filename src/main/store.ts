@@ -3,6 +3,7 @@ import { promises as fs } from 'node:fs'
 import { createHash } from 'node:crypto'
 import path from 'node:path'
 import type { AppSettings, PersistedState, PinnedItem, Track, TrackOverride } from '@shared/types'
+import { DEFAULT_KEYBINDINGS } from '@shared/keybinds'
 
 /** Legacy file names (pre user-visible folder) used for one-time migration. */
 const LEGACY = {
@@ -41,7 +42,9 @@ export const defaultSettings: AppSettings = {
   lyricsFontSize: 15,
   lyricsAlign: 'center',
   showTrackNumbers: true,
-  scanOnStartup: true
+  scanOnStartup: true,
+  keybindings: { ...DEFAULT_KEYBINDINGS },
+  performanceMode: false
 }
 
 function emptyState(): PersistedState {

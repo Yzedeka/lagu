@@ -1,7 +1,7 @@
 import { useRef, useState, type DragEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import type { QueueState, Track } from '@shared/types'
 import { AlbumArt } from './AlbumArt'
-import { CloseIcon, GripIcon, QueueIcon, TrashIcon } from '@renderer/icons'
+import { CloseIcon, GripIcon, QueueIcon } from '@renderer/icons'
 import { formatTime, formatTotalDuration } from '@renderer/lib/format'
 
 interface QueuePanelProps {
@@ -13,8 +13,6 @@ interface QueuePanelProps {
   onJump: (index: number) => void
   onRemove: (index: number) => void
   onMove: (from: number, to: number) => void
-  onClear: () => void
-  onClose: () => void
 }
 
 export function QueuePanel({
@@ -25,16 +23,14 @@ export function QueuePanel({
   onResizeEnd,
   onJump,
   onRemove,
-  onMove,
-  onClear,
-  onClose
+  onMove
 }: QueuePanelProps) {
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [overIndex, setOverIndex] = useState<number | null>(null)
   const startX = useRef(0)
   const startWidth = useRef(width)
 
-  const clamp = (value: number): number => Math.min(560, Math.max(148, value))
+  const clamp = (value: number): number => Math.min(560, Math.max(120, value))
 
   const beginResize = (e: ReactPointerEvent): void => {
     e.preventDefault()
@@ -78,16 +74,6 @@ export function QueuePanel({
         <span className="queue__title">
           <QueueIcon size={14} /> Up Next
         </span>
-        <div className="queue__header-actions">
-          {queue.order.length > 0 && (
-            <button type="button" className="icon-btn" title="Clear queue" onClick={onClear}>
-              <TrashIcon size={14} />
-            </button>
-          )}
-          <button type="button" className="icon-btn" title="Hide queue" onClick={onClose}>
-            <CloseIcon size={14} />
-          </button>
-        </div>
       </header>
 
       <div className="queue__list">

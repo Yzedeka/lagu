@@ -1,4 +1,5 @@
 import type { AppSettings } from '@shared/types'
+import { DEFAULT_KEYBINDINGS } from '@shared/keybinds'
 
 /** Mirrors the main process defaults; used before persisted settings load. */
 export const defaultSettings: AppSettings = {
@@ -29,7 +30,9 @@ export const defaultSettings: AppSettings = {
   lyricsFontSize: 15,
   lyricsAlign: 'center',
   showTrackNumbers: true,
-  scanOnStartup: true
+  scanOnStartup: true,
+  keybindings: { ...DEFAULT_KEYBINDINGS },
+  performanceMode: false
 }
 
 export const ACCENT_PRESETS: { name: string; value: string }[] = [

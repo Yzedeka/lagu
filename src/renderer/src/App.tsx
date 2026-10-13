@@ -12,6 +12,7 @@ import {
 } from '@renderer/theme/palette'
 import { Sidebar, type SidebarSelection } from '@renderer/components/Sidebar'
 import type { PinnedItem } from '@shared/types'
+import { KEYBIND_IDS, normalizeKey } from '@shared/keybinds'
 import { albumKeyOf } from '@renderer/lib/album'
 import { Browse } from '@renderer/components/Browse'
 import type { MetadataActions } from '@renderer/components/Browse'
@@ -82,9 +83,10 @@ export function App() {
       radius: settings.radius,
       density: settings.density,
       animations: settings.animations,
+      performance: settings.performanceMode,
       palette
     })
-  }, [settings.theme, settings.radius, settings.density, settings.animations, palette])
+  }, [settings.theme, settings.radius, settings.density, settings.animations, settings.performanceMode, palette])
 
   // --- zoom ----------------------------------------------------------------
   useEffect(() => {
@@ -180,12 +182,76 @@ export function App() {
       const s = settingsRef.current
       const total = p.currentTrack?.duration || p.duration || 0
 
+      if (e.key === 'Escape') {
+        if (shortcutsOpen) setShortcutsOpen(false)
+        else if (addUrlOpen) setAddUrlOpen(false)
+        else if (isFullscreen) toggleFullscreen()
+        return
+      }
+
+      // Customisable keybindings take priority over the fixed controls.
+      const pressed = normalizeKey(e.key)
+      const binds = s.keybindings ?? {}
+      const action = KEYBIND_IDS.find((id) => binds[id] && normalizeKey(binds[id]) === pressed)
+      if (action) {
+        if (pressed === ' ') e.preventDefault()
+        switch (action) {
+          case 'playPause':
+            p.toggle()
+            break
+          case 'nextTrack':
+            p.next()
+            break
+          case 'prevTrack':
+            p.prev()
+            break
+          case 'mute':
+            p.toggleMute()
+            break
+          case 'shuffle':
+            p.toggleShuffle()
+            break
+          case 'repeat':
+            p.cycleRepeat()
+            break
+          case 'lyrics':
+            if (hasLyricsRef.current) update({ showLyrics: !s.showLyrics })
+            break
+          case 'queue':
+            update({ showQueue: !s.showQueue })
+            break
+          case 'toggleSidebar':
+            update({ showSidebar: !s.showSidebar })
+            break
+          case 'fullscreen':
+            toggleFullscreen()
+            break
+          case 'goNowPlaying':
+            setSelection('now')
+            break
+          case 'goLibrary':
+            setSelection('library')
+            break
+          case 'goAlbums':
+            setSelection('albums')
+            break
+          case 'goArtists':
+            setSelection('artists')
+            break
+          case 'goFolders':
+            setSelection('folders')
+            break
+          case 'shortcuts':
+            setShortcutsOpen((v) => !v)
+            break
+          default:
+            break
+        }
+        return
+      }
+
+      // Fixed navigation controls.
       switch (e.key) {
-        case ' ':
-        case 'Spacebar':
-          e.preventDefault()
-          p.toggle()
-          break
         case 'ArrowRight':
           e.preventDefault()
           p.seek(Math.min(total, p.currentTime + 5))
@@ -201,55 +267,6 @@ export function App() {
         case 'ArrowDown':
           e.preventDefault()
           p.setVolume(Math.max(0, s.volume - 0.05))
-          break
-        case 'Escape':
-          if (shortcutsOpen) setShortcutsOpen(false)
-          else if (addUrlOpen) setAddUrlOpen(false)
-          else if (isFullscreen) toggleFullscreen()
-          break
-        default:
-          break
-      }
-
-      switch (e.key.toLowerCase()) {
-        case 'm':
-          p.toggleMute()
-          break
-        case 's':
-          p.toggleShuffle()
-          break
-        case 'r':
-          p.cycleRepeat()
-          break
-        case 'l':
-          if (hasLyricsRef.current) update({ showLyrics: !s.showLyrics })
-          break
-        case 'q':
-          update({ showQueue: !s.showQueue })
-          break
-        case 'b':
-          update({ showSidebar: !s.showSidebar })
-          break
-        case 'f':
-          toggleFullscreen()
-          break
-        case '0':
-          setSelection('now')
-          break
-        case '1':
-          setSelection('library')
-          break
-        case '2':
-          setSelection('albums')
-          break
-        case '3':
-          setSelection('artists')
-          break
-        case '4':
-          setSelection('folders')
-          break
-        case '?':
-          setShortcutsOpen((v) => !v)
           break
         default:
           break
@@ -516,8 +533,6 @@ export function App() {
             onJump={player.jumpTo}
             onRemove={player.removeFromQueue}
             onMove={player.moveInQueue}
-            onClear={player.clearQueue}
-            onClose={() => update({ showQueue: false })}
           />
         )}
       </div>
@@ -549,7 +564,9 @@ export function App() {
 
       {addUrlOpen && <AddUrlDialog onSubmit={library.addUrl} onClose={() => setAddUrlOpen(false)} />}
 
-      {shortcutsOpen && <ShortcutsOverlay onClose={() => setShortcutsOpen(false)} />}
+      {shortcutsOpen && (
+        <ShortcutsOverlay onClose={() => setShortcutsOpen(false)} bindings={settings.keybindings} />
+      )}
 
       <UpdateScreen />
 

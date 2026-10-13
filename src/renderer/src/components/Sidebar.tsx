@@ -3,6 +3,7 @@ import type { LibraryFolder, PinnedItem, Track } from '@shared/types'
 import {
   AlbumIcon,
   ArtistIcon,
+  ChevronDownIcon,
   CloseIcon,
   CreateFolderIcon,
   DiscIcon,
@@ -84,6 +85,7 @@ export function Sidebar({
 }: SidebarProps) {
   const startX = useRef(0)
   const startWidth = useRef(width)
+  const [foldersOpen, setFoldersOpen] = useState(true)
 
   const clamp = (value: number): number => Math.min(440, Math.max(150, value))
 
@@ -158,7 +160,18 @@ export function Sidebar({
       </nav>
 
       <div className="sidebar__label sidebar__label--row">
-        <span>Folders</span>
+        <button
+          type="button"
+          className="sidebar__section-toggle"
+          onClick={() => setFoldersOpen((v) => !v)}
+          aria-expanded={foldersOpen}
+        >
+          <ChevronDownIcon
+            size={14}
+            className={`sidebar__caret ${foldersOpen ? '' : 'sidebar__caret--closed'}`}
+          />
+          <span>Folders</span>
+        </button>
         <div className="sidebar__label-actions">
           <button type="button" className="icon-btn" title="Add folder" onClick={onAddFolder}>
             <CreateFolderIcon size={16} />
@@ -172,29 +185,28 @@ export function Sidebar({
           >
             <RefreshIcon size={16} />
           </button>
-          <button type="button" className="icon-btn" title="Add stream URL" onClick={onAddUrl}>
-            <LinkIcon size={16} />
-          </button>
         </div>
       </div>
 
-      <div className="sidebar__folders">
-        {folders.length === 0 && <div className="sidebar__hint">No folders added</div>}
-        {folders.map((folder) => (
-          <div key={folder.id} className="folder-item" title={folder.path}>
-            <FolderIcon size={14} />
-            <span className="folder-item__name">{folderName(folder.path)}</span>
-            <button
-              type="button"
-              className="icon-btn icon-btn--danger"
-              title="Remove from library"
-              onClick={() => onRemoveFolder(folder.id)}
-            >
-              <TrashIcon size={14} />
-            </button>
-          </div>
-        ))}
-      </div>
+      {foldersOpen && (
+        <div className="sidebar__folders">
+          {folders.length === 0 && <div className="sidebar__hint">No folders added</div>}
+          {folders.map((folder) => (
+            <div key={folder.id} className="folder-item" title={folder.path}>
+              <FolderIcon size={14} />
+              <span className="folder-item__name">{folderName(folder.path)}</span>
+              <button
+                type="button"
+                className="icon-btn icon-btn--danger"
+                title="Remove from library"
+                onClick={() => onRemoveFolder(folder.id)}
+              >
+                <TrashIcon size={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="sidebar__footer">
         <SidebarSearch
@@ -224,6 +236,9 @@ export function Sidebar({
             onClick={() => onSelect('folders')}
           >
             <FolderIcon size={16} />
+          </button>
+          <button type="button" className="icon-btn" title="Add stream URL" onClick={onAddUrl}>
+            <LinkIcon size={16} />
           </button>
         </div>
       </div>
