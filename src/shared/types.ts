@@ -226,3 +226,19 @@ export interface AppStateSnapshot {
   settings: AppSettings
   queue: QueueState
 }
+
+export type UpdatePhase =
+  | 'idle'
+  | 'checking'
+  | 'available'
+  | 'downloading'
+  | 'ready'
+  | 'none'
+  | 'error'
+
+export interface UpdateStatus {
+  phase: UpdatePhase
+  version?: string
+  percent?: number
+  error?: string
+}

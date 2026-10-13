@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Track } from '@shared/types'
 import { AlbumArt } from './AlbumArt'
+import { EditIcon } from '@renderer/icons'
 import { Range } from './Range'
 import { Visualizer } from './Visualizer'
 import { formatTime } from '@renderer/lib/format'
@@ -15,6 +16,7 @@ interface NowPlayingProps {
   lyricsOpen: boolean
   accent: string
   onSeek: (seconds: number) => void
+  onEditLyrics: () => void
   lyricsSlot: ReactNode
 }
 
@@ -28,6 +30,7 @@ export function NowPlaying({
   lyricsOpen,
   accent,
   onSeek,
+  onEditLyrics,
   lyricsSlot
 }: NowPlayingProps) {
   // Prefer the tagged duration so long tracks show their real length instead of
@@ -70,6 +73,15 @@ export function NowPlaying({
           disabled={!track || effectiveDuration <= 0}
         />
         <span className="np-time np-time--right">{formatTime(effectiveDuration)}</span>
+        <button
+          type="button"
+          className="icon-btn"
+          title="Lyrics - import .lrc"
+          onClick={onEditLyrics}
+          disabled={!track}
+        >
+          <EditIcon size={16} />
+        </button>
       </div>
 
       {error && <div className="np-error">{error}</div>}

@@ -31,6 +31,7 @@ interface BottomBarProps {
   visualizer: boolean
   queueOpen: boolean
   lyricsOpen: boolean
+  lyricsAvailable: boolean
   isFullscreen: boolean
   accent: string
   onToggle: () => void
@@ -58,6 +59,7 @@ export function BottomBar({
   visualizer,
   queueOpen,
   lyricsOpen,
+  lyricsAvailable,
   isFullscreen,
   accent,
   onToggle,
@@ -164,9 +166,9 @@ export function BottomBar({
           <button
             type="button"
             className={`icon-btn ${lyricsOpen ? 'icon-btn--active' : ''}`}
-            title="Lyrics (L)"
+            title={lyricsAvailable ? 'Lyrics (L)' : 'No lyrics for this track'}
             onClick={onToggleLyrics}
-            disabled={!track}
+            disabled={!track || (!lyricsAvailable && !lyricsOpen)}
           >
             <LyricsIcon size={17} />
           </button>

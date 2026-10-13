@@ -9,7 +9,8 @@ import type {
   ScanError,
   ScanProgress,
   Track,
-  UnsupportedFile
+  UnsupportedFile,
+  UpdateStatus
 } from './types'
 
 /** IPC channel names. Kept in one place so main and preload cannot drift. */
@@ -37,6 +38,8 @@ export const IPC = {
   artistBioSet: 'artists:bio-set',
   appDataFolder: 'app:data-folder',
   appOpenDataFolder: 'app:open-data-folder',
+  updateStatus: 'update:status',
+  updateInstall: 'update:install',
   metadataUpdate: 'metadata:update',
   metadataSetCover: 'metadata:set-cover',
   metadataFetchCover: 'metadata:fetch-cover',
@@ -55,7 +58,8 @@ export const IPC = {
   evtDone: 'library:done',
   evtRefresh: 'library:refresh',
   evtArtworkProgress: 'artwork:progress',
-  evtFullscreen: 'window:fullscreen-changed'
+  evtFullscreen: 'window:fullscreen-changed',
+  evtUpdate: 'update:changed'
 } as const
 
 export interface LibraryDone {
@@ -128,6 +132,11 @@ export interface LaguApi {
   app: {
     dataFolder(): Promise<string>
     openDataFolder(): Promise<string>
+  }
+  update: {
+    get(): Promise<UpdateStatus>
+    install(): Promise<void>
+    onStatus(cb: (status: UpdateStatus) => void): () => void
   }
   metadata: {
     /** Apply metadata edits to one or more tracks. */

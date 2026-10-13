@@ -3,6 +3,7 @@ import { IPC } from '@shared/ipc'
 import type { AppSettings, MetadataPatch, QueueState } from '@shared/types'
 import type { LibraryService } from './library'
 import type { Store } from './store'
+import { getUpdateStatus, installUpdate } from './updater'
 
 const MIN_ZOOM = -3
 const MAX_ZOOM = 3
@@ -131,6 +132,13 @@ export function registerIpc(
   })
 
   ipcMain.handle(IPC.pinsGet, () => library.getPinned())
+
+  ipcMain.handle(IPC.updateStatus, () => getUpdateStatus())
+
+  ipcMain.handle(IPC.updateInstall, () => {
+    installUpdate()
+    return true
+  })
 
   ipcMain.handle(IPC.appDataFolder, () => store.dir)
 

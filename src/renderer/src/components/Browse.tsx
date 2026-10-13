@@ -34,7 +34,7 @@ import { MetadataDialog, type MetadataInitial } from './MetadataDialog'
 import { ConfirmDialog } from './ConfirmDialog'
 import { ArtistView } from './ArtistView'
 import { AlbumView } from './AlbumView'
-import { LyricsOffsetDialog } from './LyricsOffsetDialog'
+import { LyricsDialog } from './LyricsDialog'
 import { formatTotalDuration, folderName } from '@renderer/lib/format'
 import type { BrowseSection } from './Sidebar'
 
@@ -444,24 +444,30 @@ export function Browse({
           return (
             <div key={folder.id} className="folder-row">
               <button type="button" className="folder-row__main" onClick={() => setFolderPath(folder.path)}>
-                <FolderIcon size={16} />
-                <span className="folder-row__name">{folderName(folder.path)}</span>
-                <span className="folder-row__path">{folder.path}</span>
+                <span className="folder-row__icon">
+                  <FolderIcon size={16} />
+                </span>
+                <span className="folder-row__text">
+                  <span className="folder-row__name">{folderName(folder.path)}</span>
+                  <span className="folder-row__path">{folder.path}</span>
+                </span>
               </button>
               <span className="folder-row__meta">
                 {group?.trackCount ?? 0} tracks · {formatTotalDuration(group?.duration ?? 0)}
               </span>
-              <button type="button" className="icon-btn" title="Rescan this folder" onClick={() => onRescan()}>
-                <RefreshIcon size={14} />
-              </button>
-              <button
-                type="button"
-                className="icon-btn icon-btn--danger"
-                title="Remove folder"
-                onClick={() => onRemoveFolder(folder.id)}
-              >
-                <TrashIcon size={14} />
-              </button>
+              <div className="folder-row__actions">
+                <button type="button" className="icon-btn" title="Rescan this folder" onClick={() => onRescan()}>
+                  <RefreshIcon size={15} />
+                </button>
+                <button
+                  type="button"
+                  className="icon-btn icon-btn--danger"
+                  title="Remove folder"
+                  onClick={() => onRemoveFolder(folder.id)}
+                >
+                  <TrashIcon size={15} />
+                </button>
+              </div>
             </div>
           )
         })}
@@ -531,11 +537,13 @@ export function Browse({
       )}
 
       {lrcEdit && (
-        <LyricsOffsetDialog
+        <LyricsDialog
+          trackId={lrcEdit.id}
           trackOffset={lrcEdit.lyricsOffset ?? null}
           defaultOffset={meta.defaultLyricsOffset}
-          onSave={(ms) => meta.setLyricsOffset(lrcEdit.id, ms)}
-          onUseDefault={() => meta.setLyricsOffset(lrcEdit.id, null)}
+          onImport={() => meta.importLyrics(lrcEdit.id)}
+          onClear={() => meta.clearLyrics(lrcEdit.id)}
+          onSetOffset={(ms) => meta.setLyricsOffset(lrcEdit.id, ms)}
           onClose={() => setLrcEdit(null)}
         />
       )}

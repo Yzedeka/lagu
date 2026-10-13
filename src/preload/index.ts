@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { IPC } from '@shared/ipc'
 import type { LibraryBatch, LibraryDone, LaguApi } from '@shared/ipc'
-import type { AppSettings, MetadataPatch, PinnedItem, QueueState, ScanProgress } from '@shared/types'
+import type { AppSettings, MetadataPatch, PinnedItem, QueueState, ScanProgress, UpdateStatus } from '@shared/types'
 
 function subscribe<T>(channel: string, cb: (payload: T) => void): () => void {
   const handler = (_event: IpcRendererEvent, payload: T): void => cb(payload)
@@ -52,6 +52,11 @@ const api: LaguApi = {
   app: {
     dataFolder: () => ipcRenderer.invoke(IPC.appDataFolder),
     openDataFolder: () => ipcRenderer.invoke(IPC.appOpenDataFolder)
+  },
+  update: {
+    get: () => ipcRenderer.invoke(IPC.updateStatus),
+    install: () => ipcRenderer.invoke(IPC.updateInstall),
+    onStatus: (cb: (status: UpdateStatus) => void) => subscribe(IPC.evtUpdate, cb)
   },
   metadata: {
     update: (trackIds: string[], patch: MetadataPatch) =>

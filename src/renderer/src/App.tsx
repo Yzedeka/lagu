@@ -19,10 +19,13 @@ import { NowPlaying } from '@renderer/components/NowPlaying'
 import { QueuePanel } from '@renderer/components/QueuePanel'
 import { BottomBar } from '@renderer/components/BottomBar'
 import { LyricsView } from '@renderer/components/LyricsView'
+import { LyricsDialog } from '@renderer/components/LyricsDialog'
+import { useLyricsAvailable } from '@renderer/state/useLyricsAvailable'
 import { AddUrlDialog } from '@renderer/components/AddUrlDialog'
 import { SettingsView } from '@renderer/components/SettingsView'
 import { SearchView } from '@renderer/components/SearchView'
 import { ShortcutsOverlay } from '@renderer/components/ShortcutsOverlay'
+import { UpdateScreen } from '@renderer/components/UpdateScreen'
 
 const api = window.lagu
 
@@ -42,6 +45,7 @@ export function App() {
   const [zoom, setZoom] = useState(0)
   const [sidebarWidth, setSidebarWidth] = useState(212)
   const [lyricsRevision, setLyricsRevision] = useState(0)
+  const [lyricsDialog, setLyricsDialog] = useState(false)
   const [browseFocus, setBrowseFocus] = useState<{ kind: 'album' | 'artist'; ref: string; token: number } | null>(null)
   const focusToken = useRef(0)
   const [artworkPalette, setArtworkPalette] = useState<Palette | null>(null)
@@ -213,7 +217,7 @@ export function App() {
           p.cycleRepeat()
           break
         case 'l':
-          update({ showLyrics: !s.showLyrics })
+          if (hasLyricsRef.current) update({ showLyrics: !s.showLyrics })
           break
         case 'q':
           update({ showQueue: !s.showQueue })
@@ -260,15 +264,26 @@ export function App() {
     [player.currentTrack?.id]
   )
 
+  const importLyricsFor = useCallback(() => {
+    const id = player.currentTrack?.id
+    if (id) void api.track.importLyrics(id).then(() => setLyricsRevision((v) => v + 1))
+  }, [player.currentTrack?.id])
+
+  const clearLyricsFor = useCallback(() => {
+    const id = player.currentTrack?.id
+    if (id) void api.track.clearLyrics(id).then(() => setLyricsRevision((v) => v + 1))
+  }, [player.currentTrack?.id])
+
+  const hasLyrics = useLyricsAvailable(player.currentTrack?.id ?? null, lyricsRevision)
+  const hasLyricsRef = useRef(hasLyrics)
+  hasLyricsRef.current = hasLyrics
+
   const lyricsSlot = useMemo(
     () => (
       <LyricsView
         trackId={player.currentTrack?.id ?? null}
         currentTime={player.currentTime}
-        defaultOffset={settings.lyricsOffset}
-        trackOffset={player.currentTrack?.lyricsOffset ?? null}
-        onSetOffset={setTrackLyricsOffset}
-        fullscreen={isFullscreen}
+        offset={player.currentTrack?.lyricsOffset ?? settings.lyricsOffset}
         revision={lyricsRevision}
       />
     ),
@@ -277,8 +292,6 @@ export function App() {
       player.currentTrack?.lyricsOffset,
       player.currentTime,
       settings.lyricsOffset,
-      setTrackLyricsOffset,
-      isFullscreen,
       lyricsRevision
     ]
   )
@@ -416,6 +429,7 @@ export function App() {
               lyricsOpen={lyricsOpen}
               accent={palette.accent}
               onSeek={player.seek}
+              onEditLyrics={() => setLyricsDialog(true)}
               lyricsSlot={lyricsSlot}
             />
           )}
@@ -502,6 +516,7 @@ export function App() {
         visualizer={settings.visualizer}
         queueOpen={settings.showQueue}
         lyricsOpen={lyricsOpen}
+        lyricsAvailable={hasLyrics}
         isFullscreen={isFullscreen}
         accent={palette.accent}
         onToggle={player.toggle}
@@ -520,6 +535,20 @@ export function App() {
       {addUrlOpen && <AddUrlDialog onSubmit={library.addUrl} onClose={() => setAddUrlOpen(false)} />}
 
       {shortcutsOpen && <ShortcutsOverlay onClose={() => setShortcutsOpen(false)} />}
+
+      <UpdateScreen />
+
+      {lyricsDialog && player.currentTrack && (
+        <LyricsDialog
+          trackId={player.currentTrack.id}
+          trackOffset={player.currentTrack.lyricsOffset ?? null}
+          defaultOffset={settings.lyricsOffset}
+          onImport={importLyricsFor}
+          onClear={clearLyricsFor}
+          onSetOffset={setTrackLyricsOffset}
+          onClose={() => setLyricsDialog(false)}
+        />
+      )}
     </div>
   )
 }

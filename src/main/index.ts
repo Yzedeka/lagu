@@ -6,6 +6,7 @@ import { Store } from './store'
 import { LibraryService } from './library'
 import { registerIpc, wireLibraryEvents } from './ipc'
 import { handleMediaProtocol, registerMediaScheme } from './protocol'
+import { initUpdater } from './updater'
 
 app.setName('Lagu Music Player')
 
@@ -93,6 +94,8 @@ app.whenReady().then(async () => {
   library.watchAll()
 
   createWindow()
+  initUpdater(getWindow)
+
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

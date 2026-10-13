@@ -9,10 +9,12 @@ directories:
 # The renderer and main process are already bundled by electron-vite, so only
 # the built output and manifest are needed (no node_modules at runtime).
 files:
+  # Keep production dependencies (electron-updater and its tree) so in-app
+  # updates work; everything else is bundled already.
   - out/**/*
   - package.json
-  - '!node_modules/**/*'
   - '!**/*.map'
+  - '!node_modules/**/{test,tests,__tests__,example,examples,docs}/**'
 
 # Ship the app icon so the main process can set the window icon when packaged.
 extraResources:
@@ -21,6 +23,13 @@ extraResources:
 
 asar: true
 compression: normal
+
+# Where the app looks for updates (electron-updater "generic" provider).
+# Serve latest-linux.yml / latest.yml / latest-mac.yml next to the installers.
+# Change this to your site's domain (it is baked into the packaged app).
+publish:
+  provider: generic
+  url: https://lagu.app/downloads
 
 # --- Linux ---------------------------------------------------------------
 linux:
