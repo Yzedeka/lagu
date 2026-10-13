@@ -12,7 +12,7 @@
 #   LAGU_BASE=https://example.com/downloads LAGU_DIR=~/.local/opt/lagu sh install.sh
 set -eu
 
-VERSION="0.2.1"
+VERSION="0.2.2"
 BASE="${LAGU_BASE:-https://lagu.yzedeka.com/downloads}"
 APP_NAME="Lagu-${VERSION}.AppImage"
 APP_DIR="${LAGU_DIR:-$HOME/.local/opt/lagu}"
