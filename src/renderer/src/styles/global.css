@@ -294,6 +294,7 @@ button,
   background: var(--bg-panel);
   border-right: 1px solid var(--border);
   overflow: hidden;
+  container-type: inline-size;
   animation: slideFromLeft 0.26s var(--ease);
 }
 
@@ -388,6 +389,13 @@ button,
   color: var(--text-dim);
   font-weight: 500;
   text-align: left;
+}
+
+.brand-now > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .brand-now .material-symbols-rounded {
@@ -1566,6 +1574,7 @@ button,
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 5px;
 }
 
@@ -1573,10 +1582,19 @@ button,
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   height: 44px;
   padding: 0 8px 0 4px;
   border-radius: var(--radius);
   cursor: default;
+}
+
+.queue--slim .queue-dur {
+  display: none;
+}
+
+.queue--slim .queue-row {
+  gap: 6px;
 }
 
 .queue-row:hover {
@@ -2077,6 +2095,7 @@ button,
 .settings-view__body {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   overflow-y: auto;
   padding: 8px 24px 40px;
 }
@@ -2440,6 +2459,19 @@ button,
   align-items: center;
   gap: 2px;
   margin-left: 42px;
+}
+
+/* When the sidebar is slim, shrink the footer tools so they still fit. */
+@container (max-width: 176px) {
+  .footer-tools {
+    margin-left: 36px;
+    gap: 0;
+  }
+
+  .footer-tools .icon-btn {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .volume {

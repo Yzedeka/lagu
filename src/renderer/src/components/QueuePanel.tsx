@@ -62,7 +62,7 @@ export function QueuePanel({
   }
 
   return (
-    <aside className="queue" style={{ width }}>
+    <aside className={`queue ${width < 220 ? 'queue--slim' : ''}`} style={{ width }}>
       <div
         className="queue__resizer"
         title="Drag to resize"
@@ -72,7 +72,7 @@ export function QueuePanel({
       />
       <header className="queue__header">
         <span className="queue__title">
-          <QueueIcon size={14} /> Up Next
+          <QueueIcon size={14} /> Queue
         </span>
       </header>
 
