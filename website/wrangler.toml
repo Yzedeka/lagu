@@ -8,4 +8,4 @@ compatibility_date = "2026-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "lagu-downloads"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+database_id = "f934c685-3581-4afe-bf48-62bd0669e523"
