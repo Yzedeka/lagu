@@ -68,6 +68,9 @@ export const DOWNLOADS: Download[] = [
   }
 ]
 
+/** Archive of every released version (manifests + GitHub Releases). */
+export const VERSIONS_REPO = 'https://github.com/Yzedeka/laguversions'
+
 /** Files are served from the site itself (R2 in production). */
 export const DOWNLOAD_BASE = '/downloads'
 

@@ -1,6 +1,6 @@
-import { APP, DOWNLOADS, OS_LABEL, downloadUrl, formatSize, type Os } from '@/config'
+import { APP, DOWNLOADS, OS_LABEL, VERSIONS_REPO, downloadUrl, formatSize, type Os } from '@/config'
 import { useDownloads, formatCount } from '@/lib/DownloadContext'
-import { ChevronLeftIcon, DownloadIcon, MusicIcon } from '@/icons'
+import { ChevronLeftIcon, DownloadIcon, HistoryIcon, MusicIcon } from '@/icons'
 import { Counter } from './Download'
 
 const ORDER: Os[] = ['windows', 'macos', 'linux']
@@ -54,6 +54,13 @@ export function DownloadPage() {
 
       <p className="dl-foot">
         <MusicIcon size={13} /> Free, source available, and still in beta.
+      </p>
+      <p className="dl-foot">
+        <HistoryIcon size={13} /> Every past version is archived at{' '}
+        <a href={VERSIONS_REPO} target="_blank" rel="noopener noreferrer">
+          Yzedeka/laguversions
+        </a>
+        .
       </p>
 
       <Counter hint={false} />

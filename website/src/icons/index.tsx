@@ -142,3 +142,4 @@ export const SparkleIcon = (p: IconProps) => <Icon name="auto_awesome" {...p} />
 export const PersonIcon = (p: IconProps) => <Icon name="person" {...p} />
 export const TextIcon = (p: IconProps) => <Icon name="text_fields" {...p} />
 export const TerminalIcon = (p: IconProps) => <Icon name="terminal" {...p} />
+export const HistoryIcon = (p: IconProps) => <Icon name="history" {...p} />

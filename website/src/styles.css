@@ -792,3 +792,9 @@ kbd {
   min-width: 56px;
   text-align: right;
 }
+
+.dl-foot a {
+  color: var(--blue-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
