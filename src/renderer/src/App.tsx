@@ -400,7 +400,6 @@ export function App() {
             onResize={setSidebarWidth}
             onResizeEnd={(w) => update({ sidebarWidth: w })}
             folders={library.folders}
-            trackCount={library.tracks.length}
             scanning={library.scanning}
             searchValue={searchInput}
             onSearchChange={setSearchInput}
@@ -413,7 +412,6 @@ export function App() {
             onRescan={() => void library.rescan()}
             onRemoveFolder={(id) => void library.removeFolder(id)}
             onAddUrl={() => setAddUrlOpen(true)}
-            onOpenShortcuts={() => setShortcutsOpen(true)}
           />
         )}
 
@@ -453,6 +451,7 @@ export function App() {
               onZoom={onZoom}
               onResetZoom={onResetZoom}
               onOpenShortcuts={() => setShortcutsOpen(true)}
+              trackCount={library.tracks.length}
               artworkProgress={library.artworkProgress}
               onFetchMissingArtwork={() => void library.fetchMissingArtwork()}
               hiddenCount={library.hiddenCount}

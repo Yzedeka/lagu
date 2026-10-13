@@ -23,6 +23,7 @@ interface SettingsViewProps {
   onZoom: (delta: number) => void
   onResetZoom: () => void
   onOpenShortcuts: () => void
+  trackCount: number
   artworkProgress: { done: number; total: number } | null
   onFetchMissingArtwork: () => void
   hiddenCount: number
@@ -94,6 +95,7 @@ export function SettingsView({
   onZoom,
   onResetZoom,
   onOpenShortcuts,
+  trackCount,
   artworkProgress,
   onFetchMissingArtwork,
   hiddenCount,
@@ -322,6 +324,9 @@ export function SettingsView({
           <h3 className="settings__section-title">
             <LibraryIcon size={13} /> Library
           </h3>
+          <Row label="Tracks" desc="Songs currently in your library.">
+            <span className="settings__value">{trackCount}</span>
+          </Row>
           <Row
             label="Hidden items"
             desc="Tracks you removed from the library. Their files are untouched."

@@ -6,7 +6,10 @@ export interface MobileTrack {
   url: string
   title: string
   artist: string
+  albumArtist: string
   album: string
+  trackNo?: number
+  year?: number
   duration?: number
   /** Object URL for the embedded cover, when present. */
   artwork?: string
@@ -20,6 +23,7 @@ export async function trackFromFile(file: File): Promise<MobileTrack> {
     url: URL.createObjectURL(file),
     title: fallback,
     artist: 'Unknown Artist',
+    albumArtist: 'Unknown Artist',
     album: 'Unknown Album'
   }
 
@@ -28,7 +32,10 @@ export async function trackFromFile(file: File): Promise<MobileTrack> {
     const { common, format } = meta
     track.title = common.title?.trim() || track.title
     track.artist = (common.artist || common.albumartist || '').trim() || track.artist
+    track.albumArtist = (common.albumartist || common.artist || '').trim() || track.artist
     track.album = common.album?.trim() || track.album
+    track.trackNo = common.track.no ?? undefined
+    track.year = common.year ?? undefined
     track.duration = format.duration ?? undefined
 
     const picture = common.picture?.[0]

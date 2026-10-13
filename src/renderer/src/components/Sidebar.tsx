@@ -1,23 +1,22 @@
-import { useRef, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { LibraryFolder, PinnedItem, Track } from '@shared/types'
 import {
   AlbumIcon,
   ArtistIcon,
+  CloseIcon,
   CreateFolderIcon,
   DiscIcon,
   FolderIcon,
   GraphicEqIcon,
-  KeyboardIcon,
   LibraryIcon,
   LinkIcon,
   RefreshIcon,
+  SearchIcon,
   SettingsIcon,
   TrashIcon
 } from '@renderer/icons'
 import { AlbumArt } from './AlbumArt'
-import { SearchBar } from './SearchBar'
 import appIconUrl from '@renderer/icons/app_icon.png'
-import wordmarkUrl from '@renderer/icons/lagu-wordmark.png'
 import { folderName } from '@renderer/lib/format'
 import { albumKeyOf } from '@renderer/lib/album'
 import { useArtistImage } from '@renderer/state/useArtistImage'
@@ -32,7 +31,6 @@ interface SidebarProps {
   onResize: (width: number) => void
   onResizeEnd: (width: number) => void
   folders: LibraryFolder[]
-  trackCount: number
   scanning: boolean
   searchValue: string
   onSearchChange: (value: string) => void
@@ -45,7 +43,6 @@ interface SidebarProps {
   onRescan: () => void
   onRemoveFolder: (id: string) => void
   onAddUrl: () => void
-  onOpenShortcuts: () => void
 }
 
 const NAV: { id: BrowseSection; label: string; icon: typeof GraphicEqIcon }[] = [
@@ -62,7 +59,6 @@ export function Sidebar({
   onResize,
   onResizeEnd,
   folders,
-  trackCount,
   scanning,
   searchValue,
   onSearchChange,
@@ -74,8 +70,7 @@ export function Sidebar({
   onAddFolder,
   onRescan,
   onRemoveFolder,
-  onAddUrl,
-  onOpenShortcuts
+  onAddUrl
 }: SidebarProps) {
   const startX = useRef(0)
   const startWidth = useRef(width)
@@ -109,34 +104,16 @@ export function Sidebar({
       />
 
       <div className="sidebar__brand">
-        <img className="sidebar__brand-icon" src={appIconUrl} alt="" draggable={false} />
-        <img className="sidebar__brand-wordmark" src={wordmarkUrl} alt="Lagu" draggable={false} />
-      </div>
-
-      <div className="sidebar__search">
-        <SearchBar
-          value={searchValue}
-          placeholder="Search library…"
-          compact
-          onChange={onSearchChange}
-          onSubmit={onSearchSubmit}
-          onClear={() => {
-            onSearchChange('')
-            onSearchSubmit()
-          }}
-        />
-      </div>
-
-      <nav className="sidebar__nav">
+        <img className="sidebar__brand-icon" src={appIconUrl} alt="Lagu" draggable={false} />
         <button
           type="button"
-          className={`nav-item ${selection === 'now' ? 'nav-item--active' : ''}`}
+          className={`brand-now ${selection === 'now' ? 'brand-now--active' : ''}`}
           onClick={() => onSelect('now')}
         >
           <GraphicEqIcon size={16} />
           <span>Now Playing</span>
         </button>
-      </nav>
+      </div>
 
       {pinned.length > 0 && (
         <>
@@ -222,19 +199,90 @@ export function Sidebar({
       </div>
 
       <div className="sidebar__footer">
-        <span className="sidebar__hint">
-          {trackCount} track{trackCount === 1 ? '' : 's'}
-        </span>
-        <button
-          type="button"
-          className="icon-btn"
-          title="Keyboard shortcuts (?)"
-          onClick={onOpenShortcuts}
-        >
-          <KeyboardIcon size={16} />
-        </button>
+        <SidebarSearch
+          value={searchValue}
+          onChange={onSearchChange}
+          onSubmit={onSearchSubmit}
+        />
       </div>
     </aside>
+  )
+}
+
+function SidebarSearch({
+  value,
+  onChange,
+  onSubmit
+}: {
+  value: string
+  onChange: (value: string) => void
+  onSubmit: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    if (open) inputRef.current?.focus()
+  }, [open])
+
+  const close = (): void => {
+    setOpen(false)
+    if (value) {
+      onChange('')
+      onSubmit()
+    }
+  }
+
+  const toggle = (): void => {
+    if (open) {
+      inputRef.current?.focus()
+      return
+    }
+    setOpen(true)
+  }
+
+  return (
+    <div className={`searchbox ${open ? 'searchbox--open' : ''}`}>
+      <button
+        type="button"
+        className="searchbox__btn"
+        title="Search library"
+        aria-label="Search library"
+        onClick={toggle}
+      >
+        <SearchIcon size={16} />
+      </button>
+      <input
+        ref={inputRef}
+        className="searchbox__input"
+        type="text"
+        value={value}
+        placeholder="Search library…"
+        spellCheck={false}
+        tabIndex={open ? 0 : -1}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={() => {
+          if (!value) setOpen(false)
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') onSubmit()
+          if (e.key === 'Escape') close()
+        }}
+      />
+      {value && (
+        <button
+          type="button"
+          className="searchbox__clear"
+          title="Clear"
+          onClick={() => {
+            onChange('')
+            inputRef.current?.focus()
+          }}
+        >
+          <CloseIcon size={13} />
+        </button>
+      )}
+    </div>
   )
 }
 

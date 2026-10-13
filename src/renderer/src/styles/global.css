@@ -348,35 +348,52 @@ button,
 .sidebar__brand {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 9px;
-  padding: 14px 10px 10px;
+  gap: 6px;
+  padding: 9px 8px 7px;
 }
 
-
 .sidebar__brand-icon {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   flex-shrink: 0;
   border-radius: 9px;
   object-fit: contain;
 }
 
-.sidebar__brand-wordmark {
-  height: 27px;
-  width: auto;
-  flex-shrink: 0;
-  object-fit: contain;
+.brand-now {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  font-weight: 500;
+  text-align: left;
 }
 
-/* The wordmark is a light-on-transparent image; flip it on light chrome. */
-[data-theme='light'] .sidebar__brand-wordmark,
-[data-theme='grey'] .sidebar__brand-wordmark {
-  filter: invert(1);
+.brand-now .material-symbols-rounded {
+  opacity: 0.85;
+}
+
+.brand-now:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.brand-now--active {
+  color: var(--text);
+  background: var(--accent-soft);
+}
+
+.brand-now--active .material-symbols-rounded {
+  color: var(--accent-bright);
+  opacity: 1;
 }
 
 .sidebar__label {
-  padding: 14px 16px 6px;
+  padding: 10px 16px 4px;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -389,7 +406,7 @@ button,
   align-items: center;
   justify-content: space-between;
   gap: 6px;
-  padding: 12px 8px 6px 14px;
+  padding: 10px 8px 4px 14px;
 }
 
 .sidebar__label--row > span:first-child {
@@ -487,7 +504,7 @@ button,
 }
 
 .sidebar__footer {
-  padding: 10px;
+  padding: 8px;
   border-top: 1px solid var(--border);
 }
 
@@ -2002,8 +2019,84 @@ button,
 }
 
 /* Sidebar search ---------------------------------------------------- */
-.sidebar__search {
-  padding: 8px 10px 6px;
+.searchbox {
+  display: flex;
+  align-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  overflow: hidden;
+  transition: width 0.3s var(--ease), background-color 0.2s var(--ease),
+    border-color 0.2s var(--ease);
+}
+
+.searchbox--open {
+  width: 100%;
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
+}
+
+.searchbox__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: var(--text-dim);
+}
+
+.searchbox__btn:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.searchbox--open .searchbox__btn {
+  color: var(--text);
+}
+
+.searchbox__input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 4px;
+  border: none;
+  background: none;
+  outline: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.22s var(--ease);
+}
+
+.searchbox--open .searchbox__input {
+  opacity: 1;
+  transition-delay: 0.06s;
+}
+
+.searchbox__input::placeholder {
+  color: var(--text-faint);
+}
+
+.searchbox__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-right: 4px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: var(--text-faint);
+}
+
+.searchbox__clear:hover {
+  color: var(--text);
+  background: var(--bg-hover);
 }
 
 .search--compact {
