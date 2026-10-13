@@ -23,3 +23,7 @@ website/.dev.vars
 # Misc
 *.log
 .DS_Store
+
+# Demo / packaged Android artifacts
+*.apk
+*.aab

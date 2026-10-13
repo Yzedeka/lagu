@@ -1,0 +1,9 @@
+{
+  "appId": "com.lagu.player",
+  "appName": "Lagu",
+  "webDir": "dist",
+  "backgroundColor": "#0f0f0f",
+  "android": {
+    "allowMixedContent": true
+  }
+}

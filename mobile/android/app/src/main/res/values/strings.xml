@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Lagu</string>
+    <string name="title_activity_main">Lagu</string>
+    <string name="package_name">com.lagu.player</string>
+    <string name="custom_url_scheme">com.lagu.player</string>
+</resources>
