@@ -12,6 +12,7 @@
  *
  * `Icon`/`IconProps` are re-exported so custom icons can reuse them.
  */
+import tuxUrl from '@/assets/tux.svg'
 import { Icon, type IconProps } from './Icon'
 
 export { Icon, type IconProps } from './Icon'
@@ -122,7 +123,17 @@ export const MusicIcon = (p: IconProps) => <Icon name="music_note" {...p} />
 export const VerifiedIcon = (p: IconProps) => <Icon name="check_circle" {...p} />
 export const WindowsIcon = (p: IconProps) => <Icon name="desktop_windows" {...p} />
 export const AppleIcon = (p: IconProps) => <Icon name="laptop_mac" {...p} />
-export const LinuxIcon = (p: IconProps) => <Icon name="terminal" {...p} />
+/** Tux - the official mascot art (Tux.svg, public domain, via Wikimedia). */
+export const LinuxIcon = ({ size = 18, className, style }: IconProps) => (
+  <img
+    src={tuxUrl}
+    alt=""
+    aria-hidden
+    draggable={false}
+    className={className}
+    style={{ height: size, width: 'auto', display: 'block', ...style }}
+  />
+)
 export const BoltIcon = (p: IconProps) => <Icon name="bolt" {...p} />
 export const ShieldIcon = (p: IconProps) => <Icon name="shield" {...p} />
 export const CodeIcon = (p: IconProps) => <Icon name="code" {...p} />

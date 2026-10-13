@@ -9,8 +9,21 @@
       content="Lagu is a minimalist, fast desktop music player for your local library. Artwork-driven theming, a real queue, crossfade, 8D audio and synchronized lyrics. Now in beta."
     />
     <link rel="icon" type="image/png" href="/favicon.png" />
+    <!-- Painted before the stylesheet loads so refreshing never flashes white. -->
+    <style>
+      html {
+        background-color: #0f0f0f;
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        background-color: #0f0f0f;
+        color: #e7e7e7;
+      }
+    </style>
     <link rel="apple-touch-icon" href="/favicon.png" />
     <meta name="theme-color" content="#0f0f0f" />
+    <meta name="color-scheme" content="dark" />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Lagu - a minimalist desktop music player" />

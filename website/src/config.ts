@@ -1,20 +1,21 @@
 export const APP = {
   name: 'Lagu',
   version: '0.1.0',
+  /** Display label (the 'b' marks the beta). */
+  versionLabel: 'v0.1.0b',
   beta: true,
-  repo: 'https://github.com/Yzedeka/lagu',
-  releases: 'https://github.com/Yzedeka/lagu/releases',
-  tagline: 'A minimalist, fast desktop music player for your local library.'
+  tagline: 'A minimalist desktop player for your local music library.'
 } as const
 
 export type Os = 'windows' | 'macos' | 'linux'
 
 export interface Download {
   os: Os
+  /** Short name shown on the button/row. */
   label: string
   detail: string
   file: string
-  /** Shown first for the detected platform. */
+  /** Recommended build for that platform. */
   primary?: boolean
 }
 
@@ -22,21 +23,21 @@ export const DOWNLOADS: Download[] = [
   {
     os: 'windows',
     label: 'Windows',
-    detail: 'Installer - Windows 10/11 (64-bit)',
+    detail: 'Installer - Windows 10/11, 64-bit',
     file: `Lagu-${APP.version}-setup.exe`,
     primary: true
   },
   {
     os: 'macos',
     label: 'macOS',
-    detail: '.app bundle (Intel) - unsigned',
+    detail: '.app bundle - Intel, unsigned',
     file: `Lagu-${APP.version}-mac.zip`,
     primary: true
   },
   {
     os: 'linux',
     label: 'AppImage',
-    detail: 'Portable - requires FUSE 2',
+    detail: 'Portable - needs FUSE 2',
     file: `Lagu-${APP.version}.AppImage`,
     primary: true
   },
@@ -60,24 +61,31 @@ export const DOWNLOADS: Download[] = [
   },
   {
     os: 'linux',
-    label: 'Portable',
-    detail: 'tar.gz - no FUSE needed',
+    label: 'Portable tar.gz',
+    detail: 'For systems without FUSE 2',
     file: `lagu-music-player-${APP.version}.tar.gz`
   }
 ]
 
-/**
- * Where the release files are hosted.
- *
- * By default this points at GitHub Releases for the repository. If the repo is
- * private, either make the release assets public or host them elsewhere (e.g. a
- * Cloudflare R2 bucket) and set VITE_DOWNLOAD_BASE at build time.
- */
-export const DOWNLOAD_BASE: string =
-  (import.meta.env.VITE_DOWNLOAD_BASE as string | undefined) ?? `${APP.releases}/latest/download`
+/** Files are served from the site itself (R2 in production). */
+export const DOWNLOAD_BASE = '/downloads'
 
 export function downloadUrl(file: string): string {
-  return `${DOWNLOAD_BASE.replace(/\/$/, '')}/${file}`
+  return `${DOWNLOAD_BASE}/${file}`
+}
+
+export function primaryFor(os: Os): Download {
+  return DOWNLOADS.find((d) => d.os === os && d.primary) ?? DOWNLOADS[0]
+}
+
+export function linuxDownloads(): Download[] {
+  return DOWNLOADS.filter((d) => d.os === 'linux')
+}
+
+export const OS_LABEL: Record<Os, string> = {
+  windows: 'Windows',
+  macos: 'macOS',
+  linux: 'Linux'
 }
 
 export function detectOs(): Os {
@@ -85,6 +93,5 @@ export function detectOs(): Os {
   const ua = navigator.userAgent.toLowerCase()
   if (ua.includes('win')) return 'windows'
   if (ua.includes('mac')) return 'macos'
-  if (ua.includes('linux') || ua.includes('x11')) return 'linux'
   return 'linux'
 }

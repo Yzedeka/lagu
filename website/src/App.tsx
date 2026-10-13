@@ -1,38 +1,34 @@
+import { useRoute } from '@/lib/useRoute'
+import { DownloadProvider } from '@/lib/DownloadContext'
 import { Hero } from '@/components/Hero'
 import { Features } from '@/components/Features'
-import { Footer, Platforms, Principles, Shortcuts } from '@/components/Info'
-import { APP } from '@/config'
-
-function Nav() {
-  return (
-    <nav className="nav">
-      <span className="nav__brand">{APP.name}</span>
-      <div className="nav__links">
-        <a href="#features">Features</a>
-        <a href="#platforms">Platforms</a>
-        <a href="#shortcuts">Shortcuts</a>
-        <a href="#privacy">Privacy</a>
-        <a className="nav__cta" href="#download">
-          Download
-        </a>
-      </div>
-    </nav>
-  )
-}
+import { Footer, Nav, Shortcuts } from '@/components/Info'
+import { DownloadPage } from '@/components/DownloadPage'
+import { LinuxDownloads } from '@/components/LinuxDownloads'
+import { Docs } from '@/components/Docs'
 
 export function App() {
+  const route = useRoute()
+
   return (
-    <div className="page">
-      <div className="page__glow" aria-hidden />
-      <Nav />
-      <main>
-        <Hero />
-        <Features />
-        <Platforms />
-        <Shortcuts />
-        <Principles />
-      </main>
-      <Footer />
-    </div>
+    <DownloadProvider>
+      <div className="page">
+        <div className="page__glow" aria-hidden />
+        <Nav />
+        <main>
+          {route.name === 'home' && (
+            <>
+              <Hero />
+              <Features />
+              <Shortcuts />
+            </>
+          )}
+          {route.name === 'download' && <DownloadPage />}
+          {route.name === 'linux' && <LinuxDownloads />}
+          {route.name === 'docs' && <Docs slug={route.param} />}
+        </main>
+        <Footer />
+      </div>
+    </DownloadProvider>
   )
 }
