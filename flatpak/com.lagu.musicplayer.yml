@@ -1,0 +1,49 @@
+app-id: com.lagu.musicplayer
+
+# Electron apps on Flathub build on top of the shared Electron base app, which
+# provides the Chromium sandbox shim (zypak) and the matching system libraries.
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+base: org.electronjs.Electron2.BaseApp
+base-version: '24.08'
+
+command: lagu
+
+finish-args:
+  # Display
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  # Audio + GPU
+  - --socket=pulseaudio
+  - --device=dri
+  # Online cover art / lyrics lookup (all opt-in inside the app)
+  - --share=network
+  # Read the music library and write the ~/Lagu data folder
+  - --filesystem=home
+  - --talk-name=org.freedesktop.Notifications
+  - --env=ELECTRON_OZONE_PLATFORM_HINT=auto
+
+modules:
+  - name: lagu
+    buildsystem: simple
+    build-commands:
+      # The app is pre-built with electron-builder; the unpacked app and the
+      # wrapper/desktop/icon files are all flattened into the build root.
+      - mkdir -p /app/main
+      - cp -r . /app/main/
+      - install -Dm755 lagu.sh /app/bin/lagu
+      - install -Dm644 com.lagu.musicplayer.desktop
+        /app/share/applications/com.lagu.musicplayer.desktop
+      - install -Dm644 icon.png
+        /app/share/icons/hicolor/512x512/apps/com.lagu.musicplayer.png
+    sources:
+      - type: dir
+        path: ../build/linux-unpacked
+      - type: file
+        path: lagu.sh
+      - type: file
+        path: com.lagu.musicplayer.desktop
+      - type: file
+        path: ../build/icon.png

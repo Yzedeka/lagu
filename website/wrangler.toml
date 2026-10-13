@@ -1,0 +1,11 @@
+name = "lagu"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-01-01"
+
+# Download counter storage.
+# Create it with:  npx wrangler d1 create lagu-downloads
+# then paste the returned database_id below.
+[[d1_databases]]
+binding = "DB"
+database_name = "lagu-downloads"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"

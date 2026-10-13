@@ -1,0 +1,98 @@
+appId: com.lagu.musicplayer
+productName: Lagu
+copyright: Copyright (c) 2026 Lagu
+
+directories:
+  output: build
+  buildResources: build
+
+# The renderer and main process are already bundled by electron-vite, so only
+# the built output and manifest are needed (no node_modules at runtime).
+files:
+  - out/**/*
+  - package.json
+  - '!node_modules/**/*'
+  - '!**/*.map'
+
+# Ship the app icon so the main process can set the window icon when packaged.
+extraResources:
+  - from: src/renderer/src/icons/app_icon.png
+    to: app_icon.png
+
+asar: true
+compression: normal
+
+# --- Linux ---------------------------------------------------------------
+linux:
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+    - target: rpm
+      arch: [x64]
+    # Portable tarball - runs without FUSE (handy on distros without libfuse2).
+    - target: tar.gz
+      arch: [x64]
+  category: AudioVideo
+  icon: build/icon.png
+  syncDesktopName: true
+  synopsis: Minimalist local music player
+  description: >-
+    Lagu is a minimalist desktop music player for your local library, with
+    artwork-driven theming, queue management, crossfade and synchronized lyrics.
+
+rpm:
+  depends:
+    - gtk3
+    - libnotify
+    - nss
+    - libXScrnSaver
+    - libXtst
+    - xdg-utils
+    - at-spi2-core
+    - libuuid
+    - libsecret
+
+deb:
+  depends:
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libxss1
+    - libxtst6
+    - xdg-utils
+    - libatspi2.0-0
+    - libuuid1
+    - libsecret-1-0
+
+# --- Windows -------------------------------------------------------------
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: build/icon.ico
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  artifactName: ${productName}-${version}-setup.${ext}
+
+# --- macOS ---------------------------------------------------------------
+# A .app bundle (dir target). Signing is disabled for local builds.
+mac:
+  target:
+    - target: dir
+      arch: [x64]
+    - target: zip
+      arch: [x64]
+  icon: build/icon.png
+  category: public.app-category.music
+  identity: null
+  artifactName: ${productName}-${version}-mac.${ext}
+
+# --- Android (.apk) ------------------------------------------------------
+# Electron cannot produce an APK. Android support is a separate Capacitor
+# shell that reuses the renderer/ folder verbatim; see scripts/build-apk.mjs
+# for the placeholder entry point and the plan.

@@ -1,0 +1,51 @@
+{
+  "name": "lagu-music-player",
+  "version": "0.1.0",
+  "description": "Lagu Music Player - a minimalist local desktop music player",
+  "homepage": "https://lagu.app",
+  "author": {
+    "name": "Lagu",
+    "email": "lagu@localhost"
+  },
+  "license": "MIT",
+  "main": "./out/main/index.js",
+  "desktopName": "lagu.desktop",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
+    "typecheck:web": "tsc --noEmit -p tsconfig.web.json",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "dist": "electron-vite build && electron-builder",
+    "dist:linux": "electron-vite build && electron-builder --linux",
+    "dist:win": "electron-vite build && electron-builder --win",
+    "dist:mac": "electron-vite build && electron-builder --mac",
+    "dist:all": "electron-vite build && electron-builder -mwl",
+    "build:apk": "node scripts/build-apk.mjs",
+    "dist:flatpak": "bash scripts/build-flatpak.sh"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.3.0",
+    "material-symbols": "^0.48.0",
+    "music-metadata": "^12.2.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.7"
+  },
+  "allowScripts": {
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.2": true,
+    "electron@44.7.0": true
+  }
+}

@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build output
+out/
+dist/
+website/dist/
+
+# Packaged artifacts (keep the icons below)
+build/*
+!build/icon.png
+!build/icon.ico
+
+# Flatpak build scratch
+.flatpak-builder/
+flatpak/build-dir/
+flatpak/repo/
+
+# Cloudflare / wrangler
+website/.wrangler/
+website/.dev.vars
+
+# Misc
+*.log
+.DS_Store

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Lagu
+Comment=Minimalist local music player
+Exec=lagu %U
+Icon=com.lagu.musicplayer
+Terminal=false
+Type=Application
+Categories=AudioVideo;Audio;Player;
+Keywords=music;player;audio;library;
+StartupNotify=true
+StartupWMClass=Lagu
