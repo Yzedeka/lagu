@@ -11,10 +11,11 @@ export type Os = 'windows' | 'macos' | 'linux'
 
 export interface Download {
   os: Os
-  /** Short name shown on the button/row. */
+  /** Format name shown in lists. */
   label: string
-  detail: string
   file: string
+  /** Size in bytes. */
+  size: number
   /** Recommended build for that platform. */
   primary?: boolean
 }
@@ -23,47 +24,47 @@ export const DOWNLOADS: Download[] = [
   {
     os: 'windows',
     label: 'Windows',
-    detail: 'Installer - Windows 10/11, 64-bit',
     file: `Lagu-${APP.version}-setup.exe`,
+    size: 118101874,
     primary: true
   },
   {
     os: 'macos',
     label: 'macOS',
-    detail: '.app bundle - Intel, unsigned',
     file: `Lagu-${APP.version}-mac.zip`,
+    size: 388908748,
     primary: true
   },
   {
     os: 'linux',
     label: 'AppImage',
-    detail: 'Portable - needs FUSE 2',
     file: `Lagu-${APP.version}.AppImage`,
+    size: 131202414,
     primary: true
   },
   {
     os: 'linux',
     label: '.deb',
-    detail: 'Debian, Ubuntu, Mint',
-    file: `lagu-music-player_${APP.version}_amd64.deb`
+    file: `lagu-music-player_${APP.version}_amd64.deb`,
+    size: 105667048
   },
   {
     os: 'linux',
     label: '.rpm',
-    detail: 'Fedora, RHEL, openSUSE',
-    file: `lagu-music-player-${APP.version}.x86_64.rpm`
+    file: `lagu-music-player-${APP.version}.x86_64.rpm`,
+    size: 94398412
   },
   {
     os: 'linux',
     label: 'Flatpak',
-    detail: 'Sandboxed bundle',
-    file: `Lagu-${APP.version}.flatpak`
+    file: `Lagu-${APP.version}.flatpak`,
+    size: 96302872
   },
   {
     os: 'linux',
     label: 'Portable tar.gz',
-    detail: 'For systems without FUSE 2',
-    file: `lagu-music-player-${APP.version}.tar.gz`
+    file: `lagu-music-player-${APP.version}.tar.gz`,
+    size: 125171226
   }
 ]
 
@@ -72,6 +73,13 @@ export const DOWNLOAD_BASE = '/downloads'
 
 export function downloadUrl(file: string): string {
   return `${DOWNLOAD_BASE}/${file}`
+}
+
+/** Human-readable size, e.g. "113 MB". */
+export function formatSize(bytes: number): string {
+  if (!bytes) return ''
+  const mb = bytes / (1024 * 1024)
+  return mb >= 1024 ? `${(mb / 1024).toFixed(1)} GB` : `${Math.round(mb)} MB`
 }
 
 export function primaryFor(os: Os): Download {

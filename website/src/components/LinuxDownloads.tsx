@@ -1,11 +1,13 @@
-import { APP, downloadUrl, linuxDownloads } from '@/config'
+import { APP, downloadUrl, formatSize, linuxDownloads } from '@/config'
 import { useDownloads, formatCount } from '@/lib/DownloadContext'
-import { ChevronLeftIcon, DownloadIcon, LinuxIcon } from '@/icons'
+import { ChevronLeftIcon, DownloadIcon, LinuxIcon, TerminalIcon } from '@/icons'
 import { Counter } from './Download'
 
 export function LinuxDownloads() {
   const { register, files } = useDownloads()
   const formats = linuxDownloads()
+  const origin = typeof location === 'undefined' ? '' : location.origin
+  const installCmd = `curl -fsSL ${origin}/install.sh | sh`
 
   return (
     <section className="page-section">
@@ -14,12 +16,22 @@ export function LinuxDownloads() {
       </a>
 
       <h1 className="page-title">
-        <LinuxIcon size={26} /> Lagu for Linux
+        <LinuxIcon size={24} /> Lagu for Linux
       </h1>
       <p className="page-lead">
-        Pick the package for your distribution. Version {APP.version}
+        Every Linux build of {APP.name} {APP.versionLabel}
         {APP.beta ? ' (beta)' : ''}.
       </p>
+
+      <div className="install-card">
+        <div className="install-card__head">
+          <TerminalIcon size={15} /> Automatic install
+        </div>
+        <p className="install-card__note">
+          Installs FUSE 2 for you if it is missing, then downloads and sets up the AppImage.
+        </p>
+        <code className="install-card__cmd">{installCmd}</code>
+      </div>
 
       <ul className="fmt-list">
         {formats.map((format) => (
@@ -31,9 +43,12 @@ export function LinuxDownloads() {
               onClick={() => void register(format.file)}
             >
               <span className="fmt-row__text">
-                <span className="fmt-row__label">{format.label}</span>
-                <span className="fmt-row__detail">{format.detail}</span>
+                <span className="fmt-row__label">
+                  {format.file}
+                  {format.primary && <em className="fmt-row__tag">recommended</em>}
+                </span>
               </span>
+              <span className="fmt-row__size">{formatSize(format.size)}</span>
               <span className="fmt-row__count">{formatCount(files[format.file] ?? 0)}</span>
               <DownloadIcon size={18} />
             </a>

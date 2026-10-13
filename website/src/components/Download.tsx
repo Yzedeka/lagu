@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { APP, OS_LABEL, detectOs, downloadUrl, primaryFor } from '@/config'
+import { APP, OS_LABEL, detectOs, downloadUrl, formatSize, primaryFor } from '@/config'
 import { useDownloads, formatCount } from '@/lib/DownloadContext'
 import { AppleIcon, DownloadIcon, LinuxIcon, WindowsIcon } from '@/icons'
 
@@ -34,7 +34,7 @@ export function BigDownload() {
       <Icon size={22} />
       <span className="big-dl__text">
         <span className="big-dl__label">Download for {OS_LABEL[os]}</span>
-        <span className="big-dl__detail">{primary.detail}</span>
+        <span className="big-dl__detail">{formatSize(primary.size)}</span>
       </span>
       <DownloadIcon size={20} />
     </a>

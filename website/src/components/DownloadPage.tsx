@@ -1,4 +1,4 @@
-import { APP, DOWNLOADS, OS_LABEL, downloadUrl, type Os } from '@/config'
+import { APP, DOWNLOADS, OS_LABEL, downloadUrl, formatSize, type Os } from '@/config'
 import { useDownloads, formatCount } from '@/lib/DownloadContext'
 import { ChevronLeftIcon, DownloadIcon, MusicIcon } from '@/icons'
 import { Counter } from './Download'
@@ -37,11 +37,11 @@ export function DownloadPage() {
                   >
                     <span className="fmt-row__text">
                       <span className="fmt-row__label">
-                        {item.label}
+                        {item.file}
                         {item.primary && <em className="fmt-row__tag">recommended</em>}
                       </span>
-                      <span className="fmt-row__detail">{item.detail}</span>
                     </span>
+                    <span className="fmt-row__size">{formatSize(item.size)}</span>
                     <span className="fmt-row__count">{formatCount(files[item.file] ?? 0)}</span>
                     <DownloadIcon size={18} />
                   </a>

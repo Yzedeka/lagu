@@ -744,3 +744,51 @@ kbd {
   min-width: 34px;
   text-align: right;
 }
+
+/* --- Automatic install card ------------------------------------------ */
+.install-card {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--blue);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+}
+
+.install-card__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+
+.install-card__note {
+  margin: 8px 0 12px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.install-card__cmd {
+  display: block;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.fmt-row__size {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  min-width: 56px;
+  text-align: right;
+}
