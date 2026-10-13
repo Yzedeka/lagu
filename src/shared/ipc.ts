@@ -36,6 +36,7 @@ export const IPC = {
   pinsSet: 'pins:set',
   artistBioGet: 'artists:bio-get',
   artistBioSet: 'artists:bio-set',
+  artistBioAll: 'artists:bio-all',
   appDataFolder: 'app:data-folder',
   appOpenDataFolder: 'app:open-data-folder',
   updateStatus: 'update:status',
@@ -128,6 +129,8 @@ export interface LaguApi {
   artists: {
     getBio(name: string): Promise<string>
     setBio(name: string, text: string): Promise<string>
+    /** Every stored artist bio, keyed by artist name. */
+    getBios(): Promise<Record<string, string>>
   }
   app: {
     dataFolder(): Promise<string>

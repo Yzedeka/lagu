@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import type { Track } from '@shared/types'
-import { TrackList } from './TrackList'
+import { SongGrid } from './SongGrid'
 
 interface SearchViewProps {
   query: string
@@ -45,7 +45,7 @@ export function SearchView({
         </div>
       </header>
       <div className="browse__body">
-        <TrackList
+        <SongGrid
           tracks={results}
           currentTrackId={currentTrackId}
           onPlay={(i) => onPlayContext(results, i)}

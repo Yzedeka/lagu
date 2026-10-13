@@ -47,7 +47,8 @@ const api: LaguApi = {
   },
   artists: {
     getBio: (name: string) => ipcRenderer.invoke(IPC.artistBioGet, name),
-    setBio: (name: string, text: string) => ipcRenderer.invoke(IPC.artistBioSet, name, text)
+    setBio: (name: string, text: string) => ipcRenderer.invoke(IPC.artistBioSet, name, text),
+    getBios: () => ipcRenderer.invoke(IPC.artistBioAll)
   },
   app: {
     dataFolder: () => ipcRenderer.invoke(IPC.appDataFolder),

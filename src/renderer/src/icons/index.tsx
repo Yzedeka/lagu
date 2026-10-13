@@ -110,6 +110,8 @@ export const PaletteIcon = (p: IconProps) => <Icon name="palette" {...p} />
 export const TextFieldsIcon = (p: IconProps) => <Icon name="text_fields" {...p} />
 export const ZoomInIcon = (p: IconProps) => <Icon name="zoom_in" {...p} />
 export const ZoomOutIcon = (p: IconProps) => <Icon name="zoom_out" {...p} />
+export const GridIcon = (p: IconProps) => <Icon name="grid_view" {...p} />
+export const ListIcon = (p: IconProps) => <Icon name="view_list" {...p} />
 
 // --- Lyrics ---------------------------------------------------------------
 export const LyricsIcon = (p: IconProps) => <Icon name="lyrics" {...p} />

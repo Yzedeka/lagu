@@ -563,6 +563,10 @@ export class LibraryService {
     return this.store.getArtistBio(name)
   }
 
+  getAllArtistBios(): Record<string, string> {
+    return this.store.getAllArtistBios()
+  }
+
   setArtistBio(name: string, text: string): string {
     return this.store.setArtistBio(name, text)
   }

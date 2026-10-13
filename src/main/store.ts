@@ -301,6 +301,10 @@ export class Store {
     return this.state.artistBio[name] ?? ''
   }
 
+  getAllArtistBios(): Record<string, string> {
+    return { ...this.state.artistBio }
+  }
+
   setArtistBio(name: string, text: string): string {
     const trimmed = text.trim()
     if (trimmed) this.state.artistBio[name] = trimmed

@@ -149,6 +149,8 @@ export function registerIpc(
 
   ipcMain.handle(IPC.artistBioGet, (_e, name: string) => library.getArtistBio(name))
 
+  ipcMain.handle(IPC.artistBioAll, () => library.getAllArtistBios())
+
   ipcMain.handle(IPC.artistBioSet, (_e, name: string, text: string) =>
     library.setArtistBio(name, typeof text === 'string' ? text : '')
   )

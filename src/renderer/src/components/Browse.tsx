@@ -35,8 +35,14 @@ import { ConfirmDialog } from './ConfirmDialog'
 import { ArtistView } from './ArtistView'
 import { AlbumView } from './AlbumView'
 import { LyricsDialog } from './LyricsDialog'
+import { SongGrid } from './SongGrid'
+import { ArtistGrid } from './ArtistGrid'
+import { SearchBar } from './SearchBar'
+import { GridIcon, ListIcon } from '@renderer/icons'
 import { formatTotalDuration, folderName } from '@renderer/lib/format'
 import type { BrowseSection } from './Sidebar'
+
+const api = window.lagu
 
 export interface MetadataActions {
   update: (trackIds: string[], patch: MetadataPatch) => void
@@ -116,11 +122,27 @@ export function Browse({
   const [edit, setEdit] = useState<EditState | null>(null)
   const [confirm, setConfirm] = useState<{ ids: string[] } | null>(null)
   const [lrcEdit, setLrcEdit] = useState<Track | null>(null)
+  const [libQuery, setLibQuery] = useState('')
+  const [libView, setLibView] = useState<'grid' | 'list'>('grid')
+  const [bios, setBios] = useState<Record<string, string>>({})
 
   useEffect(() => {
     setAlbumKey(null)
     setArtist(null)
     setFolderPath(null)
+    setLibQuery('')
+  }, [section])
+
+  // Load every artist bio so the Artists grid can show them under each name.
+  useEffect(() => {
+    if (section !== 'artists') return
+    let cancelled = false
+    void api.artists.getBios().then((value) => {
+      if (!cancelled) setBios(value)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [section])
 
   // Open an album/artist requested from outside (sidebar pin, etc.).
@@ -145,6 +167,20 @@ export function Browse({
   )
   const artists = useMemo(() => buildArtists(tracks), [tracks])
   const folderGroups = useMemo(() => buildFolders(tracks), [tracks])
+
+  const libNeedle = libQuery.trim().toLowerCase()
+  const libraryTracks = useMemo(() => {
+    if (!libNeedle) return tracks
+    return tracks.filter(
+      (t) =>
+        t.title.toLowerCase().includes(libNeedle) ||
+        t.artist.toLowerCase().includes(libNeedle) ||
+        t.album.toLowerCase().includes(libNeedle)
+    )
+  }, [tracks, libNeedle])
+
+  const artistTracksFor = (name: string): Track[] =>
+    tracks.filter((t) => (t.albumArtist || t.artist) === name)
 
   const selectedAlbum = albumKey ? albums.find((a) => a.key === albumKey) ?? null : null
   const artistTracks = artist ? tracks.filter((t) => (t.albumArtist || t.artist) === artist) : []
@@ -379,16 +415,68 @@ export function Browse({
     )
   } else if (section === 'library') {
     body = (
-      <TrackList
-        tracks={tracks}
-        currentTrackId={currentTrackId}
-        onPlay={(i) => onPlayContext(tracks, i)}
-        onPlayNext={onPlayNext}
-        onAddToQueue={onAddToQueue}
-        onFindCover={onFindCover}
-        onContextMenu={openTrackMenu}
-        emptyMessage="Your library is empty. Add a folder to get started."
-      />
+      <div className="song-browser">
+        <div className="song-browser__toolbar">
+          <SearchBar
+            value={libQuery}
+            placeholder="Search songs, artists, albums…"
+            compact
+            onChange={setLibQuery}
+            onSubmit={() => undefined}
+            onClear={() => setLibQuery('')}
+          />
+          <div className="segmented segmented--icons">
+            <button
+              type="button"
+              className={libView === 'grid' ? 'button--active' : ''}
+              title="Grid view"
+              onClick={() => setLibView('grid')}
+            >
+              <GridIcon size={15} />
+            </button>
+            <button
+              type="button"
+              className={libView === 'list' ? 'button--active' : ''}
+              title="List view"
+              onClick={() => setLibView('list')}
+            >
+              <ListIcon size={15} />
+            </button>
+          </div>
+        </div>
+        <div className="song-browser__body">
+          {libView === 'grid' ? (
+            <SongGrid
+              tracks={libraryTracks}
+              currentTrackId={currentTrackId}
+              onPlay={(i) => onPlayContext(libraryTracks, i)}
+              onPlayNext={onPlayNext}
+              onAddToQueue={onAddToQueue}
+              onContextMenu={openTrackMenu}
+              emptyMessage={
+                libNeedle
+                  ? 'No matching songs.'
+                  : 'Your library is empty. Add a folder to get started.'
+              }
+            />
+          ) : (
+            <TrackList
+              tracks={libraryTracks}
+              currentTrackId={currentTrackId}
+              onPlay={(i) => onPlayContext(libraryTracks, i)}
+              onPlayNext={onPlayNext}
+              onAddToQueue={onAddToQueue}
+              onFindCover={onFindCover}
+              onContextMenu={openTrackMenu}
+              emptyMessage={
+                libNeedle
+                  ? 'No matching songs.'
+                  : 'Your library is empty. Add a folder to get started.'
+              }
+            />
+          )}
+        </div>
+      </div>
     )
   } else if (section === 'albums') {
     body = (
@@ -401,32 +489,27 @@ export function Browse({
     )
   } else if (section === 'artists') {
     body = (
-      <div className="artist-list">
-        {artists.length === 0 && <div className="empty-state">No artists yet.</div>}
-        {artists.map((group) => (
-          <button
-            key={group.name}
-            type="button"
-            className="artist-row"
-            onClick={() => setArtist(group.name)}
-            onContextMenu={(e) => {
-              e.preventDefault()
-              openArtistMenu(
-                group.name,
-                tracks.filter((t) => (t.albumArtist || t.artist) === group.name).map((t) => t.id),
-                e.clientX,
-                e.clientY
-              )
-            }}
-          >
-            <span className="artist-row__name">{group.name}</span>
-            <span className="artist-row__meta">
-              {group.trackCount} track{group.trackCount === 1 ? '' : 's'} · {group.albums.length} album
-              {group.albums.length === 1 ? '' : 's'}
-            </span>
-          </button>
-        ))}
-      </div>
+      <ArtistGrid
+        artists={artists}
+        tracks={tracks}
+        bios={bios}
+        currentTrackId={currentTrackId}
+        playing={playing}
+        onOpen={(name) => setArtist(name)}
+        onPlay={(name) => {
+          const list = artistTracksFor(name)
+          if (list.length > 0) onPlayContext(list, 0)
+        }}
+        onToggle={onToggle}
+        onContextMenu={(name, x, y) =>
+          openArtistMenu(
+            name,
+            artistTracksFor(name).map((t) => t.id),
+            x,
+            y
+          )
+        }
+      />
     )
   } else {
     body = (
