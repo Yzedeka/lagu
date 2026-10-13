@@ -3,7 +3,6 @@ import appIcon from '@/assets/app_icon.png'
 import { APP, OS_LABEL, detectOs, downloadUrl, primaryFor, type Os } from '@/config'
 import { useDownloads } from '@/lib/DownloadContext'
 import { BigDownload, Counter } from './Download'
-import { Slideshow } from './Slideshow'
 
 const OTHERS: Os[] = ['windows', 'macos', 'linux']
 
@@ -25,7 +24,6 @@ export function Hero() {
       </div>
 
       <BigDownload />
-      <Slideshow />
       <Counter />
 
       <p className="hero__others">
