@@ -13,9 +13,12 @@ import {
   RefreshIcon,
   SearchIcon,
   SettingsIcon,
-  TrashIcon
+  TrashIcon,
+  VolumeIcon,
+  VolumeMuteIcon
 } from '@renderer/icons'
 import { AlbumArt } from './AlbumArt'
+import { Range } from './Range'
 import appIconUrl from '@renderer/icons/app_icon.png'
 import { folderName } from '@renderer/lib/format'
 import { albumKeyOf } from '@renderer/lib/album'
@@ -37,6 +40,10 @@ interface SidebarProps {
   onSearchSubmit: () => void
   pinned: PinnedItem[]
   tracks: Track[]
+  volume: number
+  muted: boolean
+  onSetVolume: (value: number) => void
+  onToggleMute: () => void
   onActivatePin: (pin: PinnedItem) => void
   onUnpin: (id: string) => void
   onAddFolder: () => void
@@ -65,6 +72,10 @@ export function Sidebar({
   onSearchSubmit,
   pinned,
   tracks,
+  volume,
+  muted,
+  onSetVolume,
+  onToggleMute,
   onActivatePin,
   onUnpin,
   onAddFolder,
@@ -147,18 +158,6 @@ export function Sidebar({
         ))}
       </nav>
 
-      <div className="sidebar__label">App</div>
-      <nav className="sidebar__nav">
-        <button
-          type="button"
-          className={`nav-item ${selection === 'settings' ? 'nav-item--active' : ''}`}
-          onClick={() => onSelect('settings')}
-        >
-          <SettingsIcon size={16} />
-          <span>Settings</span>
-        </button>
-      </nav>
-
       <div className="sidebar__label sidebar__label--row">
         <span>Folders</span>
         <div className="sidebar__label-actions">
@@ -204,8 +203,62 @@ export function Sidebar({
           onChange={onSearchChange}
           onSubmit={onSearchSubmit}
         />
+        <div className="footer-tools">
+          <button
+            type="button"
+            className={`icon-btn ${selection === 'settings' ? 'icon-btn--active' : ''}`}
+            title="Settings"
+            onClick={() => onSelect('settings')}
+          >
+            <SettingsIcon size={16} />
+          </button>
+          <VolumeControl
+            volume={volume}
+            muted={muted}
+            onSetVolume={onSetVolume}
+            onToggleMute={onToggleMute}
+          />
+        </div>
       </div>
     </aside>
+  )
+}
+
+function VolumeControl({
+  volume,
+  muted,
+  onSetVolume,
+  onToggleMute
+}: {
+  volume: number
+  muted: boolean
+  onSetVolume: (value: number) => void
+  onToggleMute: () => void
+}) {
+  return (
+    <div className="volume">
+      <button
+        type="button"
+        className="icon-btn"
+        title={muted ? 'Unmute' : 'Mute'}
+        onClick={onToggleMute}
+      >
+        {muted || volume === 0 ? <VolumeMuteIcon size={16} /> : <VolumeIcon size={16} />}
+      </button>
+      <div className="volume__pop">
+        <Range
+          orientation="vertical"
+          className="range--volume-vert"
+          value={muted ? 0 : volume}
+          max={1}
+          onChange={(v) => {
+            if (muted && v > 0) onToggleMute()
+            onSetVolume(v)
+          }}
+          ariaLabel="Volume"
+        />
+      </div>
+    </div>
   )
 }
 

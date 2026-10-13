@@ -1,6 +1,7 @@
 import type { RepeatMode, Track } from '@shared/types'
 import { AlbumArt } from './AlbumArt'
 import {
+  EditIcon,
   FullscreenExitIcon,
   FullscreenIcon,
   LyricsIcon,
@@ -11,9 +12,7 @@ import {
   QueueIcon,
   RepeatIcon,
   RepeatOneIcon,
-  ShuffleIcon,
-  VolumeIcon,
-  VolumeMuteIcon
+  ShuffleIcon
 } from '@renderer/icons'
 import { Range } from './Range'
 import { Visualizer } from './Visualizer'
@@ -24,8 +23,6 @@ interface BottomBarProps {
   playing: boolean
   currentTime: number
   duration: number
-  volume: number
-  muted: boolean
   shuffle: boolean
   repeat: RepeatMode
   visualizer: boolean
@@ -38,12 +35,11 @@ interface BottomBarProps {
   onNext: () => void
   onPrev: () => void
   onSeek: (seconds: number) => void
-  onSetVolume: (value: number) => void
-  onToggleMute: () => void
   onToggleShuffle: () => void
   onCycleRepeat: () => void
   onToggleQueue: () => void
   onToggleLyrics: () => void
+  onEditLyrics: () => void
   onToggleFullscreen: () => void
 }
 
@@ -52,8 +48,6 @@ export function BottomBar({
   playing,
   currentTime,
   duration,
-  volume,
-  muted,
   shuffle,
   repeat,
   visualizer,
@@ -66,12 +60,11 @@ export function BottomBar({
   onNext,
   onPrev,
   onSeek,
-  onSetVolume,
-  onToggleMute,
   onToggleShuffle,
   onCycleRepeat,
   onToggleQueue,
   onToggleLyrics,
+  onEditLyrics,
   onToggleFullscreen
 }: BottomBarProps) {
   const effectiveDuration = track?.duration && track.duration > 0 ? track.duration : duration || 0
@@ -142,26 +135,6 @@ export function BottomBar({
               <Visualizer playing={playing} colour={accent} />
             </div>
           )}
-          <div className="bb-volume">
-            <button
-              type="button"
-              className="icon-btn"
-              title={muted ? 'Unmute' : 'Mute'}
-              onClick={onToggleMute}
-            >
-              {muted || volume === 0 ? <VolumeMuteIcon size={16} /> : <VolumeIcon size={16} />}
-            </button>
-            <Range
-              className="range--volume"
-              value={muted ? 0 : volume}
-              max={1}
-              onChange={(v) => {
-                if (muted && v > 0) onToggleMute()
-                onSetVolume(v)
-              }}
-              ariaLabel="Volume"
-            />
-          </div>
 
           <button
             type="button"
@@ -171,6 +144,15 @@ export function BottomBar({
             disabled={!track || (!lyricsAvailable && !lyricsOpen)}
           >
             <LyricsIcon size={17} />
+          </button>
+          <button
+            type="button"
+            className="icon-btn"
+            title="Lyrics - import / edit .lrc"
+            onClick={onEditLyrics}
+            disabled={!track}
+          >
+            <EditIcon size={16} />
           </button>
           <button
             type="button"

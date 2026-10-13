@@ -406,6 +406,10 @@ export function App() {
             onSearchSubmit={submitSearch}
             pinned={library.pinned}
             tracks={library.tracks}
+            volume={settings.volume}
+            muted={settings.muted}
+            onSetVolume={player.setVolume}
+            onToggleMute={player.toggleMute}
             onActivatePin={activatePin}
             onUnpin={(id) => void library.setPinned(library.pinned.filter((p) => p.id !== id))}
             onAddFolder={() => void library.addFolder()}
@@ -427,7 +431,6 @@ export function App() {
               lyricsOpen={lyricsOpen}
               accent={palette.accent}
               onSeek={player.seek}
-              onEditLyrics={() => setLyricsDialog(true)}
               lyricsSlot={lyricsSlot}
             />
           )}
@@ -508,8 +511,6 @@ export function App() {
         playing={player.playing}
         currentTime={player.currentTime}
         duration={player.duration}
-        volume={settings.volume}
-        muted={settings.muted}
         shuffle={settings.shuffle}
         repeat={settings.repeat}
         visualizer={settings.visualizer}
@@ -522,12 +523,11 @@ export function App() {
         onNext={player.next}
         onPrev={player.prev}
         onSeek={player.seek}
-        onSetVolume={player.setVolume}
-        onToggleMute={player.toggleMute}
         onToggleShuffle={player.toggleShuffle}
         onCycleRepeat={player.cycleRepeat}
         onToggleQueue={() => update({ showQueue: !settings.showQueue })}
         onToggleLyrics={() => update({ showLyrics: !settings.showLyrics })}
+        onEditLyrics={() => setLyricsDialog(true)}
         onToggleFullscreen={toggleFullscreen}
       />
 

@@ -294,7 +294,7 @@ button,
   background: var(--bg-panel);
   border-right: 1px solid var(--border);
   overflow: hidden;
-  animation: slideFromLeft 0.26s var(--ease) both;
+  animation: slideFromLeft 0.26s var(--ease);
 }
 
 .sidebar__resizer {
@@ -329,7 +329,7 @@ button,
   flex-direction: column;
   background: var(--bg-panel);
   border-left: 1px solid var(--border);
-  animation: slideFromRight 0.26s var(--ease) both;
+  animation: slideFromRight 0.26s var(--ease);
 }
 
 @media (max-width: 940px) {
@@ -504,6 +504,10 @@ button,
 }
 
 .sidebar__footer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 50px;
   padding: 8px;
   border-top: 1px solid var(--border);
 }
@@ -608,7 +612,7 @@ button,
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  animation: viewIn 0.26s var(--ease) both;
+  animation: viewIn 0.26s var(--ease);
 }
 
 .browse__header {
@@ -849,7 +853,7 @@ button,
   object-fit: cover;
   display: block;
   background: var(--bg-elevated);
-  animation: artIn 0.32s var(--ease) both;
+  animation: artIn 0.32s var(--ease);
 }
 
 .art--fallback {
@@ -1060,7 +1064,7 @@ button,
   padding: 22px 34px 20px;
   gap: 16px;
   overflow: hidden;
-  animation: viewIn 0.28s var(--ease) both;
+  animation: viewIn 0.28s var(--ease);
 }
 
 .np-stage {
@@ -1163,7 +1167,7 @@ button,
   color: var(--danger-text);
   font-size: 12px;
   text-align: center;
-  animation: popIn 0.24s var(--ease) both;
+  animation: popIn 0.24s var(--ease);
 }
 
 .np-visualizer {
@@ -1238,7 +1242,7 @@ button,
   height: 100%;
   overflow-y: auto;
   padding: 4px 0;
-  animation: viewIn 0.2s var(--ease) both;
+  animation: viewIn 0.2s var(--ease);
 }
 
 .search-result {
@@ -1356,6 +1360,37 @@ button,
   flex: 0 0 90px;
 }
 
+.range--vertical {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 132px;
+  cursor: pointer;
+}
+
+.range--vertical .range-track {
+  width: 6px;
+  height: 100%;
+  margin: 0 auto;
+  border-radius: 3px;
+}
+
+.range--vertical .range-fill {
+  inset: auto 0 0 0;
+  width: 100%;
+  height: 0;
+  border-radius: 3px;
+}
+
+.range--vertical .range-thumb {
+  left: 50%;
+  bottom: 0;
+  width: 13px;
+  height: 13px;
+  margin-left: 0;
+  margin-bottom: -6.5px;
+  transform: translateX(-50%);
+}
+
 /* Lyrics ------------------------------------------------------------ */
 .lyrics-simple {
   position: relative;
@@ -1364,7 +1399,7 @@ button,
   width: 100%;
   height: 100%;
   min-height: 0;
-  animation: viewIn 0.24s var(--ease) both;
+  animation: viewIn 0.24s var(--ease);
 }
 
 .lyrics-lines,
@@ -1698,7 +1733,7 @@ button,
   align-items: center;
   justify-content: center;
   z-index: 50;
-  animation: viewIn 0.18s var(--ease) both;
+  animation: viewIn 0.18s var(--ease);
 }
 
 .modal {
@@ -1711,7 +1746,7 @@ button,
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   box-shadow: 0 24px 60px var(--shadow);
-  animation: popIn 0.22s var(--ease) both;
+  animation: popIn 0.22s var(--ease);
 }
 
 .modal--wide {
@@ -1978,7 +2013,7 @@ button,
   min-height: 0;
   display: flex;
   flex-direction: column;
-  animation: viewIn 0.26s var(--ease) both;
+  animation: viewIn 0.26s var(--ease);
 }
 
 .settings-view__body {
@@ -2025,8 +2060,8 @@ button,
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  border: 1px solid transparent;
-  background: transparent;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
   overflow: hidden;
   transition: width 0.3s var(--ease), background-color 0.2s var(--ease),
     border-color 0.2s var(--ease);
@@ -2035,7 +2070,7 @@ button,
 .searchbox--open {
   width: 100%;
   background: var(--bg-elevated);
-  border-color: var(--border-strong);
+  border-color: var(--accent);
 }
 
 .searchbox__btn {
@@ -2134,7 +2169,7 @@ button,
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   box-shadow: 0 16px 44px var(--shadow);
-  animation: popIn 0.14s var(--ease) both;
+  animation: popIn 0.14s var(--ease);
 }
 
 .context-menu__item {
@@ -2210,12 +2245,57 @@ button,
 .sidebar__footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: flex-start;
+  gap: 2px;
 }
 
-.sidebar__footer .sidebar__hint {
-  padding: 0;
+.sidebar__footer .searchbox {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  z-index: 2;
+}
+
+.sidebar__footer .searchbox--open {
+  width: calc(100% - 16px);
+  z-index: 3;
+}
+
+.footer-tools {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 42px;
+}
+
+.volume {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.volume__pop {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 7px;
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 14px 34px var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(6px);
+  transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+}
+
+.volume:hover .volume__pop {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* Confirm / danger -------------------------------------------------- */
@@ -2378,7 +2458,7 @@ button,
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  animation: viewIn 0.26s var(--ease) both;
+  animation: viewIn 0.26s var(--ease);
 }
 
 .profile__hero {
@@ -2539,7 +2619,7 @@ button,
   align-items: center;
   justify-content: center;
   background: var(--bg);
-  animation: viewIn 0.25s var(--ease) both;
+  animation: viewIn 0.25s var(--ease);
 }
 
 .update-screen__card {
