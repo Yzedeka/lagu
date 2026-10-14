@@ -59,6 +59,7 @@ export function LinuxDownloads() {
       <div className="fmt-note">
         <p>The AppImage needs FUSE 2. On Arch: fuse2, Debian/Ubuntu: libfuse2, Fedora: fuse-libs.</p>
         <p>If you would rather not install it, use the portable tar.gz above.</p>
+        <p>For the Flatpak: install the .flatpak above with flatpak install --user &lt;file&gt;.</p>
       </div>
 
       <Counter hint={false} />
