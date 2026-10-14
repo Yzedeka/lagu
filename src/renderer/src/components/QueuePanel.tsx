@@ -1,5 +1,5 @@
 import { useRef, useState, type DragEvent, type PointerEvent as ReactPointerEvent } from 'react'
-import type { QueueState, Track } from '@shared/types'
+import type { QueueMode, QueueState, Track } from '@shared/types'
 import { AlbumArt } from './AlbumArt'
 import { CloseIcon, GripIcon, QueueIcon } from '@renderer/icons'
 import { formatTime, formatTotalDuration } from '@renderer/lib/format'
@@ -8,6 +8,7 @@ interface QueuePanelProps {
   queue: QueueState
   resolve: (id: string) => Track | undefined
   width: number
+  mode: QueueMode
   onResize: (width: number) => void
   onResizeEnd: (width: number) => void
   onJump: (index: number) => void
@@ -19,6 +20,7 @@ export function QueuePanel({
   queue,
   resolve,
   width,
+  mode,
   onResize,
   onResizeEnd,
   onJump,
@@ -62,17 +64,7 @@ export function QueuePanel({
   }
 
   return (
-    <aside
-      className={[
-        'queue',
-        width < 220 ? 'queue--slim' : '',
-        width < 150 ? 'queue--tiny' : '',
-        width < 100 ? 'queue--mini' : ''
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      style={{ width }}
-    >
+    <aside className={`queue queue--${mode}`} style={{ width }}>
       <div
         className="queue__resizer"
         title="Drag to resize"

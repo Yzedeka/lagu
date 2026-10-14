@@ -12,6 +12,7 @@ import {
   LibraryIcon,
   LyricsIcon,
   PaletteIcon,
+  WifiIcon,
   ZoomInIcon,
   ZoomOutIcon
 } from '@renderer/icons'
@@ -42,6 +43,7 @@ type CategoryId =
   | 'library'
   | 'artwork'
   | 'keybinds'
+  | 'integrations'
   | 'data'
   | 'help'
 
@@ -68,6 +70,7 @@ const CATEGORIES: { id: CategoryId; label: string; icon: typeof PaletteIcon }[] 
   { id: 'library', label: 'Songs', icon: LibraryIcon },
   { id: 'artwork', label: 'Artwork', icon: ImageIcon },
   { id: 'keybinds', label: 'Keybinds', icon: KeyboardIcon },
+  { id: 'integrations', label: 'Integrations', icon: WifiIcon },
   { id: 'data', label: 'Data', icon: FolderIcon },
   { id: 'help', label: 'Help', icon: LayersIcon }
 ]
@@ -267,6 +270,14 @@ export function SettingsView({
     ),
     row(
       'appearance',
+      'cover-3d',
+      '3D album covers',
+      <Switch on={settings.cover3d} onChange={(cover3d) => update({ cover3d })} />,
+      'Show albums as records with a disc behind the sleeve. Square corners while on.',
+      'cover art record disc depth perspective'
+    ),
+    row(
+      'appearance',
       'zoom',
       'Interface zoom',
       <div className="swatches">
@@ -315,6 +326,22 @@ export function SettingsView({
       'Show queue',
       <Switch on={settings.showQueue} onChange={(showQueue) => update({ showQueue })} />,
       'Toggle the Up Next panel (Q).'
+    ),
+    row(
+      'panels',
+      'queue-mode',
+      'Queue style',
+      <Segmented
+        value={settings.queueMode}
+        options={[
+          { id: 'normal', label: 'Normal' },
+          { id: 'compact', label: 'Compact' },
+          { id: 'tiny', label: 'Tiny' }
+        ]}
+        onChange={(queueMode) => update({ queueMode })}
+      />,
+      'How dense the queue rows are.',
+      'queue density compact tiny normal'
     ),
     row(
       'panels',
@@ -580,6 +607,31 @@ export function SettingsView({
       </button>,
       'Restore every shortcut to its default key.',
       'defaults'
+    ),
+
+    // --- Integrations -----------------------------------------------------
+    row(
+      'integrations',
+      'discord-rpc',
+      'Discord Rich Presence',
+      <Switch on={settings.discordRpc} onChange={(discordRpc) => update({ discordRpc })} />,
+      'Show the track you are playing as your Discord status.',
+      'discord rich presence status'
+    ),
+    row(
+      'integrations',
+      'discord-client',
+      'Discord application ID',
+      <input
+        className="text-input text-input--client"
+        type="text"
+        value={settings.discordClientId}
+        placeholder="Application ID"
+        spellCheck={false}
+        onChange={(e) => update({ discordClientId: e.target.value.trim() })}
+      />,
+      'Create an app at discord.com/developers and paste its Application ID.',
+      'discord client id application'
     ),
 
     // --- Data -------------------------------------------------------------

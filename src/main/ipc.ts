@@ -1,9 +1,11 @@
 import { BrowserWindow, dialog, ipcMain, shell, type OpenDialogOptions } from 'electron'
 import { IPC } from '@shared/ipc'
+import type { DiscordPresence } from '@shared/ipc'
 import type { AppSettings, MetadataPatch, QueueState } from '@shared/types'
 import type { LibraryService } from './library'
 import type { Store } from './store'
 import { getUpdateStatus, installUpdate } from './updater'
+import { configureDiscord, setNowPlaying } from './discord'
 
 const MIN_ZOOM = -3
 const MAX_ZOOM = 3
@@ -180,7 +182,15 @@ export function registerIpc(
   ipcMain.handle(IPC.settingsGet, () => store.settings)
 
   ipcMain.handle(IPC.settingsSet, (_e, patch: Partial<AppSettings>) => {
-    return store.updateSettings(patch ?? {})
+    const settings = store.updateSettings(patch ?? {})
+    if (patch && ('discordRpc' in patch || 'discordClientId' in patch)) {
+      configureDiscord({ enabled: settings.discordRpc, clientId: settings.discordClientId })
+    }
+    return settings
+  })
+
+  ipcMain.on(IPC.discordUpdate, (_e, info: DiscordPresence | null) => {
+    setNowPlaying(info)
   })
 
   ipcMain.handle(IPC.settingsReset, () => library.resetSettings())

@@ -147,7 +147,17 @@ export interface AppSettings {
   keybindings: Record<string, string>
   /** Performance mode: strip animations, transitions and visual extras. */
   performanceMode: boolean
+  /** Queue row density. */
+  queueMode: QueueMode
+  /** Show album covers as 3D records (disc behind the sleeve). */
+  cover3d: boolean
+  /** Broadcast the playing track to Discord. */
+  discordRpc: boolean
+  /** Discord application id used for Rich Presence. */
+  discordClientId: string
 }
+
+export type QueueMode = 'normal' | 'compact' | 'tiny'
 
 export type LyricsAlign = 'center' | 'left'
 

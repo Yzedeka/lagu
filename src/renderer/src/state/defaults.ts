@@ -32,7 +32,11 @@ export const defaultSettings: AppSettings = {
   showTrackNumbers: true,
   scanOnStartup: true,
   keybindings: { ...DEFAULT_KEYBINDINGS },
-  performanceMode: false
+  performanceMode: false,
+  queueMode: 'normal',
+  cover3d: false,
+  discordRpc: false,
+  discordClientId: ''
 }
 
 export const ACCENT_PRESETS: { name: string; value: string }[] = [

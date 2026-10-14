@@ -7,6 +7,7 @@ import { LibraryService } from './library'
 import { registerIpc, wireLibraryEvents } from './ipc'
 import { handleMediaProtocol, registerMediaScheme } from './protocol'
 import { initUpdater } from './updater'
+import { configureDiscord, destroyDiscord } from './discord'
 
 app.setName('Lagu Music Player')
 
@@ -97,6 +98,11 @@ app.whenReady().then(async () => {
   wireLibraryEvents(getWindow, library)
   library.watchAll()
 
+  configureDiscord({
+    enabled: store.settings.discordRpc,
+    clientId: store.settings.discordClientId
+  })
+
   createWindow()
   initUpdater(getWindow)
 
@@ -116,6 +122,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('before-quit', () => {
+  destroyDiscord()
   library?.stopWatchingAll()
   void store?.flush()
 })

@@ -44,7 +44,11 @@ export const defaultSettings: AppSettings = {
   showTrackNumbers: true,
   scanOnStartup: true,
   keybindings: { ...DEFAULT_KEYBINDINGS },
-  performanceMode: false
+  performanceMode: false,
+  queueMode: 'normal',
+  cover3d: false,
+  discordRpc: false,
+  discordClientId: ''
 }
 
 function emptyState(): PersistedState {

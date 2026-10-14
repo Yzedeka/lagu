@@ -15,6 +15,7 @@ interface NowPlayingProps {
   lyricsOpen: boolean
   accent: string
   onSeek: (seconds: number) => void
+  onOpenArtist: (name: string) => void
   lyricsSlot: ReactNode
 }
 
@@ -28,6 +29,7 @@ export function NowPlaying({
   lyricsOpen,
   accent,
   onSeek,
+  onOpenArtist,
   lyricsSlot
 }: NowPlayingProps) {
   // Prefer the tagged duration so long tracks show their real length instead of
@@ -51,7 +53,18 @@ export function NowPlaying({
           {track ? track.title : 'Nothing playing'}
         </h1>
         <div className="np-sub">
-          {track ? track.artist : 'Select a track from your library'}
+          {track ? (
+            <button
+              type="button"
+              className="np-artist-link"
+              title={`Open ${track.albumArtist || track.artist}`}
+              onClick={() => onOpenArtist(track.albumArtist || track.artist)}
+            >
+              {track.artist}
+            </button>
+          ) : (
+            'Select a track from your library'
+          )}
           {track && track.album && track.album !== 'Unknown Album' && (
             <span className="np-album"> · {track.album}</span>
           )}

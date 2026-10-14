@@ -21,7 +21,7 @@ export class PlayerEngine {
   private panner: PannerNode | null = null
   private analyserNode: AnalyserNode | null = null
   private eightD = false
-  private rotateTicker: number | null = null
+  private rotationNodes: { osc: OscillatorNode[]; gains: GainNode[] } | null = null
   private readonly sources: (MediaElementAudioSourceNode | null)[] = [null, null]
   private readonly gains: (GainNode | null)[] = [null, null]
   private slot = 0
@@ -163,30 +163,70 @@ export class PlayerEngine {
   }
 
   private startRotation(): void {
-    if (this.rotateTicker != null) return
-    const start = performance.now()
-    this.rotateTicker = window.setInterval(() => {
-      if (!this.panner) return
-      // One full revolution every ~12 seconds.
-      const angle = ((performance.now() - start) / 1000) * ((2 * Math.PI) / 12)
-      const radius = 1.8
-      const x = Math.sin(angle) * radius
-      const z = -Math.cos(angle) * radius
-      if (typeof this.panner.positionX !== 'undefined') {
-        this.panner.positionX.value = x
-        this.panner.positionZ.value = z
-        this.panner.positionY.value = 0
-      } else {
-        this.panner.setPosition(x, 0, z)
-      }
-    }, 33)
+    if (!this.ctx || !this.panner || this.rotationNodes) return
+    if (typeof this.panner.positionX === 'undefined') return
+    const ctx = this.ctx
+    const panner = this.panner
+    // One full revolution every ~12 seconds, driven at audio rate so the
+    // position changes smoothly (no per-tick steps = no clicks/pops).
+    const freq = 1 / 12
+    const radius = 1.8
+
+    const sine = ctx.createOscillator()
+    sine.type = 'sine'
+    sine.frequency.value = freq
+
+    const cosine = ctx.createOscillator()
+    cosine.frequency.value = freq
+    // A "cosine" wave: the first harmonic as a real (cosine) term.
+    cosine.setPeriodicWave(
+      ctx.createPeriodicWave(Float32Array.from([0, 1]), Float32Array.from([0, 0]))
+    )
+
+    const gainX = ctx.createGain()
+    gainX.gain.value = radius
+    const gainZ = ctx.createGain()
+    gainZ.gain.value = -radius
+
+    panner.positionX.value = 0
+    panner.positionY.value = 0
+    panner.positionZ.value = 0
+
+    sine.connect(gainX).connect(panner.positionX)
+    cosine.connect(gainZ).connect(panner.positionZ)
+    sine.start()
+    cosine.start()
+
+    this.rotationNodes = { osc: [sine, cosine], gains: [gainX, gainZ] }
   }
 
   private stopRotation(): void {
-    if (this.rotateTicker != null) {
-      window.clearInterval(this.rotateTicker)
-      this.rotateTicker = null
+    const nodes = this.rotationNodes
+    if (!nodes) return
+    for (const osc of nodes.osc) {
+      try {
+        osc.stop()
+      } catch {
+        /* already stopped */
+      }
+      try {
+        osc.disconnect()
+      } catch {
+        /* already disconnected */
+      }
     }
+    for (const gain of nodes.gains) {
+      try {
+        gain.disconnect()
+      } catch {
+        /* already disconnected */
+      }
+    }
+    if (this.panner) {
+      this.panner.positionX.value = 0
+      this.panner.positionZ.value = 0
+    }
+    this.rotationNodes = null
   }
 
   async load(track: Track, autoplay: boolean): Promise<void> {

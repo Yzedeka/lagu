@@ -412,6 +412,25 @@ export function App() {
     }
   }, [player.currentTrack?.id, settings.autoLyrics])
 
+  // --- Discord Rich Presence -----------------------------------------------
+  useEffect(() => {
+    const track = player.currentTrack
+    api.discord.update(
+      track && settings.discordRpc
+        ? {
+            title: track.title,
+            artist: track.artist,
+            album: track.album,
+            position: player.currentTime,
+            duration: player.duration,
+            playing: player.playing
+          }
+        : null
+    )
+    // Intentionally keyed on the track + play state, not the ticking time.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.discordRpc, player.currentTrack, player.playing])
+
   // --- immersive fullscreen: reveal the bottom bar near the screen edge ------
   const immersive = isFullscreen && selection === 'now'
   const [barRevealed, setBarRevealed] = useState(false)
@@ -434,6 +453,7 @@ export function App() {
     settings.showQueue ? '' : 'app--no-queue',
     settings.showTrackNumbers ? '' : 'app--no-track-numbers',
     settings.lyricsAlign === 'left' ? 'app--lyrics-left' : '',
+    settings.cover3d ? 'app--covers-3d' : '',
     immersive ? 'app--immersive' : '',
     immersive && !barRevealed ? 'app--bar-hidden' : ''
   ]
@@ -485,6 +505,10 @@ export function App() {
               lyricsOpen={lyricsOpen}
               accent={palette.accent}
               onSeek={player.seek}
+              onOpenArtist={(name) => {
+                setSelection('artists')
+                setBrowseFocus({ kind: 'artist', ref: name, token: ++focusToken.current })
+              }}
               lyricsSlot={lyricsSlot}
             />
           )}
@@ -557,6 +581,7 @@ export function App() {
             queue={player.queue}
             resolve={resolve}
             width={queueWidth}
+            mode={settings.queueMode}
             onResize={setQueueWidth}
             onResizeEnd={(w) => update({ queueWidth: w })}
             onJump={player.jumpTo}

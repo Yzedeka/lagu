@@ -49,6 +49,7 @@ export const IPC = {
   settingsGet: 'settings:get',
   settingsSet: 'settings:set',
   settingsReset: 'settings:reset',
+  discordUpdate: 'discord:update',
   cacheClearArtwork: 'cache:clear-artwork',
   cacheClearLyrics: 'cache:clear-lyrics',
   queueGet: 'queue:get',
@@ -75,6 +76,16 @@ export interface LibraryDone {
 export interface LibraryBatch {
   tracks: Track[]
   unsupported: UnsupportedFile[]
+}
+
+/** The "now playing" info broadcast to Discord. */
+export interface DiscordPresence {
+  title: string
+  artist: string
+  album?: string
+  position?: number
+  duration?: number
+  playing: boolean
 }
 
 /** The typed surface exposed on `window.lagu` by the preload script. */
@@ -144,6 +155,10 @@ export interface LaguApi {
   app: {
     dataFolder(): Promise<string>
     openDataFolder(): Promise<string>
+  }
+  discord: {
+    /** Push the current track (or null to clear) to Discord Rich Presence. */
+    update(info: DiscordPresence | null): void
   }
   update: {
     get(): Promise<UpdateStatus>

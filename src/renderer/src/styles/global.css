@@ -1195,6 +1195,21 @@ button,
   white-space: nowrap;
 }
 
+.np-artist-link {
+  color: inherit;
+  font: inherit;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s var(--ease);
+}
+
+.np-artist-link:hover {
+  color: var(--accent-bright);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .np-album,
 .np-year {
   color: var(--text-faint);
@@ -1603,34 +1618,47 @@ button,
   cursor: default;
 }
 
-.queue--slim .queue-dur {
+/* Queue density modes ------------------------------------------------ */
+.queue--normal .queue-row {
+  height: 44px;
+}
+
+.queue--compact .queue-row {
+  height: 34px;
+  gap: 6px;
+  padding: 0 8px 0 2px;
+}
+
+.queue--compact .queue-grip,
+.queue--compact .queue-sub {
   display: none;
 }
 
-.queue--slim .queue-row {
-  gap: 6px;
+.queue--compact .queue-art {
+  width: 26px;
+  height: 26px;
 }
 
-/* Tiny: keep only the drag handle and the cover. */
-.queue--tiny .queue-main,
+.queue--tiny .queue-row {
+  height: 28px;
+  gap: 6px;
+  padding: 0 6px 0 2px;
+}
+
+.queue--tiny .queue-grip,
+.queue--tiny .queue-sub,
+.queue--tiny .queue-dur,
 .queue--tiny .queue-row .icon-btn {
   display: none;
 }
 
-.queue--tiny .queue-row {
-  gap: 4px;
-  padding: 0 4px;
+.queue--tiny .queue-art {
+  width: 22px;
+  height: 22px;
 }
 
-/* Mini: no longer enough room for the word "Queue". */
-.queue--mini .queue__title-text {
-  display: none;
-}
-
-.queue--mini .queue__header {
-  justify-content: center;
-  padding-left: 8px;
-  padding-right: 8px;
+.queue--tiny .queue-title-text {
+  font-size: 12px;
 }
 
 .queue-row:hover {
@@ -3462,4 +3490,63 @@ button,
 [data-performance='on'] .song-tile:hover .song-tile__art,
 [data-performance='on'] .artist-card:hover .artist-card__art {
   transform: none !important;
+}
+
+/* Text input (Discord client id) ------------------------------------- */
+.text-input--client {
+  width: 190px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 3D album covers ---------------------------------------------------- */
+.album-tile__disc,
+.profile__disc {
+  display: none;
+}
+
+.profile__artwrap {
+  position: relative;
+  width: 168px;
+  height: 168px;
+  flex-shrink: 0;
+}
+
+.profile__artwrap .profile__art {
+  position: absolute;
+  inset: 0;
+}
+
+.app--covers-3d .album-tile__art {
+  overflow: visible;
+  border: none;
+  background: none;
+}
+
+.app--covers-3d .album-tile__disc,
+.app--covers-3d .profile__artwrap .profile__disc {
+  display: block;
+  position: absolute;
+  top: 3%;
+  right: -13%;
+  width: 94%;
+  height: 94%;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle at 50% 50%, #191919 0 2px, #2a2a2a 2px 4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 2px rgba(255, 255, 255, 0.12),
+    inset 0 0 0 14px rgba(0, 0, 0, 0.35);
+  transform: perspective(1100px) rotateY(-16deg);
+  z-index: 1;
+}
+
+.app--covers-3d .album-tile__img,
+.app--covers-3d .profile__artwrap .profile__art {
+  position: relative;
+  z-index: 2;
+  border-radius: 0;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.65);
+  transform: perspective(1100px) rotateY(-16deg);
+}
+
+.app--covers-3d .profile__artwrap .profile__art {
+  position: absolute;
 }

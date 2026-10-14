@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { IPC } from '@shared/ipc'
-import type { LibraryBatch, LibraryDone, LaguApi } from '@shared/ipc'
+import type { DiscordPresence, LibraryBatch, LibraryDone, LaguApi } from '@shared/ipc'
 import type { AppSettings, MetadataPatch, PinnedItem, QueueState, ScanProgress, UpdateStatus } from '@shared/types'
 
 function subscribe<T>(channel: string, cb: (payload: T) => void): () => void {
@@ -56,6 +56,9 @@ const api: LaguApi = {
   app: {
     dataFolder: () => ipcRenderer.invoke(IPC.appDataFolder),
     openDataFolder: () => ipcRenderer.invoke(IPC.appOpenDataFolder)
+  },
+  discord: {
+    update: (info: DiscordPresence | null) => ipcRenderer.send(IPC.discordUpdate, info)
   },
   update: {
     get: () => ipcRenderer.invoke(IPC.updateStatus),
