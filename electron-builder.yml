@@ -24,6 +24,37 @@ extraResources:
 asar: true
 compression: normal
 
+# Register as a handler for common audio types so Lagu can be set as the
+# default music/audio app and opened with files.
+fileAssociations:
+  - ext: mp3
+    name: MP3 audio
+    mimeType: audio/mpeg
+  - ext: m4a
+    name: M4A audio
+    mimeType: audio/mp4
+  - ext: aac
+    name: AAC audio
+    mimeType: audio/aac
+  - ext: flac
+    name: FLAC audio
+    mimeType: audio/flac
+  - ext: ogg
+    name: Ogg audio
+    mimeType: audio/ogg
+  - ext: opus
+    name: Opus audio
+    mimeType: audio/ogg
+  - ext: wav
+    name: WAV audio
+    mimeType: audio/wav
+  - ext: wma
+    name: WMA audio
+    mimeType: audio/x-ms-wma
+  - ext: m4b
+    name: M4B audiobook
+    mimeType: audio/mp4
+
 # Where the app looks for updates (electron-updater "generic" provider).
 # Serve latest-linux.yml / latest.yml / latest-mac.yml next to the installers.
 # Change this to your site's domain (it is baked into the packaged app).

@@ -454,6 +454,15 @@ export function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.discordRpc, player.currentTrack, player.playing])
 
+  // --- open files handed to us by the OS (default audio app) ---------------
+  useEffect(() => {
+    return api.events.onOpenFiles((paths) => {
+      void api.library.openFile(paths).then((opened) => {
+        if (opened.length > 0) playerRef.current.playContext(opened, 0)
+      })
+    })
+  }, [])
+
   // --- immersive fullscreen: reveal the bottom bar near the screen edge ------
   const immersive = isFullscreen && selection === 'now'
   const [barRevealed, setBarRevealed] = useState(false)
@@ -504,10 +513,6 @@ export function App() {
             pinned={library.pinned}
             tracks={library.tracks}
             playlists={playlists.playlists}
-            volume={settings.volume}
-            muted={settings.muted}
-            onSetVolume={player.setVolume}
-            onToggleMute={player.toggleMute}
             onActivatePin={activatePin}
             onUnpin={(id) => void library.setPinned(library.pinned.filter((p) => p.id !== id))}
             onAddFolder={() => void library.addFolder()}
@@ -636,6 +641,8 @@ export function App() {
         playing={player.playing}
         currentTime={player.currentTime}
         duration={player.duration}
+        volume={settings.volume}
+        muted={settings.muted}
         shuffle={settings.shuffle}
         repeat={settings.repeat}
         visualizer={settings.visualizer}
@@ -648,6 +655,8 @@ export function App() {
         onNext={player.next}
         onPrev={player.prev}
         onSeek={player.seek}
+        onSetVolume={player.setVolume}
+        onToggleMute={player.toggleMute}
         onToggleShuffle={player.toggleShuffle}
         onCycleRepeat={player.cycleRepeat}
         onToggleQueue={() => update({ showQueue: !settings.showQueue })}

@@ -8,6 +8,7 @@ import { registerIpc, wireLibraryEvents } from './ipc'
 import { handleMediaProtocol, registerMediaScheme } from './protocol'
 import { initUpdater } from './updater'
 import { configureDiscord, destroyDiscord } from './discord'
+import { extensionOf, SUPPORTED_EXTENSIONS } from './metadata'
 
 app.setName('Lagu Music Player')
 
@@ -16,6 +17,15 @@ app.setName('Lagu Music Player')
 app.commandLine.appendSwitch('class', 'lagu')
 
 registerMediaScheme()
+
+/** Audio file paths passed on the command line (as when opened from the OS). */
+function audioFileArgs(argv: string[]): string[] {
+  return argv
+    .slice(1)
+    .filter((arg) => !arg.startsWith('-') && SUPPORTED_EXTENSIONS.has(extensionOf(arg)))
+}
+
+let pendingOpenFiles: string[] = audioFileArgs(process.argv)
 
 /** Resolve the app icon from the source tree (or a packaged resource). */
 function appIconPath(): string | undefined {
@@ -77,6 +87,10 @@ function createWindow(): void {
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow?.webContents.setZoomLevel(store?.settings.zoom ?? 0)
+    if (pendingOpenFiles.length > 0 && mainWindow) {
+      mainWindow.webContents.send(IPC.evtOpenFiles, pendingOpenFiles)
+      pendingOpenFiles = []
+    }
   })
 
   mainWindow.webContents.on('did-fail-load', (_e, code, desc, url) => {
@@ -87,7 +101,23 @@ function createWindow(): void {
   mainWindow.on('leave-full-screen', () => mainWindow?.webContents.send(IPC.evtFullscreen, false))
 }
 
+// A second launch (e.g. opening another file) focuses the existing window.
+const gotLock = process.env['LAGU_SMOKE'] ? true : app.requestSingleInstanceLock()
+if (!gotLock) app.quit()
+
+app.on('second-instance', (_e, argv) => {
+  const files = audioFileArgs(argv)
+  if (!mainWindow) return
+  if (mainWindow.isMinimized()) mainWindow.restore()
+  mainWindow.focus()
+  if (files.length > 0) {
+    if (mainWindow.webContents.isLoading()) pendingOpenFiles.push(...files)
+    else mainWindow.webContents.send(IPC.evtOpenFiles, files)
+  }
+})
+
 app.whenReady().then(async () => {
+  if (!gotLock) return
   handleMediaProtocol()
 
   store = new Store()

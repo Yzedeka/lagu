@@ -25,6 +25,8 @@ export const IPC = {
   libraryRemoveTracks: 'library:remove-tracks',
   libraryTrash: 'library:trash',
   libraryRestoreHidden: 'library:restore-hidden',
+  libraryOpenFile: 'library:open-file',
+  evtOpenFiles: 'event:open-files',
   trackArtwork: 'track:artwork-url',
   trackLyrics: 'track:lyrics',
   lyricsImport: 'lyrics:import',
@@ -114,6 +116,8 @@ export interface LaguApi {
     trash(trackIds: string[]): Promise<number>
     /** Restore all hidden tracks and rescan. */
     restoreHidden(): Promise<void>
+    /** Register loose file paths opened from the OS and return their tracks. */
+    openFile(paths: string[]): Promise<Track[]>
     /** Delete every cached lyrics file; returns how many were removed. */
     clearLyricsCache(): Promise<number>
   }
@@ -205,5 +209,7 @@ export interface LaguApi {
     onRefresh(cb: () => void): () => void
     /** Progress for online artwork lookups. */
     onArtworkProgress(cb: (p: { done: number; total: number }) => void): () => void
+    /** Fired when the OS opens one or more audio files with Lagu. */
+    onOpenFiles(cb: (paths: string[]) => void): () => void
   }
 }

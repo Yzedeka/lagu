@@ -79,6 +79,7 @@ Icon=$APP_DIR/icon.png
 Terminal=false
 Categories=AudioVideo;Audio;Player;GTK;
 Keywords=music;player;audio;library;
+MimeType=audio/mpeg;audio/mp4;audio/aac;audio/flac;audio/ogg;audio/x-wav;audio/x-ms-wma;
 StartupWMClass=lagu
 EOF
 

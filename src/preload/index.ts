@@ -20,6 +20,7 @@ const api: LaguApi = {
     remove: (trackIds: string[]) => ipcRenderer.invoke(IPC.libraryRemoveTracks, trackIds),
     trash: (trackIds: string[]) => ipcRenderer.invoke(IPC.libraryTrash, trackIds),
     restoreHidden: () => ipcRenderer.invoke(IPC.libraryRestoreHidden),
+    openFile: (paths: string[]) => ipcRenderer.invoke(IPC.libraryOpenFile, paths),
     clearLyricsCache: () => ipcRenderer.invoke(IPC.cacheClearLyrics)
   },
   track: {
@@ -93,7 +94,8 @@ const api: LaguApi = {
     onDone: (cb: (d: LibraryDone) => void) => subscribe(IPC.evtDone, cb),
     onRefresh: (cb: () => void) => subscribe(IPC.evtRefresh, cb),
     onArtworkProgress: (cb: (p: { done: number; total: number }) => void) =>
-      subscribe(IPC.evtArtworkProgress, cb)
+      subscribe(IPC.evtArtworkProgress, cb),
+    onOpenFiles: (cb: (paths: string[]) => void) => subscribe(IPC.evtOpenFiles, cb)
   }
 }
 

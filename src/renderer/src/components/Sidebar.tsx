@@ -15,13 +15,10 @@ import {
   RefreshIcon,
   SearchIcon,
   SettingsIcon,
-  TrashIcon,
-  VolumeIcon,
-  VolumeMuteIcon
+  TrashIcon
 } from '@renderer/icons'
 import { AlbumArt } from './AlbumArt'
 import { ContextMenu } from './ContextMenu'
-import { Range } from './Range'
 import { buildAlbums, buildArtists } from '@renderer/lib/album'
 import appIconUrl from '@renderer/icons/app_icon.png'
 import { folderName } from '@renderer/lib/format'
@@ -52,10 +49,6 @@ interface SidebarProps {
   pinned: PinnedItem[]
   tracks: Track[]
   playlists: Playlist[]
-  volume: number
-  muted: boolean
-  onSetVolume: (value: number) => void
-  onToggleMute: () => void
   onActivatePin: (pin: PinnedItem) => void
   onUnpin: (id: string) => void
   onAddFolder: () => void
@@ -86,10 +79,6 @@ export function Sidebar({
   pinned,
   tracks,
   playlists,
-  volume,
-  muted,
-  onSetVolume,
-  onToggleMute,
   onActivatePin,
   onUnpin,
   onAddFolder,
@@ -228,12 +217,6 @@ export function Sidebar({
           >
             <SettingsIcon size={16} />
           </button>
-          <VolumeControl
-            volume={volume}
-            muted={muted}
-            onSetVolume={onSetVolume}
-            onToggleMute={onToggleMute}
-          />
           <button
             type="button"
             className={`icon-btn ${selection === 'folders' ? 'icon-btn--active' : ''}`}
@@ -280,54 +263,25 @@ export function Sidebar({
   )
 }
 
-function VolumeControl({
-  volume,
-  muted,
-  onSetVolume,
-  onToggleMute
-}: {
-  volume: number
-  muted: boolean
-  onSetVolume: (value: number) => void
-  onToggleMute: () => void
-}) {
-  return (
-    <div className="volume">
-      <button
-        type="button"
-        className="icon-btn"
-        title={muted ? 'Unmute' : 'Mute'}
-        onClick={onToggleMute}
-      >
-        {muted || volume === 0 ? <VolumeMuteIcon size={16} /> : <VolumeIcon size={16} />}
-      </button>
-      <div className="volume__pop">
-        <Range
-          orientation="vertical"
-          className="range--volume-vert"
-          value={muted ? 0 : volume}
-          max={1}
-          onChange={(v) => {
-            if (muted && v > 0) onToggleMute()
-            onSetVolume(v)
-          }}
-          ariaLabel="Volume"
-        />
-      </div>
-    </div>
-  )
-}
-
 function ArtistThumb({ name, artTrackId }: { name: string; artTrackId: string | null }) {
   const image = useArtistImage(name)
   if (image) {
     return (
-      <img className="searchdrop__thumb searchdrop__thumb--round art" src={image} alt="" draggable={false} />
+      <img
+        className="searchdrop__thumb searchdrop__thumb--round art"
+        src={image}
+        alt=""
+        draggable={false}
+      />
     )
   }
   if (artTrackId) {
     return (
-      <AlbumArt trackId={artTrackId} className="searchdrop__thumb searchdrop__thumb--round" iconSize={14} />
+      <AlbumArt
+        trackId={artTrackId}
+        className="searchdrop__thumb searchdrop__thumb--round"
+        iconSize={14}
+      />
     )
   }
   return (
@@ -555,7 +509,6 @@ function SidebarSearch({
     </>
   )
 }
-
 
 function PinThumb({
   kind,

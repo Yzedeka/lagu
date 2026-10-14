@@ -207,6 +207,10 @@ export function registerIpc(
     return true
   })
 
+  ipcMain.handle(IPC.libraryOpenFile, (_e, paths: string[]) => {
+    return library.openFile(Array.isArray(paths) ? paths : [])
+  })
+
   ipcMain.handle(IPC.settingsGet, () => store.settings)
 
   ipcMain.handle(IPC.settingsSet, (_e, patch: Partial<AppSettings>) => {

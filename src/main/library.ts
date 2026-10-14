@@ -560,6 +560,27 @@ export class LibraryService {
     return this.store.playlists
   }
 
+  /** Register and return one or more loose files (e.g. opened via the OS). */
+  async openFile(filePaths: string[]): Promise<Track[]> {
+    const ids: string[] = []
+    for (const filePath of Array.isArray(filePaths) ? filePaths : []) {
+      if (typeof filePath !== 'string') continue
+      if (!SUPPORTED_EXTENSIONS.has(extensionOf(filePath))) continue
+      try {
+        const track = await readTrack(filePath, path.dirname(filePath), this.store)
+        this.registerTrack(track)
+        ids.push(track.id)
+      } catch {
+        /* unreadable file - skip */
+      }
+    }
+    if (ids.length > 0) {
+      this.persist()
+      this.listeners?.refresh()
+    }
+    return this.effective(ids)
+  }
+
   setPlaylists(playlists: Playlist[]): Playlist[] {
     this.store.setPlaylists(Array.isArray(playlists) ? playlists : [])
     return this.store.playlists
