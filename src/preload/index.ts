@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { IPC } from '@shared/ipc'
 import type { DiscordPresence, LibraryBatch, LibraryDone, LaguApi } from '@shared/ipc'
-import type { AppSettings, MetadataPatch, PinnedItem, QueueState, ScanProgress, UpdateStatus } from '@shared/types'
+import type { AppSettings, MetadataPatch, PinnedItem, Playlist, QueueState, ScanProgress, UpdateStatus } from '@shared/types'
 
 function subscribe<T>(channel: string, cb: (payload: T) => void): () => void {
   const handler = (_event: IpcRendererEvent, payload: T): void => cb(payload)
@@ -47,6 +47,10 @@ const api: LaguApi = {
   pins: {
     get: () => ipcRenderer.invoke(IPC.pinsGet),
     set: (pinned: PinnedItem[]) => ipcRenderer.invoke(IPC.pinsSet, pinned)
+  },
+  playlists: {
+    get: () => ipcRenderer.invoke(IPC.playlistsGet),
+    set: (playlists: Playlist[]) => ipcRenderer.invoke(IPC.playlistsSet, playlists)
   },
   artists: {
     getBio: (name: string) => ipcRenderer.invoke(IPC.artistBioGet, name),

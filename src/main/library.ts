@@ -6,7 +6,7 @@ import type {
   LibraryBatch,
   LibraryDone
 } from '@shared/ipc'
-import type { LibraryFolder, AppSettings, PinnedItem, ScanProgress, Track, TrackOverride, UnsupportedFile, MetadataPatch } from '@shared/types'
+import type { LibraryFolder, AppSettings, PinnedItem, Playlist, ScanProgress, Track, TrackOverride, UnsupportedFile, MetadataPatch } from '@shared/types'
 import { compareTracks } from '@shared/sort'
 import type { Store } from './store'
 import { extensionOf, readTrack, SUPPORTED_EXTENSIONS, KNOWN_UNSUPPORTED_EXTENSIONS, trackFromUrl, clearMetadataCaches } from './metadata'
@@ -604,6 +604,15 @@ export class LibraryService {
 
   getPinned(): PinnedItem[] {
     return this.store.pinned
+  }
+
+  getPlaylists(): Playlist[] {
+    return this.store.playlists
+  }
+
+  setPlaylists(playlists: Playlist[]): Playlist[] {
+    this.store.setPlaylists(Array.isArray(playlists) ? playlists : [])
+    return this.store.playlists
   }
 
   setPinned(pinned: PinnedItem[]): PinnedItem[] {

@@ -940,7 +940,7 @@ button,
 .album-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 20px;
+  gap: 30px;
   padding: 22px;
   overflow-y: auto;
   flex: 1;
@@ -3526,15 +3526,13 @@ button,
 .app--covers-3d .profile__artwrap .profile__disc {
   display: block;
   position: absolute;
-  top: 3%;
-  right: -13%;
-  width: 94%;
-  height: 94%;
+  top: -6%;
+  left: -6%;
+  width: 112%;
+  height: 112%;
   border-radius: 50%;
-  background: repeating-radial-gradient(circle at 50% 50%, #191919 0 2px, #2a2a2a 2px 4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 2px rgba(255, 255, 255, 0.12),
-    inset 0 0 0 14px rgba(0, 0, 0, 0.35);
-  transform: perspective(1100px) rotateY(-16deg);
+  background: repeating-radial-gradient(circle at 50% 50%, #161616 0 2px, #272727 2px 4px);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.62), inset 0 0 0 2px rgba(255, 255, 255, 0.1);
   z-index: 1;
 }
 
@@ -3543,10 +3541,135 @@ button,
   position: relative;
   z-index: 2;
   border-radius: 0;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.65);
-  transform: perspective(1100px) rotateY(-16deg);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
 }
 
 .app--covers-3d .profile__artwrap .profile__art {
   position: absolute;
+}
+
+/* The record spins while you hover the album. */
+.app--covers-3d .album-tile:hover .album-tile__disc {
+  animation: disc-spin 3.5s linear infinite;
+}
+
+@keyframes disc-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Playlists ---------------------------------------------------------- */
+.playlist-tile--new .playlist-tile__newicon {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text-faint);
+  background: var(--bg-panel);
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+
+.playlist-tile--new:hover .playlist-tile__newicon {
+  color: var(--accent-bright);
+  border-color: var(--accent);
+}
+
+.playlist-tile__badge {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: color-mix(in srgb, #000 60%, transparent);
+  color: #fff;
+}
+
+.playlist__name-input {
+  font-size: 22px;
+  font-weight: 700;
+  max-width: 420px;
+}
+
+.profile__name .icon-btn {
+  opacity: 0.55;
+}
+
+.profile__name .icon-btn:hover {
+  opacity: 1;
+}
+
+.ghost-btn--danger {
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
+}
+
+.ghost-btn--danger:hover:not(:disabled) {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.addpl__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 260px;
+  overflow-y: auto;
+  margin: 8px 0;
+}
+
+.addpl__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-align: left;
+}
+
+.addpl__row:hover {
+  background: var(--bg-hover);
+}
+
+.addpl__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 550;
+}
+
+.addpl__count {
+  font-size: 11px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.addpl__empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+.addpl__new {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.addpl__new .text-input {
+  flex: 1;
 }

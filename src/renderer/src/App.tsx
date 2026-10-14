@@ -3,6 +3,7 @@ import { useLibrary } from '@renderer/state/useLibrary'
 import { useSettings } from '@renderer/state/useSettings'
 import { usePlayer } from '@renderer/state/usePlayer'
 import { useArtwork } from '@renderer/state/useArtwork'
+import { usePlaylists } from '@renderer/state/usePlaylists'
 import {
   applyTheme,
   extractPalette,
@@ -23,6 +24,7 @@ import { LyricsView } from '@renderer/components/LyricsView'
 import { LyricsDialog } from '@renderer/components/LyricsDialog'
 import { useLyricsAvailable } from '@renderer/state/useLyricsAvailable'
 import { AddUrlDialog } from '@renderer/components/AddUrlDialog'
+import { AddToPlaylistDialog } from '@renderer/components/AddToPlaylistDialog'
 import { SettingsView } from '@renderer/components/SettingsView'
 import { SearchView } from '@renderer/components/SearchView'
 import { ShortcutsOverlay } from '@renderer/components/ShortcutsOverlay'
@@ -32,6 +34,7 @@ const api = window.lagu
 
 export function App() {
   const library = useLibrary()
+  const playlists = usePlaylists()
   const { settings, update, reload, loaded } = useSettings()
 
   const resolve = useCallback((id: string) => library.byId.get(id), [library.byId])
@@ -48,8 +51,9 @@ export function App() {
   const [queueWidth, setQueueWidth] = useState(300)
   const [lyricsRevision, setLyricsRevision] = useState(0)
   const [lyricsDialog, setLyricsDialog] = useState(false)
-  const [browseFocus, setBrowseFocus] = useState<{ kind: 'album' | 'artist'; ref: string; token: number } | null>(null)
+  const [browseFocus, setBrowseFocus] = useState<{ kind: 'album' | 'artist' | 'playlist'; ref: string; token: number } | null>(null)
   const [browseReset, setBrowseReset] = useState(0)
+  const [playlistDialog, setPlaylistDialog] = useState<{ trackIds: string[]; createOnly: boolean } | null>(null)
   const focusToken = useRef(0)
   const [artworkPalette, setArtworkPalette] = useState<Palette | null>(null)
   const initialisedView = useRef(false)
@@ -340,17 +344,29 @@ export function App() {
         if (!player.playing && list.length > 0) player.playContext(list, 0)
         return
       }
+      if (pin.kind === 'playlist') {
+        setSelection('playlists')
+        setBrowseFocus({ kind: 'playlist', ref: pin.ref, token: ++focusToken.current })
+        return
+      }
       const list = library.tracks.filter((t) => (t.albumArtist || t.artist) === pin.ref)
       setSelection('artists')
       setBrowseFocus({ kind: 'artist', ref: pin.ref, token: ++focusToken.current })
       if (!player.playing && list.length > 0) player.playContext(list, 0)
+      return
     },
     [library, player]
   )
 
   const selectSection = useCallback((sel: SidebarSelection) => {
     setSelection(sel)
-    if (sel === 'library' || sel === 'albums' || sel === 'artists' || sel === 'folders') {
+    if (
+      sel === 'library' ||
+      sel === 'albums' ||
+      sel === 'artists' ||
+      sel === 'playlists' ||
+      sel === 'folders'
+    ) {
       setBrowseFocus(null)
       setBrowseReset((n) => n + 1)
     }
@@ -392,6 +408,7 @@ export function App() {
         if (library.pinned.some((p) => p.id === id)) return
         void library.setPinned([...library.pinned, { ...item, id }])
       },
+      addToPlaylist: (trackIds) => setPlaylistDialog({ trackIds, createOnly: false }),
       defaultLyricsOffset: settings.lyricsOffset,
       online: settings.fetchArtworkOnline
     }),
@@ -480,6 +497,7 @@ export function App() {
             onSearchSelect={openSearchResult}
             pinned={library.pinned}
             tracks={library.tracks}
+            playlists={playlists.playlists}
             volume={settings.volume}
             muted={settings.muted}
             onSetVolume={player.setVolume}
@@ -549,6 +567,8 @@ export function App() {
               key={browseReset}
               section={selection}
               tracks={library.tracks}
+              byId={library.byId}
+              playlists={playlists.playlists}
               folders={library.folders}
               scanning={library.scanning}
               progress={library.progress}
@@ -567,6 +587,13 @@ export function App() {
               onAddFolder={() => void library.addFolder()}
               onRescan={() => void library.rescan()}
               onRemoveFolder={(id) => void library.removeFolder(id)}
+              onCreatePlaylist={() => setPlaylistDialog({ trackIds: [], createOnly: true })}
+              onRenamePlaylist={(id, name) => playlists.rename(id, name)}
+              onDeletePlaylist={(id) => {
+                playlists.remove(id)
+                if (browseFocus?.kind === 'playlist' && browseFocus.ref === id) setBrowseFocus(null)
+              }}
+              onRemoveFromPlaylist={(id, trackId) => playlists.removeTrack(id, trackId)}
               meta={meta}
               albumSort={settings.albumSort}
               albumSortDesc={settings.albumSortDesc}
@@ -617,6 +644,25 @@ export function App() {
       />
 
       {addUrlOpen && <AddUrlDialog onSubmit={library.addUrl} onClose={() => setAddUrlOpen(false)} />}
+
+      {playlistDialog && (
+        <AddToPlaylistDialog
+          playlists={playlists.playlists}
+          trackCount={playlistDialog.trackIds.length}
+          createOnly={playlistDialog.createOnly}
+          onAdd={(id) => {
+            playlists.addTracks(id, playlistDialog.trackIds)
+            setPlaylistDialog(null)
+          }}
+          onCreate={(name) => {
+            const playlist = playlists.create(name, playlistDialog.trackIds)
+            setPlaylistDialog(null)
+            setSelection('playlists')
+            setBrowseFocus({ kind: 'playlist', ref: playlist.id, token: ++focusToken.current })
+          }}
+          onClose={() => setPlaylistDialog(null)}
+        />
+      )}
 
       {shortcutsOpen && (
         <ShortcutsOverlay onClose={() => setShortcutsOpen(false)} bindings={settings.keybindings} />

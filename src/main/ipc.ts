@@ -161,6 +161,12 @@ export function registerIpc(
     return library.setPinned(Array.isArray(pinned) ? (pinned as never[]) : [])
   })
 
+  ipcMain.handle(IPC.playlistsGet, () => library.getPlaylists())
+
+  ipcMain.handle(IPC.playlistsSet, (_e, playlists: unknown) => {
+    return library.setPlaylists(Array.isArray(playlists) ? (playlists as never[]) : [])
+  })
+
   ipcMain.handle(IPC.metadataSetLyricsOffset, (_e, trackIds: string[], ms: number | null) => {
     return library.setLyricsOffset(Array.isArray(trackIds) ? trackIds : [], ms ?? null)
   })

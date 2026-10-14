@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
-import type { LibraryFolder, PinnedItem, Track } from '@shared/types'
+import type { LibraryFolder, PinnedItem, Playlist, Track } from '@shared/types'
 import {
   AlbumIcon,
   ArtistIcon,
@@ -11,6 +11,7 @@ import {
   GraphicEqIcon,
   LibraryIcon,
   LinkIcon,
+  PlaylistIcon,
   RefreshIcon,
   SearchIcon,
   SettingsIcon,
@@ -27,7 +28,7 @@ import { folderName } from '@renderer/lib/format'
 import { albumKeyOf } from '@renderer/lib/album'
 import { useArtistImage } from '@renderer/state/useArtistImage'
 
-export type BrowseSection = 'library' | 'albums' | 'artists' | 'folders'
+export type BrowseSection = 'library' | 'albums' | 'artists' | 'playlists' | 'folders'
 export type SidebarSelection = 'now' | BrowseSection | 'search' | 'settings'
 
 /** A clickable result from the global search. */
@@ -50,6 +51,7 @@ interface SidebarProps {
   onSearchSelect: (target: SearchTarget) => void
   pinned: PinnedItem[]
   tracks: Track[]
+  playlists: Playlist[]
   volume: number
   muted: boolean
   onSetVolume: (value: number) => void
@@ -65,7 +67,8 @@ interface SidebarProps {
 const NAV: { id: BrowseSection; label: string; icon: typeof GraphicEqIcon }[] = [
   { id: 'library', label: 'Library', icon: LibraryIcon },
   { id: 'albums', label: 'Albums', icon: AlbumIcon },
-  { id: 'artists', label: 'Artists', icon: ArtistIcon }
+  { id: 'artists', label: 'Artists', icon: ArtistIcon },
+  { id: 'playlists', label: 'Playlists', icon: PlaylistIcon }
 ]
 
 export function Sidebar({
@@ -82,6 +85,7 @@ export function Sidebar({
   onSearchSelect,
   pinned,
   tracks,
+  playlists,
   volume,
   muted,
   onSetVolume,
@@ -147,6 +151,7 @@ export function Sidebar({
                 key={pin.id}
                 pin={pin}
                 tracks={tracks}
+                playlists={playlists}
                 onActivate={onActivatePin}
                 onUnpin={onUnpin}
               />
@@ -549,11 +554,13 @@ function PinThumb({
 function PinRow({
   pin,
   tracks,
+  playlists,
   onActivate,
   onUnpin
 }: {
   pin: PinnedItem
   tracks: Track[]
+  playlists: Playlist[]
   onActivate: (pin: PinnedItem) => void
   onUnpin: (id: string) => void
 }) {
@@ -564,6 +571,10 @@ function PinRow({
     artTrackId = tracks.find((t) => t.id === pin.ref)?.id ?? null
   } else if (pin.kind === 'album') {
     const list = tracks.filter((t) => albumKeyOf(t) === pin.ref)
+    artTrackId = (list.find((t) => t.hasArtwork) ?? list[0])?.id ?? null
+  } else if (pin.kind === 'playlist') {
+    const playlist = playlists.find((p) => p.id === pin.ref)
+    const list = playlist ? tracks.filter((t) => playlist.trackIds.includes(t.id)) : []
     artTrackId = (list.find((t) => t.hasArtwork) ?? list[0])?.id ?? null
   } else {
     const list = tracks.filter((t) => (t.albumArtist || t.artist) === pin.ref)

@@ -2,7 +2,7 @@ import { app } from 'electron'
 import { promises as fs } from 'node:fs'
 import { createHash } from 'node:crypto'
 import path from 'node:path'
-import type { AppSettings, PersistedState, PinnedItem, Track, TrackOverride } from '@shared/types'
+import type { AppSettings, PersistedState, PinnedItem, Playlist, Track, TrackOverride } from '@shared/types'
 import { DEFAULT_KEYBINDINGS } from '@shared/keybinds'
 
 /** Legacy file names (pre user-visible folder) used for one-time migration. */
@@ -59,7 +59,8 @@ function emptyState(): PersistedState {
     queue: { order: [], index: -1 },
     hidden: [],
     pinned: [],
-    artistBio: {}
+    artistBio: {},
+    playlists: []
   }
 }
 
@@ -212,7 +213,8 @@ export class Store {
         queue: parsed.queue ?? base.queue,
         hidden: parsed.hidden ?? base.hidden,
         pinned: parsed.pinned ?? base.pinned,
-        artistBio: parsed.artistBio ?? base.artistBio
+        artistBio: parsed.artistBio ?? base.artistBio,
+        playlists: parsed.playlists ?? base.playlists
       }
     } catch {
       this.state = base
@@ -309,6 +311,15 @@ export class Store {
     this.scheduleSave()
   }
 
+  get playlists(): Playlist[] {
+    return this.state.playlists
+  }
+
+  setPlaylists(playlists: Playlist[]): void {
+    this.state.playlists = playlists
+    this.scheduleSave()
+  }
+
   getArtistBio(name: string): string {
     return this.state.artistBio[name] ?? ''
   }
@@ -388,7 +399,8 @@ export class Store {
       queue: this.state.queue,
       hidden: this.state.hidden,
       pinned: this.state.pinned,
-      artistBio: this.state.artistBio
+      artistBio: this.state.artistBio,
+      playlists: this.state.playlists
     }
     try {
       await fs.writeFile(this.statePath, JSON.stringify(rest, null, 2), 'utf8')

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type {
   AlbumSort,
   PinnedItem,
+  Playlist,
   LibraryFolder,
   MetadataPatch,
   ScanProgress,
@@ -20,6 +21,7 @@ import {
   LyricsRemoveIcon,
   PlayIcon,
   PinIcon,
+  PlaylistIcon,
   PlusIcon,
   QueueIcon,
   RefreshIcon,
@@ -37,6 +39,8 @@ import { AlbumView } from './AlbumView'
 import { LyricsDialog } from './LyricsDialog'
 import { SongGrid } from './SongGrid'
 import { ArtistGrid } from './ArtistGrid'
+import { PlaylistGrid } from './PlaylistGrid'
+import { PlaylistView } from './PlaylistView'
 import { SearchBar } from './SearchBar'
 import { GridIcon, ListIcon } from '@renderer/icons'
 import { formatTotalDuration, folderName } from '@renderer/lib/format'
@@ -55,6 +59,7 @@ export interface MetadataActions {
   clearLyrics: (trackId: string) => void
   setLyricsOffset: (trackId: string, ms: number | null) => void
   pin: (item: Omit<PinnedItem, 'id'>) => void
+  addToPlaylist: (trackIds: string[]) => void
   /** Global lyrics offset in ms, used as the default in the editor. */
   defaultLyricsOffset: number
   online: boolean
@@ -63,6 +68,8 @@ export interface MetadataActions {
 interface BrowseProps {
   section: BrowseSection
   tracks: Track[]
+  byId: Map<string, Track>
+  playlists: Playlist[]
   folders: LibraryFolder[]
   scanning: boolean
   progress: ScanProgress | null
@@ -77,12 +84,16 @@ interface BrowseProps {
   onAddFolder: () => void
   onRescan: () => void
   onRemoveFolder: (id: string) => void
+  onCreatePlaylist: () => void
+  onRenamePlaylist: (id: string, name: string) => void
+  onDeletePlaylist: (id: string) => void
+  onRemoveFromPlaylist: (id: string, trackId: string) => void
   meta: MetadataActions
   albumSort: AlbumSort
   albumSortDesc: boolean
   onSortChange: (sort: AlbumSort, desc: boolean) => void
   /** External navigation request (e.g. from a sidebar pin). */
-  focus?: { kind: 'album' | 'artist'; ref: string; token: number } | null
+  focus?: { kind: 'album' | 'artist' | 'playlist'; ref: string; token: number } | null
 }
 
 interface EditState {
@@ -95,6 +106,8 @@ interface EditState {
 export function Browse({
   section,
   tracks,
+  byId,
+  playlists,
   folders,
   scanning,
   progress,
@@ -109,6 +122,10 @@ export function Browse({
   onAddFolder,
   onRescan,
   onRemoveFolder,
+  onCreatePlaylist,
+  onRenamePlaylist,
+  onDeletePlaylist,
+  onRemoveFromPlaylist,
   meta,
   albumSort,
   albumSortDesc,
@@ -117,6 +134,7 @@ export function Browse({
 }: BrowseProps) {
   const [albumKey, setAlbumKey] = useState<string | null>(null)
   const [artist, setArtist] = useState<string | null>(null)
+  const [playlistId, setPlaylistId] = useState<string | null>(null)
   const [folderPath, setFolderPath] = useState<string | null>(null)
   const [menu, setMenu] = useState<{ x: number; y: number; items: MenuItem[] } | null>(null)
   const [edit, setEdit] = useState<EditState | null>(null)
@@ -130,6 +148,7 @@ export function Browse({
     setAlbumKey(null)
     setArtist(null)
     setFolderPath(null)
+    setPlaylistId(null)
     setLibQuery('')
   }, [section])
 
@@ -145,17 +164,24 @@ export function Browse({
     }
   }, [section])
 
-  // Open an album/artist requested from outside (sidebar pin, etc.).
+  // Open an album/artist/playlist requested from outside (sidebar pin, etc.).
   useEffect(() => {
     if (!focus) return
     if (focus.kind === 'album') {
       setAlbumKey(focus.ref)
       setArtist(null)
       setFolderPath(null)
+      setPlaylistId(null)
+    } else if (focus.kind === 'playlist') {
+      setPlaylistId(focus.ref)
+      setAlbumKey(null)
+      setArtist(null)
+      setFolderPath(null)
     } else {
       setArtist(focus.ref)
       setAlbumKey(null)
       setFolderPath(null)
+      setPlaylistId(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focus?.token])
@@ -185,12 +211,17 @@ export function Browse({
   const selectedAlbum = albumKey ? albums.find((a) => a.key === albumKey) ?? null : null
   const artistTracks = artist ? tracks.filter((t) => (t.albumArtist || t.artist) === artist) : []
   const folderTracks = folderPath ? tracks.filter((t) => (t.folder || '(streams)') === folderPath) : []
+  const selectedPlaylist = playlistId ? playlists.find((p) => p.id === playlistId) ?? null : null
+  const playlistTracks = selectedPlaylist
+    ? selectedPlaylist.trackIds.map((id) => byId.get(id)).filter((t): t is Track => Boolean(t))
+    : []
 
-  const showBack = Boolean(selectedAlbum || artist || folderPath)
+  const showBack = Boolean(selectedAlbum || artist || folderPath || selectedPlaylist)
   const back = (): void => {
     setAlbumKey(null)
     setArtist(null)
     setFolderPath(null)
+    setPlaylistId(null)
   }
 
   // --- context menus --------------------------------------------------------
@@ -240,6 +271,11 @@ export function Browse({
         icon: <PinIcon size={15} />,
         separatorBefore: true,
         onClick: () => meta.pin({ kind: 'album', ref: album.key, label: album.name, subtitle: album.artist })
+      },
+      {
+        label: 'Add to playlist…',
+        icon: <PlaylistIcon size={15} />,
+        onClick: () => meta.addToPlaylist(ids)
       },
       ...removalItems(ids)
     )
@@ -302,6 +338,12 @@ export function Browse({
         onClick: () => meta.pin({ kind: 'track', ref: track.id, label: track.title, subtitle: track.artist })
       }
     )
+    items.push({
+      label: 'Add to playlist…',
+      icon: <PlaylistIcon size={15} />,
+      separatorBefore: true,
+      onClick: () => meta.addToPlaylist([track.id])
+    })
     items.push(...removalItems([track.id]))
     setMenu({ x, y, items })
   }
@@ -334,8 +376,59 @@ export function Browse({
           })
       }
     ]
+    items.push({
+      label: 'Add to playlist…',
+      icon: <PlaylistIcon size={15} />,
+      onClick: () => meta.addToPlaylist(ids)
+    })
     items.push(...removalItems(ids))
     setMenu({ x, y, items })
+  }
+
+  const openPlaylistMenu = (playlist: Playlist, x: number, y: number): void => {
+    const items: MenuItem[] = [
+      { label: 'Open playlist', icon: <PlaylistIcon size={15} />, onClick: () => setPlaylistId(playlist.id) },
+      {
+        label: 'Pin to sidebar',
+        icon: <PinIcon size={15} />,
+        separatorBefore: true,
+        onClick: () =>
+          meta.pin({
+            kind: 'playlist',
+            ref: playlist.id,
+            label: playlist.name,
+            subtitle: `${playlist.trackIds.length} track${playlist.trackIds.length === 1 ? '' : 's'}`
+          })
+      },
+      {
+        label: 'Delete playlist',
+        icon: <TrashIcon size={15} />,
+        danger: true,
+        separatorBefore: true,
+        onClick: () => onDeletePlaylist(playlist.id)
+      }
+    ]
+    setMenu({ x, y, items })
+  }
+
+  const openPlaylistTrackMenu = (track: Track, x: number, y: number): void => {
+    if (!selectedPlaylist) return
+    const pid = selectedPlaylist.id
+    setMenu({
+      x,
+      y,
+      items: [
+        { label: 'Play', icon: <PlayIcon size={15} />, onClick: () => onPlayContext([track], 0) },
+        { label: 'Play next', icon: <PlusIcon size={15} />, onClick: () => onPlayNext(track) },
+        { label: 'Add to queue', icon: <QueueIcon size={15} />, onClick: () => onAddToQueue(track) },
+        {
+          label: 'Remove from playlist',
+          icon: <RemoveCircleIcon size={15} />,
+          separatorBefore: true,
+          onClick: () => onRemoveFromPlaylist(pid, track.id)
+        }
+      ]
+    })
   }
 
   const openSortMenu = (x: number, y: number): void => {
@@ -362,9 +455,11 @@ export function Browse({
     ? selectedAlbum.name
     : artist
       ? artist
-      : folderPath
-        ? folderName(folderPath)
-        : LABELS[section]
+      : selectedPlaylist
+        ? selectedPlaylist.name
+        : folderPath
+          ? folderName(folderPath)
+          : LABELS[section]
 
   let body
   if (selectedAlbum) {
@@ -403,6 +498,23 @@ export function Browse({
           setArtist(null)
           setAlbumKey(album.key)
         }}
+      />
+    )
+  } else if (selectedPlaylist) {
+    body = (
+      <PlaylistView
+        playlist={selectedPlaylist}
+        tracks={playlistTracks}
+        playing={playing}
+        currentTrackId={currentTrackId}
+        onPlayContext={onPlayContext}
+        onToggle={onToggle}
+        onPlayNext={onPlayNext}
+        onAddToQueue={onAddToQueue}
+        onFindCover={onFindCover}
+        onTrackContextMenu={openPlaylistTrackMenu}
+        onRename={(name) => onRenamePlaylist(selectedPlaylist.id, name)}
+        onDelete={() => onDeletePlaylist(selectedPlaylist.id)}
       />
     )
   } else if (folderPath) {
@@ -513,6 +625,16 @@ export function Browse({
             y
           )
         }
+      />
+    )
+  } else if (section === 'playlists') {
+    body = (
+      <PlaylistGrid
+        playlists={playlists}
+        byId={byId}
+        onOpen={(id) => setPlaylistId(id)}
+        onCreate={onCreatePlaylist}
+        onContextMenu={openPlaylistMenu}
       />
     )
   } else {
@@ -659,5 +781,6 @@ const LABELS: Record<BrowseSection, string> = {
   library: 'Library',
   albums: 'Albums',
   artists: 'Artists',
+  playlists: 'Playlists',
   folders: 'Folders'
 }

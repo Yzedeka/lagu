@@ -5,6 +5,7 @@ import type {
   LibraryFolder,
   MetadataPatch,
   PinnedItem,
+  Playlist,
   QueueState,
   ScanError,
   ScanProgress,
@@ -34,6 +35,8 @@ export const IPC = {
   artworkArtistImage: 'artwork:artist-image',
   pinsGet: 'pins:get',
   pinsSet: 'pins:set',
+  playlistsGet: 'playlists:get',
+  playlistsSet: 'playlists:set',
   artistBioGet: 'artists:bio-get',
   artistBioSet: 'artists:bio-set',
   artistBioAll: 'artists:bio-all',
@@ -145,6 +148,10 @@ export interface LaguApi {
   pins: {
     get(): Promise<PinnedItem[]>
     set(pinned: PinnedItem[]): Promise<PinnedItem[]>
+  }
+  playlists: {
+    get(): Promise<Playlist[]>
+    set(playlists: Playlist[]): Promise<Playlist[]>
   }
   artists: {
     getBio(name: string): Promise<string>

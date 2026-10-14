@@ -58,11 +58,19 @@ export type AlbumSort = 'artist' | 'name' | 'year' | 'added' | 'tracks'
 /** An item pinned to the sidebar for quick access. */
 export interface PinnedItem {
   id: string
-  kind: 'track' | 'album' | 'artist'
-  /** trackId for tracks, album key for albums, artist name for artists. */
+  kind: 'track' | 'album' | 'artist' | 'playlist'
+  /** trackId for tracks, album key for albums, artist name for artists, playlist id for playlists. */
   ref: string
   label: string
   subtitle?: string
+}
+
+/** A user-made collection of tracks. */
+export interface Playlist {
+  id: string
+  name: string
+  trackIds: string[]
+  createdAt: number
 }
 
 /**
@@ -179,6 +187,8 @@ export interface PersistedState {
   pinned: PinnedItem[]
   /** User-written artist bios, keyed by artist name. */
   artistBio: Record<string, string>
+  /** User-made playlists. */
+  playlists: Playlist[]
 }
 
 export interface ScanError {
