@@ -379,6 +379,10 @@ export function Browse({
         onAddToQueue={onAddToQueue}
         onFindCover={onFindCover}
         onContextMenu={openTrackMenu}
+        onOpenArtist={(name) => {
+          setAlbumKey(null)
+          setArtist(name)
+        }}
       />
     )
   } else if (artist) {

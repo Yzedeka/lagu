@@ -58,16 +58,18 @@ function ArtistCard({
         if (e.key === 'Enter') onOpen(group.name)
       }}
     >
-      <div className="artist-card__art">
-        {image ? (
-          <img className="artist-card__img art" src={image} alt="" draggable={false} />
-        ) : artTrack ? (
-          <AlbumArt trackId={artTrack.id} className="artist-card__img" iconSize={40} />
-        ) : (
-          <div className="artist-card__img art--fallback">
-            <ArtistIcon size={40} />
-          </div>
-        )}
+      <div className="artist-card__artwrap">
+        <div className="artist-card__art">
+          {image ? (
+            <img className="artist-card__img art" src={image} alt="" draggable={false} />
+          ) : artTrack ? (
+            <AlbumArt trackId={artTrack.id} className="artist-card__img" iconSize={40} />
+          ) : (
+            <div className="artist-card__img art--fallback">
+              <ArtistIcon size={40} />
+            </div>
+          )}
+        </div>
         <button
           type="button"
           className="artist-card__play"

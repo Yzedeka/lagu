@@ -10,7 +10,7 @@ import {
   resolvePalette,
   type Palette
 } from '@renderer/theme/palette'
-import { Sidebar, type SidebarSelection } from '@renderer/components/Sidebar'
+import { Sidebar, type SidebarSelection, type SearchTarget } from '@renderer/components/Sidebar'
 import type { PinnedItem } from '@shared/types'
 import { KEYBIND_IDS, normalizeKey } from '@shared/keybinds'
 import { albumKeyOf } from '@renderer/lib/album'
@@ -49,6 +49,7 @@ export function App() {
   const [lyricsRevision, setLyricsRevision] = useState(0)
   const [lyricsDialog, setLyricsDialog] = useState(false)
   const [browseFocus, setBrowseFocus] = useState<{ kind: 'album' | 'artist'; ref: string; token: number } | null>(null)
+  const [browseReset, setBrowseReset] = useState(0)
   const focusToken = useRef(0)
   const [artworkPalette, setArtworkPalette] = useState<Palette | null>(null)
   const initialisedView = useRef(false)
@@ -347,6 +348,32 @@ export function App() {
     [library, player]
   )
 
+  const selectSection = useCallback((sel: SidebarSelection) => {
+    setSelection(sel)
+    if (sel === 'library' || sel === 'albums' || sel === 'artists' || sel === 'folders') {
+      setBrowseFocus(null)
+      setBrowseReset((n) => n + 1)
+    }
+  }, [])
+
+  const openSearchResult = useCallback(
+    (target: SearchTarget) => {
+      if (target.kind === 'track') {
+        const track = library.byId.get(target.ref)
+        if (track) player.playTrack(track)
+        return
+      }
+      if (target.kind === 'album') {
+        setSelection('albums')
+        setBrowseFocus({ kind: 'album', ref: target.ref, token: ++focusToken.current })
+        return
+      }
+      setSelection('artists')
+      setBrowseFocus({ kind: 'artist', ref: target.ref, token: ++focusToken.current })
+    },
+    [library, player]
+  )
+
   const meta = useMemo<MetadataActions>(
     () => ({
       update: (ids, patch) => void api.metadata.update(ids, patch),
@@ -421,7 +448,7 @@ export function App() {
         {settings.showSidebar && (
           <Sidebar
             selection={selection}
-            onSelect={setSelection}
+            onSelect={selectSection}
             width={sidebarWidth}
             onResize={setSidebarWidth}
             onResizeEnd={(w) => update({ sidebarWidth: w })}
@@ -430,6 +457,7 @@ export function App() {
             searchValue={searchInput}
             onSearchChange={setSearchInput}
             onSearchSubmit={submitSearch}
+            onSearchSelect={openSearchResult}
             pinned={library.pinned}
             tracks={library.tracks}
             volume={settings.volume}
@@ -494,6 +522,7 @@ export function App() {
 
           {selection !== 'now' && selection !== 'settings' && selection !== 'search' && (
             <Browse
+              key={browseReset}
               section={selection}
               tracks={library.tracks}
               folders={library.folders}

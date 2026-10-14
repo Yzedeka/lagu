@@ -2364,6 +2364,97 @@ button,
   background: var(--bg-hover);
 }
 
+/* Global search results (above the sidebar search box) ----------------- */
+.searchdrop {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: calc(100% + 6px);
+  z-index: 20;
+  max-height: 56vh;
+  overflow-y: auto;
+  padding: 5px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  box-shadow: 0 16px 44px var(--shadow);
+  animation: popIn 0.14s var(--ease);
+}
+
+.searchdrop__label {
+  padding: 6px 8px 3px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.searchdrop__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: calc(var(--radius) * 0.8);
+  text-align: left;
+}
+
+.searchdrop__row:hover {
+  background: var(--bg-hover);
+}
+
+.searchdrop__thumb {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: calc(var(--radius) * 0.7);
+  object-fit: cover;
+}
+
+.searchdrop__thumb--round {
+  border-radius: 50%;
+}
+
+.searchdrop__thumb.art--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+}
+
+.searchdrop__main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.searchdrop__title {
+  font-size: 12.5px;
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchdrop__sub {
+  font-size: 11px;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchdrop__empty {
+  padding: 12px;
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
 .search--compact {
   height: 30px;
   padding: 0 4px 0 10px;
@@ -2625,6 +2716,10 @@ button,
   background: var(--bg-elevated);
 }
 
+.pin-thumb--round {
+  border-radius: 50%;
+}
+
 .pin-row__meta {
   display: flex;
   flex-direction: column;
@@ -2727,6 +2822,10 @@ button,
   background: var(--bg-elevated);
 }
 
+.profile__art--round {
+  border-radius: 50%;
+}
+
 .profile__info {
   flex: 1;
   min-width: 0;
@@ -2754,6 +2853,18 @@ button,
 .profile__meta {
   font-size: 12px;
   color: var(--text-faint);
+}
+
+.profile__artist-link {
+  color: var(--text-dim);
+  font: inherit;
+  transition: color 0.15s var(--ease);
+}
+
+.profile__artist-link:hover {
+  color: var(--accent-bright);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .profile__actions {
@@ -3123,10 +3234,15 @@ button,
   padding: 4px;
 }
 
-.artist-card__art {
+.artist-card__artwrap {
   position: relative;
   width: 124px;
   height: 124px;
+}
+
+.artist-card__art {
+  position: absolute;
+  inset: 0;
   border-radius: 50%;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -3155,13 +3271,13 @@ button,
 
 .artist-card__play {
   position: absolute;
-  right: 3px;
-  bottom: 3px;
+  right: -2px;
+  bottom: -2px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: var(--accent);
   color: var(--accent-contrast);

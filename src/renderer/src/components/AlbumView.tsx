@@ -17,6 +17,7 @@ interface AlbumViewProps {
   onAddToQueue: (track: Track) => void
   onFindCover?: (track: Track) => void
   onContextMenu: (track: Track, x: number, y: number) => void
+  onOpenArtist: (name: string) => void
 }
 
 export function AlbumView({
@@ -28,7 +29,8 @@ export function AlbumView({
   onPlayNext,
   onAddToQueue,
   onFindCover,
-  onContextMenu
+  onContextMenu,
+  onOpenArtist
 }: AlbumViewProps) {
   const [query, setQuery] = useState('')
   const artTrack = album.tracks.find((t) => t.hasArtwork) ?? album.tracks[0]
@@ -50,9 +52,15 @@ export function AlbumView({
           <div className="profile__kind">Album</div>
           <h1 className="profile__name">{album.name}</h1>
           <div className="profile__meta">
-            {album.artist}
-            {album.year ? ` - ${album.year}` : ''} - {album.tracks.length} track
-            {album.tracks.length === 1 ? '' : 's'} - {formatTotalDuration(album.duration)}
+            <button
+              type="button"
+              className="profile__artist-link"
+              onClick={() => onOpenArtist(album.artist)}
+            >
+              {album.artist}
+            </button>
+            {album.year ? ` · ${album.year}` : ''} · {album.tracks.length} track
+            {album.tracks.length === 1 ? '' : 's'} · {formatTotalDuration(album.duration)}
           </div>
           <div className="profile__actions">
             <button

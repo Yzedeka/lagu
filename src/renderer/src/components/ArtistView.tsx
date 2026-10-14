@@ -87,11 +87,11 @@ export function ArtistView({
     <div className="profile">
       <header className="profile__hero">
         {image ? (
-          <img className="profile__art art" src={image} alt="" draggable={false} />
+          <img className="profile__art profile__art--round art" src={image} alt="" draggable={false} />
         ) : artTrack ? (
-          <AlbumArt trackId={artTrack.id} className="profile__art" iconSize={56} />
+          <AlbumArt trackId={artTrack.id} className="profile__art profile__art--round" iconSize={56} />
         ) : (
-          <div className="profile__art art--fallback">
+          <div className="profile__art profile__art--round art--fallback">
             <ArtistIcon size={56} />
           </div>
         )}

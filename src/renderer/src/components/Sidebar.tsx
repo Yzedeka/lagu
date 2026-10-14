@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { LibraryFolder, PinnedItem, Track } from '@shared/types'
 import {
   AlbumIcon,
@@ -21,6 +21,7 @@ import {
 import { AlbumArt } from './AlbumArt'
 import { ContextMenu } from './ContextMenu'
 import { Range } from './Range'
+import { buildAlbums, buildArtists } from '@renderer/lib/album'
 import appIconUrl from '@renderer/icons/app_icon.png'
 import { folderName } from '@renderer/lib/format'
 import { albumKeyOf } from '@renderer/lib/album'
@@ -28,6 +29,12 @@ import { useArtistImage } from '@renderer/state/useArtistImage'
 
 export type BrowseSection = 'library' | 'albums' | 'artists' | 'folders'
 export type SidebarSelection = 'now' | BrowseSection | 'search' | 'settings'
+
+/** A clickable result from the global search. */
+export interface SearchTarget {
+  kind: 'track' | 'album' | 'artist'
+  ref: string
+}
 
 interface SidebarProps {
   selection: SidebarSelection
@@ -40,6 +47,7 @@ interface SidebarProps {
   searchValue: string
   onSearchChange: (value: string) => void
   onSearchSubmit: () => void
+  onSearchSelect: (target: SearchTarget) => void
   pinned: PinnedItem[]
   tracks: Track[]
   volume: number
@@ -71,6 +79,7 @@ export function Sidebar({
   searchValue,
   onSearchChange,
   onSearchSubmit,
+  onSearchSelect,
   pinned,
   tracks,
   volume,
@@ -201,6 +210,8 @@ export function Sidebar({
           value={searchValue}
           onChange={onSearchChange}
           onSubmit={onSearchSubmit}
+          tracks={tracks}
+          onSelect={onSearchSelect}
         />
         <div className="footer-tools">
           <button
@@ -301,14 +312,37 @@ function VolumeControl({
   )
 }
 
+function ArtistThumb({ name, artTrackId }: { name: string; artTrackId: string | null }) {
+  const image = useArtistImage(name)
+  if (image) {
+    return (
+      <img className="searchdrop__thumb searchdrop__thumb--round art" src={image} alt="" draggable={false} />
+    )
+  }
+  if (artTrackId) {
+    return (
+      <AlbumArt trackId={artTrackId} className="searchdrop__thumb searchdrop__thumb--round" iconSize={14} />
+    )
+  }
+  return (
+    <div className="searchdrop__thumb searchdrop__thumb--round art--fallback">
+      <ArtistIcon size={14} />
+    </div>
+  )
+}
+
 function SidebarSearch({
   value,
   onChange,
-  onSubmit
+  onSubmit,
+  tracks,
+  onSelect
 }: {
   value: string
   onChange: (value: string) => void
   onSubmit: () => void
+  tracks: Track[]
+  onSelect: (target: SearchTarget) => void
 }) {
   const [open, setOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -316,6 +350,52 @@ function SidebarSearch({
   useEffect(() => {
     if (open) inputRef.current?.focus()
   }, [open])
+
+  const needle = value.trim().toLowerCase()
+  const albums = useMemo(() => buildAlbums(tracks), [tracks])
+  const artists = useMemo(() => buildArtists(tracks), [tracks])
+
+  const foundArtists = useMemo(
+    () => (needle ? artists.filter((a) => a.name.toLowerCase().includes(needle)).slice(0, 4) : []),
+    [artists, needle]
+  )
+  const foundAlbums = useMemo(
+    () =>
+      needle
+        ? albums
+            .filter(
+              (a) => a.name.toLowerCase().includes(needle) || a.artist.toLowerCase().includes(needle)
+            )
+            .slice(0, 4)
+        : [],
+    [albums, needle]
+  )
+  const foundTracks = useMemo(
+    () =>
+      needle
+        ? tracks
+            .filter(
+              (t) =>
+                t.title.toLowerCase().includes(needle) ||
+                t.artist.toLowerCase().includes(needle) ||
+                t.album.toLowerCase().includes(needle)
+            )
+            .slice(0, 6)
+        : [],
+    [tracks, needle]
+  )
+  const total = foundArtists.length + foundAlbums.length + foundTracks.length
+
+  const pick = (target: SearchTarget): void => {
+    onSelect(target)
+    onChange('')
+    setOpen(false)
+  }
+
+  const artTrackOf = (name: string): string | null =>
+    tracks.find((t) => (t.albumArtist || t.artist) === name && t.hasArtwork)?.id ??
+    tracks.find((t) => (t.albumArtist || t.artist) === name)?.id ??
+    null
 
   const close = (): void => {
     setOpen(false)
@@ -334,47 +414,112 @@ function SidebarSearch({
   }
 
   return (
-    <div className={`searchbox ${open ? 'searchbox--open' : ''}`}>
-      <button
-        type="button"
-        className="searchbox__btn"
-        title="Search library"
-        aria-label="Search library"
-        onClick={toggle}
-      >
-        <SearchIcon size={16} />
-      </button>
-      <input
-        ref={inputRef}
-        className="searchbox__input"
-        type="text"
-        value={value}
-        placeholder="Search library…"
-        spellCheck={false}
-        tabIndex={open ? 0 : -1}
-        onChange={(e) => onChange(e.target.value)}
-        onBlur={() => {
-          if (!value) setOpen(false)
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') onSubmit()
-          if (e.key === 'Escape') close()
-        }}
-      />
-      {value && (
+    <>
+      <div className={`searchbox ${open ? 'searchbox--open' : ''}`}>
         <button
           type="button"
-          className="searchbox__clear"
-          title="Clear"
-          onClick={() => {
-            onChange('')
-            inputRef.current?.focus()
-          }}
+          className="searchbox__btn"
+          title="Search"
+          aria-label="Search"
+          onClick={toggle}
         >
-          <CloseIcon size={13} />
+          <SearchIcon size={16} />
         </button>
+        <input
+          ref={inputRef}
+          className="searchbox__input"
+          type="text"
+          value={value}
+          placeholder="Search songs, albums, artists…"
+          spellCheck={false}
+          tabIndex={open ? 0 : -1}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={() => {
+            if (!value) setOpen(false)
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') onSubmit()
+            if (e.key === 'Escape') close()
+          }}
+        />
+        {value && (
+          <button
+            type="button"
+            className="searchbox__clear"
+            title="Clear"
+            onClick={() => {
+              onChange('')
+              inputRef.current?.focus()
+            }}
+          >
+            <CloseIcon size={13} />
+          </button>
+        )}
+      </div>
+
+      {open && needle && (
+        <div className="searchdrop" role="listbox" aria-label="Search results">
+          {total === 0 && <div className="searchdrop__empty">No matches for “{value.trim()}”.</div>}
+
+          {foundArtists.length > 0 && <div className="searchdrop__label">Artists</div>}
+          {foundArtists.map((a) => (
+            <button
+              key={`a-${a.name}`}
+              type="button"
+              className="searchdrop__row"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => pick({ kind: 'artist', ref: a.name })}
+            >
+              <ArtistThumb name={a.name} artTrackId={artTrackOf(a.name)} />
+              <span className="searchdrop__main">
+                <span className="searchdrop__title">{a.name}</span>
+                <span className="searchdrop__sub">
+                  Artist · {a.trackCount} track{a.trackCount === 1 ? '' : 's'}
+                </span>
+              </span>
+            </button>
+          ))}
+
+          {foundAlbums.length > 0 && <div className="searchdrop__label">Albums</div>}
+          {foundAlbums.map((al) => (
+            <button
+              key={`al-${al.key}`}
+              type="button"
+              className="searchdrop__row"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => pick({ kind: 'album', ref: al.key })}
+            >
+              <AlbumArt
+                trackId={(al.tracks.find((t) => t.hasArtwork) ?? al.tracks[0])?.id}
+                className="searchdrop__thumb"
+                iconSize={14}
+              />
+              <span className="searchdrop__main">
+                <span className="searchdrop__title">{al.name}</span>
+                <span className="searchdrop__sub">{al.artist}</span>
+              </span>
+            </button>
+          ))}
+
+          {foundTracks.length > 0 && <div className="searchdrop__label">Songs</div>}
+          {foundTracks.map((t) => (
+            <button
+              key={`t-${t.id}`}
+              type="button"
+              className="searchdrop__row"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => pick({ kind: 'track', ref: t.id })}
+            >
+              <AlbumArt trackId={t.id} className="searchdrop__thumb" iconSize={14} />
+              <span className="searchdrop__main">
+                <span className="searchdrop__title">{t.title}</span>
+                <span className="searchdrop__sub">{t.artist}</span>
+              </span>
+            </button>
+          ))}
+        </div>
       )}
-    </div>
+    </>
   )
 }
 
@@ -389,12 +534,13 @@ function PinThumb({
   artistName: string | null
 }) {
   const artistImage = useArtistImage(kind === 'artist' ? artistName : null)
+  const round = kind === 'artist' ? ' pin-thumb--round' : ''
   if (kind === 'artist' && artistImage) {
-    return <img className="pin-thumb art" src={artistImage} alt="" draggable={false} />
+    return <img className={`pin-thumb art${round}`} src={artistImage} alt="" draggable={false} />
   }
-  if (artTrackId) return <AlbumArt trackId={artTrackId} className="pin-thumb" iconSize={14} />
+  if (artTrackId) return <AlbumArt trackId={artTrackId} className={`pin-thumb${round}`} iconSize={14} />
   return (
-    <div className="pin-thumb art--fallback">
+    <div className={`pin-thumb art--fallback${round}`}>
       {kind === 'artist' ? <ArtistIcon size={14} /> : <DiscIcon size={14} />}
     </div>
   )
