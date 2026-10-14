@@ -10,6 +10,7 @@ const SLIDES: Slide[] = [
   { src: '/screenshots/library.png', label: 'Library' },
   { src: '/screenshots/albums.png', label: 'Albums' },
   { src: '/screenshots/artists.png', label: 'Artists' },
+  { src: '/screenshots/playlists.png', label: 'Playlists' },
   { src: '/screenshots/settings.png', label: 'Settings' }
 ]
 
