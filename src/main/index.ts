@@ -102,7 +102,7 @@ function createWindow(): void {
 }
 
 // A second launch (e.g. opening another file) focuses the existing window.
-const gotLock = process.env['LAGU_SMOKE'] ? true : app.requestSingleInstanceLock()
+const gotLock = app.requestSingleInstanceLock()
 if (!gotLock) app.quit()
 
 app.on('second-instance', (_e, argv) => {
