@@ -1612,7 +1612,7 @@ button,
   align-items: center;
   gap: 8px;
   min-width: 0;
-  height: 44px;
+  height: 34px;
   padding: 0 8px 0 4px;
   border-radius: var(--radius);
   cursor: default;
@@ -1620,44 +1620,40 @@ button,
 
 /* Queue density modes ------------------------------------------------ */
 .queue--normal .queue-row {
-  height: 44px;
-}
-
-.queue--compact .queue-row {
   height: 34px;
   gap: 6px;
   padding: 0 8px 0 2px;
 }
 
-.queue--compact .queue-grip,
-.queue--compact .queue-sub {
+.queue--normal .queue-grip,
+.queue--normal .queue-sub {
   display: none;
 }
 
-.queue--compact .queue-art {
+.queue--normal .queue-art {
   width: 26px;
   height: 26px;
 }
 
-.queue--tiny .queue-row {
+.queue--compact .queue-row {
   height: 28px;
   gap: 6px;
   padding: 0 6px 0 2px;
 }
 
-.queue--tiny .queue-grip,
-.queue--tiny .queue-sub,
-.queue--tiny .queue-dur,
-.queue--tiny .queue-row .icon-btn {
+.queue--compact .queue-grip,
+.queue--compact .queue-sub,
+.queue--compact .queue-dur,
+.queue--compact .queue-row .icon-btn {
   display: none;
 }
 
-.queue--tiny .queue-art {
+.queue--compact .queue-art {
   width: 22px;
   height: 22px;
 }
 
-.queue--tiny .queue-title-text {
+.queue--compact .queue-title-text {
   font-size: 12px;
 }
 
@@ -3699,4 +3695,51 @@ button,
 
 .addpl__new .text-input {
   flex: 1;
+}
+
+/* Unified motion ----------------------------------------------------- *
+ * One consistent, gentle transition for every interactive surface so the
+ * whole app feels like the same place. */
+.track-row,
+.queue-row,
+.folder-row,
+.folder-item,
+.artist-row,
+.pin-row,
+.searchdrop__row,
+.addpl__row,
+.settings__row,
+.context-menu__item,
+.shortcut-row,
+.nav-item,
+.brand-now,
+.settings-nav__item,
+.sidebar__section-toggle,
+.segmented button,
+.icon-btn,
+.ghost-btn,
+.primary-btn,
+.album-tile,
+.artist-card,
+.song-tile,
+.playlist-tile,
+.swatch,
+.switch,
+.select,
+.text-input {
+  transition: background-color 0.16s var(--ease), color 0.16s var(--ease),
+    border-color 0.16s var(--ease), transform 0.16s var(--ease),
+    box-shadow 0.2s var(--ease), opacity 0.16s var(--ease);
+}
+
+.folder-row:hover {
+  background: var(--bg-hover);
+}
+
+.settings__row:hover {
+  background: color-mix(in srgb, var(--bg-hover) 55%, transparent);
+}
+
+.context-menu__item:active:not(:disabled) {
+  transform: scale(0.99);
 }

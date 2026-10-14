@@ -335,8 +335,7 @@ export function SettingsView({
         value={settings.queueMode}
         options={[
           { id: 'normal', label: 'Normal' },
-          { id: 'compact', label: 'Compact' },
-          { id: 'tiny', label: 'Tiny' }
+          { id: 'compact', label: 'Compact' }
         ]}
         onChange={(queueMode) => update({ queueMode })}
       />,

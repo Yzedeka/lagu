@@ -608,7 +608,7 @@ export function App() {
             queue={player.queue}
             resolve={resolve}
             width={queueWidth}
-            mode={settings.queueMode}
+            mode={settings.queueMode === 'compact' ? 'compact' : 'normal'}
             onResize={setQueueWidth}
             onResizeEnd={(w) => update({ queueWidth: w })}
             onJump={player.jumpTo}
