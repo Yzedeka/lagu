@@ -3499,8 +3499,12 @@ button,
 }
 
 /* 3D album covers ---------------------------------------------------- */
-.album-tile__disc,
-.profile__disc {
+.cover3d {
+  position: absolute;
+  inset: 0;
+}
+
+.cover3d__disc {
   display: none;
 }
 
@@ -3516,41 +3520,65 @@ button,
   inset: 0;
 }
 
-.app--covers-3d .album-tile__art {
+/* Enabled: sleeve on the left, record sticking out ~50% to the right. */
+.app--covers-3d .album-tile__art:has(.cover3d) {
+  aspect-ratio: 3 / 2;
   overflow: visible;
   border: none;
   background: none;
 }
 
-.app--covers-3d .album-tile__disc,
-.app--covers-3d .profile__artwrap .profile__disc {
+.app--covers-3d .profile__artwrap {
+  width: 252px;
+}
+
+.app--covers-3d .cover3d {
+  transform: perspective(1200px) rotateY(-16deg);
+}
+
+.app--covers-3d .cover3d .album-tile__img,
+.app--covers-3d .cover3d .profile__art {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: auto;
+  bottom: auto;
+  width: auto;
+  height: 100%;
+  aspect-ratio: 1;
+  border-radius: 0;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
+  z-index: 2;
+}
+
+.app--covers-3d .cover3d__disc {
   display: block;
   position: absolute;
-  top: -6%;
-  left: -6%;
-  width: 112%;
-  height: 112%;
+  left: 33.3333%;
+  top: 0;
+  width: auto;
+  height: 100%;
+  aspect-ratio: 1;
   border-radius: 50%;
-  background: repeating-radial-gradient(circle at 50% 50%, #161616 0 2px, #272727 2px 4px);
-  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.62), inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+  background: repeating-radial-gradient(circle at 50% 50%, #131313 0 2px, #232323 2px 4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 2px rgba(255, 255, 255, 0.08);
   z-index: 1;
 }
 
-.app--covers-3d .album-tile__img,
-.app--covers-3d .profile__artwrap .profile__art {
-  position: relative;
-  z-index: 2;
-  border-radius: 0;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
-}
-
-.app--covers-3d .profile__artwrap .profile__art {
+.app--covers-3d .cover3d__label {
   position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 42%;
+  height: 42%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 /* The record spins while you hover the album. */
-.app--covers-3d .album-tile:hover .album-tile__disc {
-  animation: disc-spin 3.5s linear infinite;
+.app--covers-3d .album-tile:hover .cover3d__disc {
+  animation: disc-spin 4s linear infinite;
 }
 
 @keyframes disc-spin {

@@ -34,8 +34,12 @@ export function AlbumGrid({ albums, onOpen, onPlay, onContextMenu }: AlbumGridPr
           }}
         >
           <div className="album-tile__art">
-            <div className="album-tile__disc" aria-hidden />
-            <AlbumArt trackId={artworkTrack(album)} className="album-tile__img" iconSize={28} />
+            <div className="cover3d">
+              <div className="cover3d__disc" aria-hidden>
+                <AlbumArt trackId={artworkTrack(album)} className="cover3d__label" iconSize={18} />
+              </div>
+              <AlbumArt trackId={artworkTrack(album)} className="album-tile__img" iconSize={28} />
+            </div>
             <button
               type="button"
               className="album-tile__play"

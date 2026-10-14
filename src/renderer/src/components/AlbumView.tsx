@@ -48,8 +48,12 @@ export function AlbumView({
     <div className="profile">
       <header className="profile__hero">
         <div className="profile__artwrap">
-          <div className="profile__disc" aria-hidden />
-          <AlbumArt trackId={artTrack?.id} className="profile__art" iconSize={56} />
+          <div className="cover3d">
+            <div className="cover3d__disc" aria-hidden>
+              <AlbumArt trackId={artTrack?.id} className="cover3d__label" iconSize={18} />
+            </div>
+            <AlbumArt trackId={artTrack?.id} className="profile__art" iconSize={56} />
+          </div>
         </div>
         <div className="profile__info">
           <div className="profile__kind">Album</div>
