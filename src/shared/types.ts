@@ -159,6 +159,8 @@ export interface AppSettings {
   keybindings: Record<string, string>
   /** Performance mode: strip animations, transitions and visual extras. */
   performanceMode: boolean
+  /** Show the Now Playing art as a spinning record instead of the sleeve. */
+  nowPlayingDisc: boolean
   /** Queue row density. */
   queueMode: QueueMode
   /** Show album covers as 3D records (disc behind the sleeve). */

@@ -73,9 +73,8 @@ export function QueuePanel({
         aria-orientation="vertical"
       />
       <header className="queue__header">
-        <span className="queue__title">
-          <QueueIcon size={14} /> <span className="queue__title-text">Queue</span>
-        </span>
+        <QueueIcon size={14} className="queue__icon" />
+        <span className="queue__total">{formatTotalDuration(total)}</span>
       </header>
 
       <div className="queue__list">
@@ -125,8 +124,6 @@ export function QueuePanel({
           )
         })}
       </div>
-
-      <footer className="queue__footer">{formatTotalDuration(total)}</footer>
     </aside>
   )
 }

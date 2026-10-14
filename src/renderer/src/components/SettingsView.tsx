@@ -408,6 +408,17 @@ export function SettingsView({
     ),
     row(
       'playback',
+      'now-disc',
+      'Now Playing disc mode',
+      <Switch
+        on={settings.nowPlayingDisc}
+        onChange={(nowPlayingDisc) => update({ nowPlayingDisc })}
+      />,
+      'Show a spinning record with the cover in the middle instead of the sleeve.',
+      'vinyl record disc spin cover'
+    ),
+    row(
+      'playback',
       'crossfade',
       'Crossfade',
       <div className="settings__number">

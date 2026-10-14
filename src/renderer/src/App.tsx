@@ -527,6 +527,7 @@ export function App() {
               error={player.error}
               visualizer={settings.visualizer}
               lyricsOpen={lyricsOpen}
+              disc={settings.nowPlayingDisc}
               accent={palette.accent}
               onSeek={player.seek}
               onOpenArtist={(name) => {

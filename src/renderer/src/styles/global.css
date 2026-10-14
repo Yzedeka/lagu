@@ -1765,8 +1765,8 @@ button,
 }
 
 .bb-play {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   flex-shrink: 0;
   box-shadow: none;
 }
@@ -1820,7 +1820,8 @@ button,
 /* Timeline */
 .bb-timeline {
   flex: 1 1 auto;
-  min-width: 180px;
+  max-width: 560px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -3734,4 +3735,47 @@ button,
 
 .context-menu__item:active:not(:disabled) {
   transform: scale(0.99);
+}
+
+/* Queue header total ------------------------------------------------- */
+.queue__icon {
+  color: var(--text-faint);
+}
+
+.queue__total {
+  font-size: 11px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Now Playing disc mode ---------------------------------------------- */
+.np-disc {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: min(42vh, 420px);
+  width: min(42vh, 420px);
+  max-height: 100%;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle at 50% 50%, #131313 0 3px, #232323 3px 6px);
+  box-shadow: 0 24px 60px var(--shadow), inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+  animation: np-disc-spin 10s linear infinite;
+}
+
+.np-disc__label {
+  width: 42%;
+  height: 42%;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes np-disc-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -13,6 +13,7 @@ interface NowPlayingProps {
   error: string | null
   visualizer: boolean
   lyricsOpen: boolean
+  disc: boolean
   accent: string
   onSeek: (seconds: number) => void
   onOpenArtist: (name: string) => void
@@ -27,6 +28,7 @@ export function NowPlaying({
   error,
   visualizer,
   lyricsOpen,
+  disc,
   accent,
   onSeek,
   onOpenArtist,
@@ -43,7 +45,13 @@ export function NowPlaying({
           lyricsSlot
         ) : (
           <div className="np-art-wrap">
-            <AlbumArt trackId={track?.id} className="np-art" iconSize={72} />
+            {disc ? (
+              <div className="np-disc">
+                <AlbumArt trackId={track?.id} className="np-disc__label" iconSize={72} />
+              </div>
+            ) : (
+              <AlbumArt trackId={track?.id} className="np-art" iconSize={72} />
+            )}
           </div>
         )}
       </div>

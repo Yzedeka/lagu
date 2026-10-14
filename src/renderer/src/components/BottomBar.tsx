@@ -81,7 +81,7 @@ export function BottomBar({
             onClick={onToggle}
             disabled={!track}
           >
-            {playing ? <PauseIcon size={21} /> : <PlayIcon size={21} />}
+            {playing ? <PauseIcon size={18} /> : <PlayIcon size={18} />}
           </button>
           <AlbumArt trackId={track?.id} className="bb-art" iconSize={16} />
           <div className="bb-track__meta">

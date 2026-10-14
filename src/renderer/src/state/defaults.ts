@@ -34,6 +34,7 @@ export const defaultSettings: AppSettings = {
   scanOnStartup: true,
   keybindings: { ...DEFAULT_KEYBINDINGS },
   performanceMode: false,
+  nowPlayingDisc: false,
   queueMode: 'normal',
   cover3d: false,
   discordRpc: false,
