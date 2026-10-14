@@ -150,28 +150,9 @@ export function BottomBar({
           </div>
         </div>
 
-        {/* Right: utilities + volume */}
+        {/* Right: volume + utilities */}
         <div className="bb-side bb-side--right">
           <div className="bb-utils">
-            <button
-              type="button"
-              className={`icon-btn ${lyricsOpen ? 'icon-btn--active' : ''}`}
-              title={lyricsAvailable ? 'Lyrics (L)' : 'No lyrics for this track'}
-              onClick={onToggleLyrics}
-              disabled={!track || (!lyricsAvailable && !lyricsOpen)}
-            >
-              <LyricsIcon size={17} />
-            </button>
-            <button
-              type="button"
-              className="icon-btn"
-              title="Lyrics - import / edit .lrc"
-              onClick={onEditLyrics}
-              disabled={!track}
-            >
-              <EditIcon size={16} />
-            </button>
-
             <div className="bb-volume">
               <button
                 type="button"
@@ -193,6 +174,24 @@ export function BottomBar({
               />
             </div>
 
+            <button
+              type="button"
+              className={`icon-btn ${lyricsOpen ? 'icon-btn--active' : ''}`}
+              title={lyricsAvailable ? 'Lyrics (L)' : 'No lyrics for this track'}
+              onClick={onToggleLyrics}
+              disabled={!track || (!lyricsAvailable && !lyricsOpen)}
+            >
+              <LyricsIcon size={17} />
+            </button>
+            <button
+              type="button"
+              className="icon-btn"
+              title="Lyrics - import / edit .lrc"
+              onClick={onEditLyrics}
+              disabled={!track}
+            >
+              <EditIcon size={16} />
+            </button>
             <button
               type="button"
               className={`icon-btn ${isFullscreen ? 'icon-btn--active' : ''}`}
