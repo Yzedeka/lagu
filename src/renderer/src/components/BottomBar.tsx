@@ -72,7 +72,8 @@ export function BottomBar({
   return (
     <footer className="bottom-bar">
       <div className="bottom-bar__content">
-        <div className="bb-left">
+        {/* Now playing: transport button, art, meta, visualizer */}
+        <div className="bb-now">
           <button
             type="button"
             className="play-btn bb-play"
@@ -89,22 +90,15 @@ export function BottomBar({
             </span>
             <span className="bb-sub">{track?.artist ?? '-'}</span>
           </div>
+          {visualizer && (
+            <div className="bb-visualizer">
+              <Visualizer playing={playing} colour={accent} />
+            </div>
+          )}
         </div>
 
-        <div className="bb-center">
-          <span className="bb-time">{formatTime(currentTime)}</span>
-          <Range
-            className="range--progress"
-            value={currentTime}
-            max={effectiveDuration || 1}
-            onChange={onSeek}
-            ariaLabel="Seek"
-            disabled={!track || effectiveDuration <= 0}
-          />
-          <span className="bb-time bb-time--right">{formatTime(effectiveDuration)}</span>
-        </div>
-
-        <div className="bb-right">
+        {/* Transport */}
+        <div className="bb-transport">
           <button
             type="button"
             className={`icon-btn ${shuffle ? 'icon-btn--active' : ''}`}
@@ -127,15 +121,24 @@ export function BottomBar({
           >
             {repeat === 'one' ? <RepeatOneIcon size={16} /> : <RepeatIcon size={16} />}
           </button>
+        </div>
 
-          <div className="bb-divider" />
+        {/* Timeline */}
+        <div className="bb-timeline">
+          <span className="bb-time">{formatTime(currentTime)}</span>
+          <Range
+            className="range--progress"
+            value={currentTime}
+            max={effectiveDuration || 1}
+            onChange={onSeek}
+            ariaLabel="Seek"
+            disabled={!track || effectiveDuration <= 0}
+          />
+          <span className="bb-time bb-time--right">{formatTime(effectiveDuration)}</span>
+        </div>
 
-          {visualizer && (
-            <div className="bb-visualizer">
-              <Visualizer playing={playing} colour={accent} />
-            </div>
-          )}
-
+        {/* Utilities */}
+        <div className="bb-utils">
           <button
             type="button"
             className={`icon-btn ${lyricsOpen ? 'icon-btn--active' : ''}`}
