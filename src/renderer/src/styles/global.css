@@ -3521,7 +3521,7 @@ button,
 }
 
 /* Enabled: sleeve on the left, record sticking out ~50% to the right. */
-.app--covers-3d .album-tile__art:has(.cover3d) {
+.app--covers-3d .album-tile__art--cover {
   aspect-ratio: 3 / 2;
   overflow: visible;
   border: none;
@@ -3543,9 +3543,9 @@ button,
   top: 0;
   right: auto;
   bottom: auto;
-  width: auto;
+  width: 66.6667%;
   height: 100%;
-  aspect-ratio: 1;
+  object-fit: cover;
   border-radius: 0;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65);
   z-index: 2;
@@ -3556,9 +3556,8 @@ button,
   position: absolute;
   left: 33.3333%;
   top: 0;
-  width: auto;
+  width: 66.6667%;
   height: 100%;
-  aspect-ratio: 1;
   border-radius: 50%;
   background: repeating-radial-gradient(circle at 50% 50%, #131313 0 2px, #232323 2px 4px);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 2px rgba(255, 255, 255, 0.08);

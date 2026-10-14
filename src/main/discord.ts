@@ -12,21 +12,39 @@ export interface DiscordPresence {
 let client: Client | null = null
 let clientId = ''
 let enabled = false
-let ready = false
+let connected = false
 let connecting = false
 let current: DiscordPresence | null = null
+let retryTimer: NodeJS.Timeout | null = null
 
 function clip(text: string, max = 128): string {
   return text.length > max ? `${text.slice(0, max - 1)}…` : text
 }
 
+function clearRetry(): void {
+  if (retryTimer) {
+    clearTimeout(retryTimer)
+    retryTimer = null
+  }
+}
+
+function scheduleRetry(): void {
+  if (!enabled || !clientId || retryTimer) return
+  retryTimer = setTimeout(() => {
+    retryTimer = null
+    void connect()
+  }, 15000)
+  retryTimer.unref?.()
+}
+
 async function teardown(): Promise<void> {
-  const c = client
+  clearRetry()
+  connected = false
+  const old = client
   client = null
-  ready = false
-  if (c) {
+  if (old) {
     try {
-      await c.destroy()
+      await old.destroy()
     } catch {
       /* ignore */
     }
@@ -34,37 +52,61 @@ async function teardown(): Promise<void> {
 }
 
 async function connect(): Promise<void> {
-  if (!enabled || !clientId || connecting) return
+  if (!enabled || !clientId || connecting || connected) return
   connecting = true
+  clearRetry()
   await teardown()
+  if (!enabled || !clientId) {
+    connecting = false
+    return
+  }
+
+  const instance = new Client({ clientId })
+  // Keep the module reference in place before connecting so the 'connected'
+  // handler (which fires mid-connect) can read `client.user`.
+  client = instance
+
+  const markReady = (): void => {
+    connected = true
+    void push()
+  }
+  // `connect()` resolves on the "connected" event (the plain IPC/READY path);
+  // "ready" is only emitted by the OAuth `login()` path. Listen for both.
+  instance.on('connected', markReady)
+  instance.on('ready', markReady)
+  instance.on('disconnected', () => {
+    connected = false
+    if (client === instance) scheduleRetry()
+  })
+
   try {
-    const c = new Client({ clientId })
-    c.on('ready', () => {
-      ready = true
-      void push()
-    })
-    c.on('disconnected', () => {
-      ready = false
-    })
-    await c.connect()
-    client = c
+    await instance.connect()
   } catch {
-    // Discord isn't running or the id is wrong - stay silent.
-    client = null
-    ready = false
+    // Discord isn't running (or the id is wrong) - try again later.
+    if (client === instance) {
+      client = null
+      connected = false
+      try {
+        await instance.destroy()
+      } catch {
+        /* ignore */
+      }
+      scheduleRetry()
+    }
   } finally {
     connecting = false
   }
 }
 
 async function push(): Promise<void> {
-  if (!ready || !client?.user) return
+  const user = client?.user
+  if (!connected || !user) return
   try {
     if (!current || !current.playing) {
-      await client.user.clearActivity()
+      await user.clearActivity()
       return
     }
-    await client.user.setActivity({
+    await user.setActivity({
       details: clip(current.title),
       state: clip(current.artist + (current.album ? ` · ${current.album}` : '')),
       startTimestamp: Date.now() - Math.max(0, (current.position ?? 0) * 1000),
@@ -92,5 +134,6 @@ export function setNowPlaying(info: DiscordPresence | null): void {
 }
 
 export function destroyDiscord(): void {
+  enabled = false
   void teardown()
 }

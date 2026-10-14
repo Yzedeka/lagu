@@ -33,7 +33,7 @@ export function AlbumGrid({ albums, onOpen, onPlay, onContextMenu }: AlbumGridPr
             if (e.key === 'Enter') onOpen(album)
           }}
         >
-          <div className="album-tile__art">
+          <div className="album-tile__art album-tile__art--cover">
             <div className="cover3d">
               <div className="cover3d__disc" aria-hidden>
                 <AlbumArt trackId={artworkTrack(album)} className="cover3d__label" iconSize={18} />
