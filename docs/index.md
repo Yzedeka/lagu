@@ -8,20 +8,23 @@ cover tint the interface with its own accent colours.
 It is not a Spotify clone and not a web dashboard. It is a small, practical tool
 for people who keep their music on disk.
 
-> Version 0.2.0 - source available - built with Electron, React and TypeScript.
+> Version 0.2.2 - source available - built with Electron, React and TypeScript.
 
 ## What it does
 
 - **Local library** - add any number of folders, scan them, and browse by
-  Library, Albums, Artists and Folders. Your files are never moved, renamed or
-  modified.
+  Library, Albums, Artists, Playlists and Folders. Your files are never moved,
+  renamed or modified.
 - **Real playback** - play/pause, previous/next, seek, volume, a persistent
   **Queue** you can reorder, plus shuffle and repeat.
+- **Playlists** - build your own collections, give them custom covers, pin and
+  search them.
+- **Open with Lagu** - set it as your default audio app; files open and play.
 - **Custom keybinds** - rebind any keyboard action, or flick on **Performance
   mode** to strip every animation.
 - **Dynamic theming** - the dominant colours of the current artwork become the
-  interface accent. Four themes (Dark, Light, Grey, Black) and a fixed-accent
-  option.
+  interface accent. Four themes, a fixed-accent option, a choice of fonts, and
+  optional **3D album covers**.
 - **Slim visualizer** - a subtle, rounded spectrum that reacts to the audio and
   borrows its colour from the artwork.
 - **Synchronized lyrics** - line-by-line and **word-by-word (Enhanced LRC)**,
@@ -30,7 +33,8 @@ for people who keep their music on disk.
   the files.
 - **Crossfade & 8D audio** - blend tracks together, or rotate the sound around
   your head.
-- **Pins** - keep artists, albums and tracks one click away in the sidebar.
+- **Discord Rich Presence** - show what you're playing as your Discord status.
+- **Pins** - keep artists, albums, tracks and playlists one click away.
 
 ## Documentation
 

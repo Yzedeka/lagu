@@ -5,7 +5,7 @@ away in an app cache:
 
 ```
 ~/Lagu/
-  settings.json     settings, library folders, queue, pins, hidden items, bios
+  settings.json     settings, library folders, queue, pins, hidden items, bios, playlists
   metadata.json     your metadata edits (overrides)
   library.json      the scanned track index
   lyrics/           every .lrc file (imported and auto-fetched online)
@@ -21,14 +21,15 @@ away in an app cache:
 ## What each file is
 
 - **settings.json** - the app's configuration: your settings, the library folders
-  you added, the current queue, pinned items, hidden tracks and artist bios.
+  you added, the current queue, pinned items, hidden tracks, artist bios and
+  playlists.
 - **metadata.json** - every metadata edit you made, keyed by file path. Deleting
   a track's entry reverts it to the file's real tags.
 - **library.json** - the cached index of scanned tracks, so the library appears
   instantly on launch before a rescan.
 - **lyrics/** - the `.lrc` files you imported plus any lyrics fetched online.
 - **artwork/** - the covers and artist images Lagu has cached (embedded, from a
-  folder, chosen by you, or fetched online).
+  folder, chosen by you, or fetched online), including custom playlist covers.
 - **catalog/** - a plain, human-readable snapshot of your library, regenerated
   whenever the library changes.
 

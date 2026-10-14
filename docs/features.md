@@ -9,23 +9,38 @@
 - Browse the same music four ways:
   - **Library** - a searchable grid of every song (with a grid / list toggle),
     matching titles, artists and albums as you type.
-  - **Albums** - an artwork grid, with a sort menu (Artist, Album name, Year,
-    Recently added, Track count, ascending/descending).
+  - **Albums** - a large artwork grid, with a sort menu (Artist, Album name,
+    Year, Recently added, Track count, ascending/descending).
   - **Artists** - artist cards with profile art, a short bio and album/track
     counts that open a full artist profile.
+  - **Playlists** - your own playlists, with custom covers (see below).
   - **Folders** - the folders you added, with track counts and durations.
-- **Search** from the sidebar (type and press Enter) or live in the Library.
-- **Pins** - pin artists, albums and tracks to the sidebar for one-click access.
+- **Global search** from the sidebar: as you type, a results panel appears with
+  **Playlists**, **Artists**, **Albums** and **Songs** - click any result to open
+  or play it.
+- **Pins** - pin artists, albums, tracks and playlists to the sidebar.
 - Your files are **never moved, renamed or modified**.
+
+## Playlists
+
+- Create playlists and add tracks from the right-click menu on a song, album or
+  artist (**Add to playlist…**).
+- Rename, delete and reorder-free manage them; each playlist has its own cover,
+  which you can **set from a local image** or leave to show the first track's art.
+- **Pin playlists** to the sidebar and search them like anything else.
 
 ## Playback
 
 - Play/pause, previous/next, seek, and volume with mute.
 - A **persistent Queue** you can reorder by dragging and prune with a click; it
-  is restored between sessions.
+  is restored between sessions. Its total runtime is shown in the panel header.
+- Three queue densities in Settings - **Normal** (default) and **Compact** - plus
+  a **resizable width** (drag its edge).
 - **Shuffle** and **repeat** (off / all / one).
 - **Crossfade** between tracks (configurable, 0-20 seconds).
-- **8D audio** - a rotating spatial effect for local files.
+- **8D audio** - a smooth, rotating spatial effect for local files.
+- **Open audio files with Lagu** - set it as your default music app and files
+  open straight into the player.
 - The player survives a library rescan: your place in the queue is kept.
 
 ## Artwork & theming
@@ -33,9 +48,13 @@
 - Embedded artwork is read from tags, with a **folder-art fallback**
   (`cover.jpg`, `folder.png`, `front.jpg`, an image named after the album, or any
   image in the folder - searched up the folder tree).
-- **Online lookup** (opt-in) searches iTunes and Deezer for missing covers.
+- **Online lookup** (opt-in) searches iTunes and Deezer for missing covers. It
+  only ever runs when you ask - editing tags never changes your covers.
 - The dominant colours of the current artwork drive the interface accent,
   progress bars, selected controls and visualizer bars.
+- **3D album covers** - an optional mode that shows each album as a sleeve with a
+  record sticking out of the side, spinning on hover, with the cover on the
+  record's label.
 - Four themes: **Dark**, **Light**, **Grey** and **Black** (near-AMOLED).
 
 ## Lyrics
@@ -58,6 +77,7 @@ Right-click a track, album or artist to:
 - **Find cover online**.
 - **Import .lrc** / **Remove .lrc** / **Edit .lrc** timing.
 - **Rename artist** across all of their tracks.
+- **Add to playlist…**.
 - **Remove from library** (reversible) or **Delete files** (moves to the system
   trash, with confirmation).
 
@@ -66,23 +86,26 @@ Edits are stored as overrides in the app - the files themselves are untouched.
 ## Interface
 
 - Compact three-part layout: sidebar, main area, queue panel.
-- **Resizable sidebar and queue** (drag their edges). The queue gets slimmer as
-  you drag - it drops row timestamps, then titles, then the "Queue" label, down
-  to just the cover and drag handle.
-- A **collapsible Folders** section, and a compact footer with search, settings,
-  volume (hover for a vertical slider) and folder shortcuts.
-- The **Now Playing** view has the artwork front and centre with a pill-shaped
-  seek bar; lyrics render on the background, not in a box.
-- A **bottom bar** with the play button on the left, the seek bar and times in
-  the middle, and transport plus utilities on the right.
+- A **collapsible Folders** section and a footer with search, settings and folder
+  shortcuts.
+- A redesigned **bottom bar**: the playing track and visualizer on the left,
+  shuffle/previous/next/repeat, the **centered timeline**, then the lyrics, `.lrc`
+  editor, **volume** (horizontal) and fullscreen/queue controls on the right.
+- **Now Playing** puts the artwork front and centre; lyrics render on the
+  background, not in a box. An optional **disc mode** shows a spinning record
+  with the cover in the middle instead of the sleeve.
+- **Resizable sidebar and queue** (drag their edges).
 - In **fullscreen Now Playing** the bottom bar auto-hides and pops up when you
   move the mouse to the bottom edge.
-- Secondary panels (sidebar, queue) can be hidden for an even more minimal view.
 
 ## Personalization
 
 - **Custom keybinds** - rebind every keyboard action from Settings → Keybinds.
+- **Font** - pick the interface typeface (Inter, System, Serif, Monospace,
+  Rounded).
 - **Performance mode** - one switch that removes all animations, transitions and
   visual extras for the smoothest possible experience on low-end machines.
+- **Discord Rich Presence** - show the track you're playing as your Discord
+  status (requires your own Discord application ID).
 - A **categorized, searchable Settings** page with cache management and a
   full reset.

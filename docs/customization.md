@@ -12,8 +12,10 @@ the left, with a **search box** that filters every option on the page.
 | **Accent colour** | Follow the artwork, or pick a fixed colour (presets + colour picker) |
 | **Corner radius** | 0-8px; 0 keeps everything sharp |
 | **Density** | Comfortable or Compact |
+| **Font** | Inter (default), System UI, Serif, Monospace, Rounded |
 | **Animations** | Master switch for transitions and view effects |
 | **Performance mode** | Disables *every* animation, transition and visual extra (also hides the visualizer and backdrop blur) |
+| **3D album covers** | Show albums as a sleeve with a record sticking out of the side (square corners while on) |
 | **Interface zoom** | Zoom the whole UI, or reset it |
 | **Sidebar width** | Set the sidebar width without dragging (150-440px) |
 
@@ -24,12 +26,15 @@ a consistent default accent is used.
 ## Panels
 
 - **Show sidebar** / **Show queue** - toggle the secondary panels.
+- **Queue style** - **Normal** (default) or **Compact** row density.
 - **Queue width** - set the queue width without dragging (drag its edge too).
 - **Audio visualizer** - show or hide the spectrum.
 
 ## Playback
 
 - **8D audio** - rotating spatial effect (local files).
+- **Now Playing disc mode** - show a spinning record with the cover in the middle
+  instead of the sleeve.
 - **Crossfade** - blend seconds between tracks (0 disables).
 - **Scan on startup** - rescan your library folders each time Lagu launches.
 
@@ -50,7 +55,20 @@ a consistent default accent is used.
 ## Artwork
 
 - **Look up covers online** - search iTunes/Deezer for missing artwork.
-- **Fetch missing covers** - run the lookup over the whole library.
+- **Fetch missing covers** - run the lookup over the whole library. Editing tags
+  never changes covers on its own - only these actions do.
+
+## Playlists
+
+- Playlists live in the **Playlists** view. Right-click a playlist to **Set
+  cover…**, **Remove cover**, **Pin to sidebar** or **Delete**.
+- Playlists without a custom cover show the first track's artwork.
+
+## Integrations
+
+- **Discord Rich Presence** - show the track you're playing as your Discord
+  status. Paste your own **Discord application ID** (create one at
+  discord.com/developers) and have Discord running.
 
 ## Keybinds
 
@@ -71,10 +89,11 @@ help overlay (**?**) always reflects your current bindings.
 
 - **Drag its right edge** to resize it; when it gets slim the "Now Playing"
   label wraps to two lines and the footer controls shrink to fit.
-- **Pin** artists, albums and tracks to it for quick access; each pin shows the
-  album cover or artist image.
+- **Pin** artists, albums, tracks and playlists to it for quick access; each pin
+  shows the album cover or artist image.
 - The **Folders** section can be collapsed with its chevron, and the footer
-  holds the search, settings, volume and folder shortcuts.
+  holds the search, settings and folder shortcuts. (Volume lives in the bottom
+  bar.)
 
 ## Icons
 

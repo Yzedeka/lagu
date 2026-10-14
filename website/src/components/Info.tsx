@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import wordmark from '@/assets/lagu-wordmark.png'
-import { APP } from '@/config'
+import { APP, DONATE_URL, REPO_URL, VERSIONS_REPO } from '@/config'
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false)
@@ -20,8 +20,14 @@ export function Nav() {
         </a>
         <div className="nav__links">
           <a href="#/docs">Docs</a>
-          <a className="nav__cta" href="#/download">
-            Download
+          <a href="#/download">Download</a>
+          <a
+            className="nav__donate"
+            href={DONATE_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Donate
           </a>
         </div>
       </div>
@@ -66,15 +72,92 @@ export function Shortcuts() {
   )
 }
 
+const FAQ: { q: string; a: string }[] = [
+  {
+    q: 'Is Lagu free?',
+    a: 'Yes. Lagu is free to download and use, and the source is available. Donations are optional and keep development going.'
+  },
+  {
+    q: 'Do I need an account?',
+    a: 'No. There is no sign-in and no cloud. Your account-less library stays on your own machine.'
+  },
+  {
+    q: 'Which platforms does it run on?',
+    a: 'Windows, macOS and Linux - AppImage, .deb, .rpm, a portable tarball and an Arch package.'
+  },
+  {
+    q: 'What audio formats work?',
+    a: 'MP3, M4A/AAC, FLAC, OGG/Vorbis, Opus, WAV and more, plus remote stream URLs.'
+  },
+  {
+    q: 'Will it change my music files?',
+    a: 'Never. Lagu reads your files where they live; tags edits, covers and lyrics are stored separately in your Lagu folder.'
+  },
+  {
+    q: 'Can I set it as my default music player?',
+    a: 'Yes. Register Lagu as your default audio app and double-clicking a file opens it and starts playing.'
+  }
+]
+
+export function Faq() {
+  return (
+    <section className="section">
+      <h2 className="section__title">Frequently asked questions</h2>
+      <div className="faq">
+        {FAQ.map((item) => (
+          <details className="faq__item" key={item.q}>
+            <summary className="faq__q">{item.q}</summary>
+            <p className="faq__a">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 export function Footer() {
   return (
     <footer className="footer">
-      <span>
-        {APP.name} {APP.versionLabel}
-      </span>
-      <div className="footer__links">
-        <a href="#/">Download</a>
-        <a href="#/docs">Docs</a>
+      <div className="footer__inner">
+        <div className="footer__brand">
+          <img className="footer__wordmark" src={wordmark} alt={APP.name} draggable={false} />
+          <p className="footer__tagline">
+            A minimalist desktop player for your local music library. Your files, your machine.
+          </p>
+        </div>
+
+        <nav className="footer__cols">
+          <div className="footer__col">
+            <span className="footer__col-title">Product</span>
+            <a href="#/download">Download</a>
+            <a href="#/linux">Linux builds</a>
+            <a href="#/docs">Documentation</a>
+          </div>
+          <div className="footer__col">
+            <span className="footer__col-title">Project</span>
+            <a href={REPO_URL} target="_blank" rel="noreferrer">
+              Source code
+            </a>
+            <a href={VERSIONS_REPO} target="_blank" rel="noreferrer">
+              Version archive
+            </a>
+            <a href={DONATE_URL} target="_blank" rel="noreferrer">
+              Donate
+            </a>
+          </div>
+          <div className="footer__col">
+            <span className="footer__col-title">Platforms</span>
+            <span className="footer__muted">Windows · macOS · Linux</span>
+            <span className="footer__muted">{APP.versionLabel} (beta)</span>
+          </div>
+        </nav>
+      </div>
+
+      <div className="footer__base">
+        <span>
+          {APP.name} {APP.versionLabel}
+        </span>
+        <span>Source-available · offline-first · not affiliated with any streaming service.</span>
       </div>
     </footer>
   )

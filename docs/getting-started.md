@@ -56,3 +56,11 @@ npm run typecheck   # main + preload + renderer
 
 Everything you change is stored in a user-visible folder - see
 [Data & Storage](data-and-storage.md).
+
+## Open files with Lagu
+
+Lagu registers as a handler for common audio types (MP3, M4A, AAC, FLAC, OGG,
+Opus, WAV, WMA and M4B). Set it as your default **music/audio app** in your
+system settings, and double-clicking a file opens Lagu and starts playing it.
+Opening another file while Lagu is already running just focuses the window and
+plays the new file.

@@ -1869,11 +1869,22 @@ button,
 .bb-volume {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  margin: 0 4px;
 }
 
 .bb-volume .range--volume {
-  flex: 0 0 96px;
+  flex: 0 0 76px;
+}
+
+.bb-volume .range--volume .range-track {
+  height: 6px;
+}
+
+.bb-volume .range--volume .range-thumb {
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
 }
 
 @media (max-width: 1100px) {

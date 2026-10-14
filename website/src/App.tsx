@@ -3,7 +3,7 @@ import { DownloadProvider } from '@/lib/DownloadContext'
 import { Hero } from '@/components/Hero'
 import { Features } from '@/components/Features'
 import { Slideshow } from '@/components/Slideshow'
-import { Footer, Nav, Shortcuts } from '@/components/Info'
+import { Footer, Nav, Shortcuts, Faq } from '@/components/Info'
 import { DownloadPage } from '@/components/DownloadPage'
 import { LinuxDownloads } from '@/components/LinuxDownloads'
 import { Docs } from '@/components/Docs'
@@ -23,6 +23,7 @@ export function App() {
               <Slideshow />
               <Features />
               <Shortcuts />
+              <Faq />
             </>
           )}
           {route.name === 'download' && <DownloadPage />}

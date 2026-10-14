@@ -71,6 +71,12 @@ export const DOWNLOADS: Download[] = [
 /** Archive of every released version (manifests + GitHub Releases). */
 export const VERSIONS_REPO = 'https://github.com/Yzedeka/laguversions'
 
+/** Main source repository. */
+export const REPO_URL = 'https://github.com/Yzedeka/lagu'
+
+/** Where the Donate button points. */
+export const DONATE_URL = 'https://github.com/sponsors/Yzedeka'
+
 /** Files are served from the site itself (R2 in production). */
 export const DOWNLOAD_BASE = '/downloads'
 

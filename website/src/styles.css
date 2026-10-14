@@ -146,6 +146,72 @@ h3 {
   color: #fff;
 }
 
+.nav__donate {
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  border: 1px solid color-mix(in srgb, var(--blue) 55%, transparent);
+  color: var(--blue-bright);
+  font-weight: 600;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.nav__donate:hover {
+  background: color-mix(in srgb, var(--blue) 16%, transparent);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+/* --- FAQ ------------------------------------------------------------- */
+.faq {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.faq__item {
+  padding: 16px 18px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.14s ease;
+}
+
+.faq__item[open] {
+  border-color: var(--border-strong);
+}
+
+.faq__q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.faq__q::-webkit-details-marker {
+  display: none;
+}
+
+.faq__q::after {
+  content: '+';
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+.faq__item[open] .faq__q::after {
+  content: '\2013';
+}
+
+.faq__a {
+  margin: 10px 0 0;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 /* --- Hero ------------------------------------------------------------ */
 .hero {
   position: relative;
@@ -681,27 +747,92 @@ kbd {
 .footer {
   position: relative;
   z-index: 1;
-  width: 100%;
   max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 24px 24px 40px;
+  margin: 40px auto 0;
+  padding: 36px 24px 28px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.footer__inner {
+  display: grid;
+  grid-template-columns: 1.3fr 2fr;
+  gap: 32px;
+}
+
+.footer__brand {
+  max-width: 320px;
+}
+
+.footer__wordmark {
+  height: 20px;
+  width: auto;
+  opacity: 0.85;
+  margin-bottom: 12px;
+}
+
+.footer__tagline {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.footer__cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.footer__col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer__col-title {
+  margin-bottom: 2px;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.footer__col a {
+  color: var(--text-dim);
+}
+
+.footer__col a:hover {
+  color: var(--text);
+}
+
+.footer__muted {
+  color: var(--text-faint);
+  font-size: 12.5px;
+}
+
+.footer__base {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
+  margin-top: 28px;
+  padding-top: 18px;
   border-top: 1px solid var(--border);
   font-size: 12px;
   color: var(--text-faint);
 }
 
-.footer__links {
-  display: flex;
-  gap: 18px;
-}
+@media (max-width: 760px) {
+  .footer__inner {
+    grid-template-columns: 1fr;
+  }
 
-.footer__links a:hover {
-  color: var(--text);
+  .footer__cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* --- Download groups -------------------------------------------------- */

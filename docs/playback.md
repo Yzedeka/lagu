@@ -10,8 +10,8 @@ starts at the chosen track. The queue is a real, editable list:
 - **Play next** / **Add to queue** from any track's right-click menu or row
   hover buttons.
 - The queue and your position in it are **restored between sessions**.
-- Drag its left edge to resize; when it gets slim it hides row timestamps, then
-  titles, then its own label - down to just the cover and drag handle.
+- Choose its density in Settings → Panels: **Normal** (default) or **Compact**,
+  and drag its left edge to resize. Its total runtime sits in the panel header.
 
 ## Shuffle and repeat
 

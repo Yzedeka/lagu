@@ -171,6 +171,28 @@ export function BottomBar({
             >
               <EditIcon size={16} />
             </button>
+
+            <div className="bb-volume">
+              <button
+                type="button"
+                className="icon-btn"
+                title={muted ? 'Unmute' : 'Mute'}
+                onClick={onToggleMute}
+              >
+                {muted || volume === 0 ? <VolumeMuteIcon size={16} /> : <VolumeIcon size={16} />}
+              </button>
+              <Range
+                className="range--volume"
+                value={muted ? 0 : volume}
+                max={1}
+                onChange={(v) => {
+                  if (muted && v > 0) onToggleMute()
+                  onSetVolume(v)
+                }}
+                ariaLabel="Volume"
+              />
+            </div>
+
             <button
               type="button"
               className={`icon-btn ${isFullscreen ? 'icon-btn--active' : ''}`}
@@ -187,27 +209,6 @@ export function BottomBar({
             >
               <QueueIcon size={17} />
             </button>
-          </div>
-
-          <div className="bb-volume">
-            <button
-              type="button"
-              className="icon-btn"
-              title={muted ? 'Unmute' : 'Mute'}
-              onClick={onToggleMute}
-            >
-              {muted || volume === 0 ? <VolumeMuteIcon size={16} /> : <VolumeIcon size={16} />}
-            </button>
-            <Range
-              className="range--volume"
-              value={muted ? 0 : volume}
-              max={1}
-              onChange={(v) => {
-                if (muted && v > 0) onToggleMute()
-                onSetVolume(v)
-              }}
-              ariaLabel="Volume"
-            />
           </div>
         </div>
       </div>
