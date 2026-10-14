@@ -37,6 +37,8 @@ export const IPC = {
   pinsSet: 'pins:set',
   playlistsGet: 'playlists:get',
   playlistsSet: 'playlists:set',
+  playlistsSetCover: 'playlists:set-cover',
+  playlistsCoverUrl: 'playlists:cover-url',
   artistBioGet: 'artists:bio-get',
   artistBioSet: 'artists:bio-set',
   artistBioAll: 'artists:bio-all',
@@ -152,6 +154,10 @@ export interface LaguApi {
   playlists: {
     get(): Promise<Playlist[]>
     set(playlists: Playlist[]): Promise<Playlist[]>
+    /** Pick an image file and store it as the playlist's cover. */
+    setCover(id: string): Promise<string | null>
+    /** Resolve a stored playlist cover file name to a URL. */
+    coverUrl(file: string): Promise<string>
   }
   artists: {
     getBio(name: string): Promise<string>

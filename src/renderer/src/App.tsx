@@ -86,12 +86,13 @@ export function App() {
     applyTheme({
       theme: settings.theme,
       radius: settings.radius,
+      fontFamily: settings.fontFamily,
       density: settings.density,
       animations: settings.animations,
       performance: settings.performanceMode,
       palette
     })
-  }, [settings.theme, settings.radius, settings.density, settings.animations, settings.performanceMode, palette])
+  }, [settings.theme, settings.radius, settings.fontFamily, settings.density, settings.animations, settings.performanceMode, palette])
 
   // --- zoom ----------------------------------------------------------------
   useEffect(() => {
@@ -384,6 +385,11 @@ export function App() {
         setBrowseFocus({ kind: 'album', ref: target.ref, token: ++focusToken.current })
         return
       }
+      if (target.kind === 'playlist') {
+        setSelection('playlists')
+        setBrowseFocus({ kind: 'playlist', ref: target.ref, token: ++focusToken.current })
+        return
+      }
       setSelection('artists')
       setBrowseFocus({ kind: 'artist', ref: target.ref, token: ++focusToken.current })
     },
@@ -594,6 +600,12 @@ export function App() {
                 if (browseFocus?.kind === 'playlist' && browseFocus.ref === id) setBrowseFocus(null)
               }}
               onRemoveFromPlaylist={(id, trackId) => playlists.removeTrack(id, trackId)}
+              onSetPlaylistCover={(id) => {
+                void api.playlists.setCover(id).then((file) => {
+                  if (file) playlists.setCover(id, file)
+                })
+              }}
+              onRemovePlaylistCover={(id) => playlists.setCover(id, undefined)}
               meta={meta}
               albumSort={settings.albumSort}
               albumSortDesc={settings.albumSortDesc}

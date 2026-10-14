@@ -191,16 +191,21 @@ export const FALLBACK_ACCENTS: Record<ThemeMode, string> = {
 export interface ApplyThemeOptions {
   theme: ThemeMode
   radius: number
+  fontFamily: string
   density: Density
   animations: boolean
   performance: boolean
   palette: Palette
 }
 
+const DEFAULT_FONT_STACK =
+  "'Inter Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+
 /** Push theme + accent + layout customisation into CSS custom properties. */
 export function applyTheme({
   theme,
   radius,
+  fontFamily,
   density,
   animations,
   performance,
@@ -209,6 +214,7 @@ export function applyTheme({
   const root = document.documentElement
   root.dataset.theme = theme
   root.dataset.density = density
+  root.style.setProperty('--font', fontFamily || DEFAULT_FONT_STACK)
   root.dataset.animations = animations ? 'on' : 'off'
   root.dataset.performance = performance ? 'on' : 'off'
   root.style.setProperty('--radius', `${radius}px`)

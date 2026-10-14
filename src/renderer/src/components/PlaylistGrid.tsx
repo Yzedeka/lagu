@@ -1,5 +1,5 @@
 import type { Playlist, Track } from '@shared/types'
-import { AlbumArt } from './AlbumArt'
+import { PlaylistArt } from './PlaylistArt'
 import { PlaylistIcon, PlusIcon } from '@renderer/icons'
 
 interface PlaylistGridProps {
@@ -11,9 +11,6 @@ interface PlaylistGridProps {
 }
 
 export function PlaylistGrid({ playlists, byId, onOpen, onCreate, onContextMenu }: PlaylistGridProps) {
-  const art = (playlist: Playlist): string | null =>
-    playlist.trackIds.find((id) => byId.get(id)?.hasArtwork) ?? playlist.trackIds[0] ?? null
-
   return (
     <div className="album-grid">
       <div
@@ -48,7 +45,7 @@ export function PlaylistGrid({ playlists, byId, onOpen, onCreate, onContextMenu 
           }}
         >
           <div className="album-tile__art">
-            <AlbumArt trackId={art(playlist) ?? undefined} className="album-tile__img" iconSize={28} />
+            <PlaylistArt playlist={playlist} byId={byId} className="album-tile__img" iconSize={28} />
             <span className="playlist-tile__badge">
               <PlaylistIcon size={13} />
             </span>

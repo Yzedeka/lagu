@@ -167,6 +167,28 @@ export function registerIpc(
     return library.setPlaylists(Array.isArray(playlists) ? (playlists as never[]) : [])
   })
 
+  ipcMain.handle(IPC.playlistsSetCover, async (_e, id: string) => {
+    if (typeof id !== 'string' || id.length === 0) return null
+    const win = getWindow()
+    const result = win
+      ? await dialog.showOpenDialog(win, {
+          title: 'Choose a playlist cover',
+          properties: ['openFile'],
+          filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp', 'gif'] }]
+        })
+      : await dialog.showOpenDialog({
+          title: 'Choose a playlist cover',
+          properties: ['openFile'],
+          filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp', 'gif'] }]
+        })
+    if (result.canceled || result.filePaths.length === 0) return null
+    return library.setPlaylistCover(id, result.filePaths[0])
+  })
+
+  ipcMain.handle(IPC.playlistsCoverUrl, (_e, file: string) => {
+    return typeof file === 'string' && file.length > 0 ? library.playlistCoverUrl(file) : ''
+  })
+
   ipcMain.handle(IPC.metadataSetLyricsOffset, (_e, trackIds: string[], ms: number | null) => {
     return library.setLyricsOffset(Array.isArray(trackIds) ? trackIds : [], ms ?? null)
   })

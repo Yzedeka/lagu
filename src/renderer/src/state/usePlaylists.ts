@@ -10,6 +10,7 @@ export interface PlaylistsModel {
   remove: (id: string) => void
   addTracks: (id: string, trackIds: string[]) => void
   removeTrack: (id: string, trackId: string) => void
+  setCover: (id: string, cover?: string) => void
   find: (id: string) => Playlist | undefined
 }
 
@@ -86,5 +87,12 @@ export function usePlaylists(): PlaylistsModel {
 
   const find = useCallback((id: string) => playlists.find((p) => p.id === id), [playlists])
 
-  return { playlists, create, rename, remove, addTracks, removeTrack, find }
+  const setCover = useCallback(
+    (id: string, cover?: string) => {
+      mutate((prev) => prev.map((p) => (p.id === id ? { ...p, cover } : p)))
+    },
+    [mutate]
+  )
+
+  return { playlists, create, rename, remove, addTracks, removeTrack, setCover, find }
 }

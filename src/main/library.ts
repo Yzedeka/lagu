@@ -320,9 +320,6 @@ export class LibraryService {
     this.persist()
     this.listeners?.refresh()
 
-    // Metadata changed → re-look up the cover for the new album/artist/title.
-    if (this.store.settings.fetchArtworkOnline) this.scheduleCoverRefresh(trackIds)
-
     return this.effective(trackIds)
   }
 
@@ -420,53 +417,6 @@ export class LibraryService {
     this.persist()
     this.listeners?.refresh()
     return { ok: true, tracks: this.effective(trackIds) }
-  }
-
-  // --- cover refresh after metadata edits -----------------------------------
-  private coverRefreshQueue: string[][] = []
-  private coverRefreshRunning = false
-
-  /** A track needs a (re)lookup when it has no art, or its art was fetched online. */
-  private needsCoverLookup(trackId: string): boolean {
-    const track = this.tracks.get(trackId)
-    if (!track) return false
-    if (!track.hasArtwork) return true
-    return this.store.getOverride(trackId)?.coverSource === 'online'
-  }
-
-  /** Queue an online cover lookup for each affected album group. */
-  private scheduleCoverRefresh(trackIds: string[]): void {
-    const groups = new Map<string, string[]>()
-    for (const id of trackIds) {
-      const track = this.tracks.get(id)
-      if (!track) continue
-      const key = `${track.albumArtist || track.artist}\u0000${track.album}`
-      const list = groups.get(key) ?? []
-      list.push(id)
-      groups.set(key, list)
-    }
-    for (const ids of groups.values()) {
-      if (ids.some((id) => this.needsCoverLookup(id))) this.coverRefreshQueue.push(ids)
-    }
-    void this.pumpCoverRefresh()
-  }
-
-  private async pumpCoverRefresh(): Promise<void> {
-    if (this.coverRefreshRunning) return
-    this.coverRefreshRunning = true
-    try {
-      while (this.coverRefreshQueue.length > 0) {
-        const ids = this.coverRefreshQueue.shift() as string[]
-        try {
-          await this.fetchCoverFor(ids)
-        } catch (err) {
-          console.error('[lagu] cover refresh failed', err)
-        }
-        await new Promise((resolve) => setTimeout(resolve, 400))
-      }
-    } finally {
-      this.coverRefreshRunning = false
-    }
   }
 
   /** Drop an auto-fetched cover (never a user-chosen one) so stale art disappears. */
@@ -613,6 +563,20 @@ export class LibraryService {
   setPlaylists(playlists: Playlist[]): Playlist[] {
     this.store.setPlaylists(Array.isArray(playlists) ? playlists : [])
     return this.store.playlists
+  }
+
+  /** Copy a chosen image into the artwork cache and return its file name. */
+  async setPlaylistCover(id: string, sourcePath: string): Promise<string> {
+    const data = await fs.readFile(sourcePath)
+    const ext = extensionOf(sourcePath) || 'jpg'
+    const fileName = `playlist-${this.store.hashPath(`playlist:${id}`)}.${ext}`
+    await fs.writeFile(path.join(this.store.artworkDir, fileName), data)
+    return fileName
+  }
+
+  /** Renderer-safe URL for a stored playlist cover file. */
+  playlistCoverUrl(file: string): string {
+    return mediaUrlFor(path.join(this.store.artworkDir, file))
   }
 
   setPinned(pinned: PinnedItem[]): PinnedItem[] {

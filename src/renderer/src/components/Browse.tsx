@@ -88,6 +88,8 @@ interface BrowseProps {
   onRenamePlaylist: (id: string, name: string) => void
   onDeletePlaylist: (id: string) => void
   onRemoveFromPlaylist: (id: string, trackId: string) => void
+  onSetPlaylistCover: (id: string) => void
+  onRemovePlaylistCover: (id: string) => void
   meta: MetadataActions
   albumSort: AlbumSort
   albumSortDesc: boolean
@@ -126,6 +128,8 @@ export function Browse({
   onRenamePlaylist,
   onDeletePlaylist,
   onRemoveFromPlaylist,
+  onSetPlaylistCover,
+  onRemovePlaylistCover,
   meta,
   albumSort,
   albumSortDesc,
@@ -388,6 +392,17 @@ export function Browse({
   const openPlaylistMenu = (playlist: Playlist, x: number, y: number): void => {
     const items: MenuItem[] = [
       { label: 'Open playlist', icon: <PlaylistIcon size={15} />, onClick: () => setPlaylistId(playlist.id) },
+      {
+        label: 'Set cover…',
+        icon: <ImageIcon size={15} />,
+        onClick: () => onSetPlaylistCover(playlist.id)
+      },
+      {
+        label: 'Remove cover',
+        icon: <RemoveCircleIcon size={15} />,
+        disabled: !playlist.cover,
+        onClick: () => onRemovePlaylistCover(playlist.id)
+      },
       {
         label: 'Pin to sidebar',
         icon: <PinIcon size={15} />,

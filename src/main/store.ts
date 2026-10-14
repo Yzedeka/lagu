@@ -27,6 +27,7 @@ export const defaultSettings: AppSettings = {
   accentMode: 'artwork',
   accentColor: '#7d97b8',
   radius: 5,
+  fontFamily: '',
   density: 'comfortable',
   animations: true,
   crossfade: 4,

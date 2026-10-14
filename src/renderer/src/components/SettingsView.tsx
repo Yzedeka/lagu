@@ -54,6 +54,18 @@ const THEMES: { id: ThemeMode; label: string }[] = [
   { id: 'black', label: 'Black' }
 ]
 
+const FONTS: { label: string; value: string }[] = [
+  { label: 'Inter (default)', value: '' },
+  {
+    label: 'System UI',
+    value:
+      'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+  },
+  { label: 'Serif', value: 'Georgia, "Times New Roman", Times, serif' },
+  { label: 'Monospace', value: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace' },
+  { label: 'Rounded', value: '"Trebuchet MS", "Segoe UI", system-ui, sans-serif' }
+]
+
 const ALBUM_SORTS: { id: AlbumSort; label: string }[] = [
   { id: 'artist', label: 'Artist' },
   { id: 'name', label: 'Album name' },
@@ -248,6 +260,25 @@ export function SettingsView({
         onChange={(density) => update({ density })}
       />,
       'Row height and spacing.'
+    ),
+    row(
+      'appearance',
+      'font',
+      'Font',
+      <select
+        className="select"
+        value={settings.fontFamily}
+        aria-label="Interface font"
+        onChange={(e) => update({ fontFamily: e.target.value })}
+      >
+        {FONTS.map((font) => (
+          <option key={font.label} value={font.value}>
+            {font.label}
+          </option>
+        ))}
+      </select>,
+      'The typeface used across the app.',
+      'typeface typography text font'
     ),
     row(
       'appearance',

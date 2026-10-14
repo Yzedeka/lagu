@@ -33,7 +33,7 @@ export type SidebarSelection = 'now' | BrowseSection | 'search' | 'settings'
 
 /** A clickable result from the global search. */
 export interface SearchTarget {
-  kind: 'track' | 'album' | 'artist'
+  kind: 'track' | 'album' | 'artist' | 'playlist'
   ref: string
 }
 
@@ -216,6 +216,7 @@ export function Sidebar({
           onChange={onSearchChange}
           onSubmit={onSearchSubmit}
           tracks={tracks}
+          playlists={playlists}
           onSelect={onSearchSelect}
         />
         <div className="footer-tools">
@@ -341,12 +342,14 @@ function SidebarSearch({
   onChange,
   onSubmit,
   tracks,
+  playlists,
   onSelect
 }: {
   value: string
   onChange: (value: string) => void
   onSubmit: () => void
   tracks: Track[]
+  playlists: Playlist[]
   onSelect: (target: SearchTarget) => void
 }) {
   const [open, setOpen] = useState(false)
@@ -389,7 +392,11 @@ function SidebarSearch({
         : [],
     [tracks, needle]
   )
-  const total = foundArtists.length + foundAlbums.length + foundTracks.length
+  const foundPlaylists = useMemo(
+    () => (needle ? playlists.filter((p) => p.name.toLowerCase().includes(needle)).slice(0, 4) : []),
+    [playlists, needle]
+  )
+  const total = foundArtists.length + foundAlbums.length + foundTracks.length + foundPlaylists.length
 
   const pick = (target: SearchTarget): void => {
     onSelect(target)
@@ -465,6 +472,27 @@ function SidebarSearch({
       {open && needle && (
         <div className="searchdrop" role="listbox" aria-label="Search results">
           {total === 0 && <div className="searchdrop__empty">No matches for “{value.trim()}”.</div>}
+
+          {foundPlaylists.length > 0 && <div className="searchdrop__label">Playlists</div>}
+          {foundPlaylists.map((p) => (
+            <button
+              key={`p-${p.id}`}
+              type="button"
+              className="searchdrop__row"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => pick({ kind: 'playlist', ref: p.id })}
+            >
+              <span className="searchdrop__thumb art--fallback">
+                <PlaylistIcon size={14} />
+              </span>
+              <span className="searchdrop__main">
+                <span className="searchdrop__title">{p.name}</span>
+                <span className="searchdrop__sub">
+                  Playlist · {p.trackIds.length} track{p.trackIds.length === 1 ? '' : 's'}
+                </span>
+              </span>
+            </button>
+          ))}
 
           {foundArtists.length > 0 && <div className="searchdrop__label">Artists</div>}
           {foundArtists.map((a) => (

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Playlist, Track } from '@shared/types'
-import { AlbumArt } from './AlbumArt'
-import { EditIcon, PauseIcon, PlayIcon, PlaylistIcon, TrashIcon } from '@renderer/icons'
+import { PlaylistArt } from './PlaylistArt'
+import { EditIcon, PauseIcon, PlayIcon, TrashIcon } from '@renderer/icons'
 import { TrackList } from './TrackList'
 import { formatTotalDuration } from '@renderer/lib/format'
 
@@ -42,10 +42,7 @@ export function PlaylistView({
     setEditing(false)
   }, [playlist.id, playlist.name])
 
-  const artTrack = useMemo(
-    () => tracks.find((t) => t.hasArtwork) ?? tracks[0],
-    [tracks]
-  )
+  const byId = useMemo(() => new Map(tracks.map((t) => [t.id, t])), [tracks])
   const total = tracks.reduce((sum, t) => sum + (t.duration ?? 0), 0)
   const playingHere = playing && tracks.some((t) => t.id === currentTrackId)
 
@@ -57,13 +54,7 @@ export function PlaylistView({
   return (
     <div className="profile">
       <header className="profile__hero">
-        {artTrack ? (
-          <AlbumArt trackId={artTrack.id} className="profile__art" iconSize={56} />
-        ) : (
-          <div className="profile__art art--fallback">
-            <PlaylistIcon size={56} />
-          </div>
-        )}
+        <PlaylistArt playlist={playlist} byId={byId} className="profile__art" iconSize={56} />
 
         <div className="profile__info">
           <div className="profile__kind">Playlist</div>

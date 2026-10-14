@@ -50,7 +50,9 @@ const api: LaguApi = {
   },
   playlists: {
     get: () => ipcRenderer.invoke(IPC.playlistsGet),
-    set: (playlists: Playlist[]) => ipcRenderer.invoke(IPC.playlistsSet, playlists)
+    set: (playlists: Playlist[]) => ipcRenderer.invoke(IPC.playlistsSet, playlists),
+    setCover: (id: string) => ipcRenderer.invoke(IPC.playlistsSetCover, id),
+    coverUrl: (file: string) => ipcRenderer.invoke(IPC.playlistsCoverUrl, file)
   },
   artists: {
     getBio: (name: string) => ipcRenderer.invoke(IPC.artistBioGet, name),

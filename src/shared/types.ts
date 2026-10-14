@@ -71,6 +71,8 @@ export interface Playlist {
   name: string
   trackIds: string[]
   createdAt: number
+  /** Custom cover image (artwork-cache file name), when the user set one. */
+  cover?: string
 }
 
 /**
@@ -120,6 +122,8 @@ export interface AppSettings {
   accentColor: string
   /** Corner radius in px (0 keeps everything sharp). */
   radius: number
+  /** Interface font stack ('' uses the bundled Inter default). */
+  fontFamily: string
   density: Density
   /** Master switch for UI transitions/animations. */
   animations: boolean
