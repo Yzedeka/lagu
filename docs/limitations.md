@@ -55,6 +55,15 @@ limited.
 - The global offset applies to all tracks; per-track offsets override it.
 - Lyrics are matched by artist/title, so unusual spellings can miss.
 
+## Downloads
+
+- Searching and downloading uses **yt-dlp** and requires a network connection;
+  converting to MP3/M4A/Opus requires **ffmpeg**. Packaged builds bundle yt-dlp
+  but not ffmpeg.
+- Downloads depend on the source site's availability and terms. Private,
+  age-gated or region-locked tracks cannot be downloaded.
+- Downloads are added to the library when they finish; they do not autoplay.
+
 ## Editing
 
 - Metadata edits are **app-side overrides**, not written into your files. Your

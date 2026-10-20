@@ -52,6 +52,16 @@ a consistent default accent is used.
 - **Show track numbers** - toggle the number column in lists.
 - **Default album sort** + **Sort direction** - how the Albums grid opens.
 
+## Downloads
+
+- **Default folder** - where downloaded tracks are saved. **Auto** uses your
+  first library folder, falling back to `~/Music/Lagu`.
+- **Audio format** - MP3, M4A or Opus.
+- **Audio quality** - Best, 320, 192 or 128 kbps.
+- **yt-dlp** - shows the bundled version and warns when ffmpeg is missing.
+- Open the downloader from the cloud icon next to **Add stream URL** in the
+  sidebar.
+
 ## Artwork
 
 - **Look up covers online** - search iTunes/Deezer for missing artwork.

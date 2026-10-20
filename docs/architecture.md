@@ -14,6 +14,7 @@ src/
     metadata.ts     tags + artwork discovery
     lyrics.ts       LRC parsing and online lookup
     coverart.ts     online cover / artist-image lookup
+    downloads.ts    yt-dlp search, download and library import
     protocol.ts     lagu:// media scheme (range requests)
     store.ts        persistence + user-visible data folder
   preload/       contextBridge -> window.lagu (typed)

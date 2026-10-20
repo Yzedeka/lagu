@@ -16,6 +16,10 @@ build/*
 flatpak/build-dir/
 flatpak/repo/
 
+# Bundled yt-dlp binaries (fetched by scripts/fetch-ytdlp.mjs)
+resources/bin/*
+!resources/bin/.gitkeep
+
 # Cloudflare / wrangler
 website/.wrangler/
 website/.dev.vars

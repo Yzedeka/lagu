@@ -941,6 +941,7 @@ button,
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 34px;
+  align-content: start;
   padding: 24px;
   overflow-y: auto;
   flex: 1;
@@ -3824,4 +3825,198 @@ button,
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Download music ---------------------------------------------------- */
+.download-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.download-dialog__warn {
+  margin: 0;
+  color: var(--danger-text);
+}
+
+.download-dialog__search,
+.download-dialog__link {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.download-dialog__link {
+  padding-top: 2px;
+}
+
+.download-dialog__link .text-input {
+  font-size: 12px;
+}
+
+.download-dialog__options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.download-dialog__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.download-dialog__option--folder {
+  flex: 1 1 100%;
+}
+
+.download-dialog__label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+}
+
+.download-dialog__folder {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.download-results {
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+}
+
+.download-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 9px;
+  border-bottom: 1px solid var(--border);
+}
+
+.download-result:last-child {
+  border-bottom: 0;
+}
+
+.download-result:hover {
+  background: var(--bg-elevated);
+}
+
+.download-result__thumb {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: calc(var(--radius) * 0.6);
+  background: var(--bg-elevated);
+}
+
+.download-result__thumb--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+}
+
+.download-result__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.download-result__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.download-result__sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.download-job {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+}
+
+.download-job--error {
+  background: color-mix(in srgb, var(--danger-text) 12%, transparent);
+}
+
+.download-job__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.download-job__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.download-job__percent {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.download-job__bar {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text) 12%, transparent);
+}
+
+.download-job__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 0.2s linear;
+}
+
+.download-job__message {
+  font-size: 11px;
+  color: var(--text-dim);
+  overflow-wrap: anywhere;
+}
+
+.download-job__cancel {
+  align-self: flex-start;
+  margin-top: 2px;
 }

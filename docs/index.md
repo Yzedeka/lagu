@@ -20,6 +20,8 @@ for people who keep their music on disk.
 - **Playlists** - build your own collections, give them custom covers, pin and
   search them.
 - **Open with Lagu** - set it as your default audio app; files open and play.
+- **Downloads** - search YouTube through yt-dlp and save tracks as MP3, M4A or
+  Opus into the folder you choose.
 - **Custom keybinds** - rebind any keyboard action, or flick on **Performance
   mode** to strip every animation.
 - **Dynamic theming** - the dominant colours of the current artwork become the

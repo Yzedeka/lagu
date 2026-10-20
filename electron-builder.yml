@@ -20,6 +20,11 @@ files:
 extraResources:
   - from: src/renderer/src/icons/app_icon.png
     to: app_icon.png
+  # Bundled yt-dlp (fetched by scripts/fetch-ytdlp.mjs before packaging).
+  - from: resources/bin
+    to: bin
+    filter:
+      - '**/*'
 
 asar: true
 compression: normal

@@ -23,7 +23,11 @@ npm install
 npm run dev        # run the app
 npm run build      # bundle
 npm run typecheck  # main + preload + renderer
+npm run fetch:ytdlp # optional: bundle yt-dlp for in-app downloads
 ```
+
+The download search uses `yt-dlp` (bundled by the packaging scripts, or a system
+install when running from source) and needs `ffmpeg` to convert audio.
 
 ## Packaging
 

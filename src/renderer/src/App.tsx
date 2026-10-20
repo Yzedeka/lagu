@@ -24,6 +24,7 @@ import { LyricsView } from '@renderer/components/LyricsView'
 import { LyricsDialog } from '@renderer/components/LyricsDialog'
 import { useLyricsAvailable } from '@renderer/state/useLyricsAvailable'
 import { AddUrlDialog } from '@renderer/components/AddUrlDialog'
+import { DownloadDialog } from '@renderer/components/DownloadDialog'
 import { AddToPlaylistDialog } from '@renderer/components/AddToPlaylistDialog'
 import { SettingsView } from '@renderer/components/SettingsView'
 import { SearchView } from '@renderer/components/SearchView'
@@ -44,6 +45,7 @@ export function App() {
   const [searchInput, setSearchInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [addUrlOpen, setAddUrlOpen] = useState(false)
+  const [downloadOpen, setDownloadOpen] = useState(false)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [zoom, setZoom] = useState(0)
@@ -191,6 +193,7 @@ export function App() {
       if (e.key === 'Escape') {
         if (shortcutsOpen) setShortcutsOpen(false)
         else if (addUrlOpen) setAddUrlOpen(false)
+        else if (downloadOpen) setDownloadOpen(false)
         else if (isFullscreen) toggleFullscreen()
         return
       }
@@ -280,7 +283,7 @@ export function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [onZoom, onResetZoom, update, toggleFullscreen, isFullscreen, shortcutsOpen, addUrlOpen])
+  }, [onZoom, onResetZoom, update, toggleFullscreen, isFullscreen, shortcutsOpen, addUrlOpen, downloadOpen])
 
   const lyricsOpen = settings.showLyrics && Boolean(player.currentTrack)
 
@@ -519,6 +522,7 @@ export function App() {
             onRescan={() => void library.rescan()}
             onRemoveFolder={(id) => void library.removeFolder(id)}
             onAddUrl={() => setAddUrlOpen(true)}
+            onDownloadMusic={() => setDownloadOpen(true)}
           />
         )}
 
@@ -666,6 +670,15 @@ export function App() {
       />
 
       {addUrlOpen && <AddUrlDialog onSubmit={library.addUrl} onClose={() => setAddUrlOpen(false)} />}
+
+      {downloadOpen && (
+        <DownloadDialog
+          defaultFolder={settings.downloadFolder}
+          defaultFormat={settings.downloadFormat}
+          defaultQuality={settings.downloadQuality}
+          onClose={() => setDownloadOpen(false)}
+        />
+      )}
 
       {playlistDialog && (
         <AddToPlaylistDialog

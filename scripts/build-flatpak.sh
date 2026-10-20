@@ -10,6 +10,9 @@ cd "$(dirname "$0")/.."
 
 VERSION="$(node -p "require('./package.json').version")"
 
+echo "==> Fetching the bundled yt-dlp binary"
+npm run fetch:ytdlp
+
 echo "==> Building the app (unpacked Linux)"
 npm run build
 npx electron-builder --linux dir

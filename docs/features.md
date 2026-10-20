@@ -21,6 +21,20 @@
 - **Pins** - pin artists, albums, tracks and playlists to the sidebar.
 - Your files are **never moved, renamed or modified**.
 
+## Downloads
+
+- **Download music** from the sidebar (cloud icon next to **Add stream URL**).
+- Search YouTube through **yt-dlp**, pick a result and save it as **MP3, M4A or
+  Opus** at the quality you choose (Best, 320, 192 or 128 kbps).
+- Paste a **YouTube playlist or album link** to download the whole collection
+  into its own subfolder, with per-item and overall progress.
+- Choose a destination folder per download, or set a **default folder, format
+  and quality** in **Settings → Downloads**.
+- Finished tracks are added to the library automatically and never start
+  playing on their own. Downloads need **ffmpeg** for conversion.
+- The yt-dlp binary is bundled with packaged builds; source builds fall back to
+  a system `yt-dlp`, or you can fetch one with `npm run fetch:ytdlp`.
+
 ## Playlists
 
 - Create playlists and add tracks from the right-click menu on a song, album or

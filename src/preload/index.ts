@@ -1,7 +1,17 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { IPC } from '@shared/ipc'
 import type { DiscordPresence, LibraryBatch, LibraryDone, LaguApi } from '@shared/ipc'
-import type { AppSettings, MetadataPatch, PinnedItem, Playlist, QueueState, ScanProgress, UpdateStatus } from '@shared/types'
+import type {
+  AppSettings,
+  DownloadJobStatus,
+  DownloadRequest,
+  MetadataPatch,
+  PinnedItem,
+  Playlist,
+  QueueState,
+  ScanProgress,
+  UpdateStatus
+} from '@shared/types'
 
 function subscribe<T>(channel: string, cb: (payload: T) => void): () => void {
   const handler = (_event: IpcRendererEvent, payload: T): void => cb(payload)
@@ -44,6 +54,14 @@ const api: LaguApi = {
     fetchMissing: () => ipcRenderer.invoke(IPC.artworkFetchMissing),
     artistImage: (name: string) => ipcRenderer.invoke(IPC.artworkArtistImage, name),
     clearCache: () => ipcRenderer.invoke(IPC.cacheClearArtwork)
+  },
+  downloads: {
+    search: (query: string) => ipcRenderer.invoke(IPC.downloadsSearch, query),
+    start: (request: DownloadRequest) => ipcRenderer.invoke(IPC.downloadsStart, request),
+    cancel: () => ipcRenderer.invoke(IPC.downloadsCancel),
+    pickFolder: () => ipcRenderer.invoke(IPC.downloadsPickFolder),
+    defaultFolder: () => ipcRenderer.invoke(IPC.downloadsDefaultFolder),
+    toolStatus: () => ipcRenderer.invoke(IPC.downloadsToolStatus)
   },
   pins: {
     get: () => ipcRenderer.invoke(IPC.pinsGet),
@@ -95,6 +113,8 @@ const api: LaguApi = {
     onRefresh: (cb: () => void) => subscribe(IPC.evtRefresh, cb),
     onArtworkProgress: (cb: (p: { done: number; total: number }) => void) =>
       subscribe(IPC.evtArtworkProgress, cb),
+    onDownloadProgress: (cb: (status: DownloadJobStatus) => void) =>
+      subscribe(IPC.evtDownloadProgress, cb),
     onOpenFiles: (cb: (paths: string[]) => void) => subscribe(IPC.evtOpenFiles, cb)
   }
 }

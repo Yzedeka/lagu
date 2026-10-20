@@ -1,11 +1,17 @@
 import { BrowserWindow, dialog, ipcMain, shell, type OpenDialogOptions } from 'electron'
 import { IPC } from '@shared/ipc'
 import type { DiscordPresence } from '@shared/ipc'
-import type { AppSettings, MetadataPatch, QueueState } from '@shared/types'
+import type {
+  AppSettings,
+  DownloadRequest,
+  MetadataPatch,
+  QueueState
+} from '@shared/types'
 import type { LibraryService } from './library'
 import type { Store } from './store'
 import { getUpdateStatus, installUpdate } from './updater'
 import { configureDiscord, setNowPlaying } from './discord'
+import { DownloadService } from './downloads'
 
 const MIN_ZOOM = -3
 const MAX_ZOOM = 3
@@ -19,6 +25,43 @@ export function registerIpc(
   store: Store,
   library: LibraryService
 ): void {
+  const downloads = new DownloadService(library, store, (status) => {
+    const win = getWindow()
+    if (win && !win.isDestroyed()) win.webContents.send(IPC.evtDownloadProgress, status)
+  })
+
+  ipcMain.handle(IPC.downloadsSearch, (_e, query: unknown) =>
+    downloads.search(typeof query === 'string' ? query : '')
+  )
+
+  ipcMain.handle(IPC.downloadsStart, (_e, request: DownloadRequest) => {
+    if (!request || typeof request.url !== 'string') {
+      return { ok: false, error: 'No track was selected.' }
+    }
+    return downloads.start(request)
+  })
+
+  ipcMain.handle(IPC.downloadsCancel, () => downloads.cancel())
+
+  ipcMain.handle(IPC.downloadsDefaultFolder, () => downloads.defaultFolder())
+
+  ipcMain.handle(IPC.downloadsToolStatus, () => downloads.toolStatus())
+
+  ipcMain.handle(IPC.downloadsPickFolder, async () => {
+    const win = getWindow()
+    const defaultPath = await downloads.defaultFolder().catch(() => undefined)
+    const options: OpenDialogOptions = {
+      title: 'Choose a download folder',
+      defaultPath,
+      properties: ['openDirectory', 'createDirectory']
+    }
+    const result = win
+      ? await dialog.showOpenDialog(win, options)
+      : await dialog.showOpenDialog(options)
+    if (result.canceled || result.filePaths.length === 0) return null
+    return result.filePaths[0]
+  })
+
   ipcMain.handle(IPC.libraryState, () => ({
     folders: library.getFolders(),
     tracks: library.getAllTracks(),

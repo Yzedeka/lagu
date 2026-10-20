@@ -1,5 +1,13 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import type { AlbumSort, AppSettings, LyricsAlign, ThemeMode } from '@shared/types'
+import type {
+  AlbumSort,
+  AppSettings,
+  DownloadFormat,
+  DownloadQuality,
+  DownloadToolStatus,
+  LyricsAlign,
+  ThemeMode
+} from '@shared/types'
 import { ACCENT_PRESETS } from '@renderer/state/defaults'
 import {
   AnimationIcon,
@@ -41,6 +49,7 @@ type CategoryId =
   | 'playback'
   | 'lyrics'
   | 'library'
+  | 'downloads'
   | 'artwork'
   | 'keybinds'
   | 'integrations'
@@ -80,6 +89,7 @@ const CATEGORIES: { id: CategoryId; label: string; icon: typeof PaletteIcon }[] 
   { id: 'playback', label: 'Playback', icon: GraphicEqIcon },
   { id: 'lyrics', label: 'Lyrics', icon: LyricsIcon },
   { id: 'library', label: 'Songs', icon: LibraryIcon },
+  { id: 'downloads', label: 'Downloads', icon: CloudDownloadIcon },
   { id: 'artwork', label: 'Artwork', icon: ImageIcon },
   { id: 'keybinds', label: 'Keybinds', icon: KeyboardIcon },
   { id: 'integrations', label: 'Integrations', icon: WifiIcon },
@@ -154,6 +164,8 @@ export function SettingsView({
   const [query, setQuery] = useState('')
   const [active, setActive] = useState<CategoryId>('appearance')
   const [dataFolder, setDataFolder] = useState('')
+  const [downloadFolder, setDownloadFolder] = useState('')
+  const [downloadTool, setDownloadTool] = useState<DownloadToolStatus | null>(null)
   const [offsetText, setOffsetText] = useState((settings.lyricsOffset / 1000).toString())
   const [busy, setBusy] = useState<string | null>(null)
   const [note, setNote] = useState('')
@@ -164,7 +176,16 @@ export function SettingsView({
 
   useEffect(() => {
     void api.app.dataFolder().then(setDataFolder)
+    void api.downloads.defaultFolder().then(setDownloadFolder)
+    void api.downloads.toolStatus().then(setDownloadTool)
   }, [])
+
+  const chooseDownloadFolder = async (): Promise<void> => {
+    const picked = await api.downloads.pickFolder()
+    if (!picked) return
+    setDownloadFolder(picked)
+    update({ downloadFolder: picked })
+  }
 
   const row = (
     category: CategoryId,
@@ -583,6 +604,80 @@ export function SettingsView({
         ]}
         onChange={(dir) => update({ albumSortDesc: dir === 'desc' })}
       />
+    ),
+
+    // --- Downloads --------------------------------------------------------
+    row(
+      'downloads',
+      'download-folder',
+      'Default folder',
+      <div className="swatches">
+        {settings.downloadFolder && (
+          <button
+            type="button"
+            className="ghost-btn"
+            onClick={() => update({ downloadFolder: '' })}
+          >
+            Auto
+          </button>
+        )}
+        <button type="button" className="ghost-btn" onClick={() => void chooseDownloadFolder()}>
+          <FolderIcon size={14} /> Choose…
+        </button>
+      </div>,
+      settings.downloadFolder || `${downloadFolder || 'First library folder'} (automatic)`,
+      'download destination folder music save location'
+    ),
+    row(
+      'downloads',
+      'download-format',
+      'Audio format',
+      <select
+        className="select"
+        value={settings.downloadFormat}
+        aria-label="Download audio format"
+        onChange={(e) => update({ downloadFormat: e.target.value as DownloadFormat })}
+      >
+        <option value="mp3">MP3</option>
+        <option value="m4a">M4A</option>
+        <option value="opus">Opus</option>
+      </select>,
+      'Container used when converting downloads.',
+      'download audio format mp3 m4a opus'
+    ),
+    row(
+      'downloads',
+      'download-quality',
+      'Audio quality',
+      <select
+        className="select"
+        value={settings.downloadQuality}
+        aria-label="Download audio quality"
+        onChange={(e) => update({ downloadQuality: e.target.value as DownloadQuality })}
+      >
+        <option value="best">Best</option>
+        <option value="320">320 kbps</option>
+        <option value="192">192 kbps</option>
+        <option value="128">128 kbps</option>
+      </select>,
+      'Bitrate for lossy downloads. Best keeps the source quality.',
+      'download bitrate quality'
+    ),
+    row(
+      'downloads',
+      'download-tool',
+      'yt-dlp',
+      <span className="settings__value">
+        {downloadTool
+          ? downloadTool.available
+            ? downloadTool.version ?? 'Available'
+            : 'Not found'
+          : 'Checking…'}
+      </span>,
+      downloadTool?.available
+        ? `${downloadTool.bundled ? 'Bundled binary' : 'System install'}${downloadTool.ffmpeg ? '' : ' - ffmpeg not found, conversions may fail'}`
+        : downloadTool?.error ?? 'Required for searching and downloading.',
+      'yt-dlp youtube download tool ffmpeg binary'
     ),
 
     // --- Artwork ----------------------------------------------------------

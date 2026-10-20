@@ -1,6 +1,11 @@
 import type {
   AppSettings,
   AddUrlResult,
+  DownloadJobStatus,
+  DownloadRequest,
+  DownloadSearchResult,
+  DownloadStartResult,
+  DownloadToolStatus,
   Lyrics,
   LibraryFolder,
   MetadataPatch,
@@ -35,6 +40,12 @@ export const IPC = {
   artworkFetch: 'artwork:fetch',
   artworkFetchMissing: 'artwork:fetch-missing',
   artworkArtistImage: 'artwork:artist-image',
+  downloadsSearch: 'downloads:search',
+  downloadsStart: 'downloads:start',
+  downloadsCancel: 'downloads:cancel',
+  downloadsPickFolder: 'downloads:pick-folder',
+  downloadsDefaultFolder: 'downloads:default-folder',
+  downloadsToolStatus: 'downloads:tool-status',
   pinsGet: 'pins:get',
   pinsSet: 'pins:set',
   playlistsGet: 'playlists:get',
@@ -70,6 +81,7 @@ export const IPC = {
   evtDone: 'library:done',
   evtRefresh: 'library:refresh',
   evtArtworkProgress: 'artwork:progress',
+  evtDownloadProgress: 'downloads:progress',
   evtFullscreen: 'window:fullscreen-changed',
   evtUpdate: 'update:changed'
 } as const
@@ -151,6 +163,24 @@ export interface LaguApi {
     /** Delete every cached cover image; returns how many were removed. */
     clearCache(): Promise<number>
   }
+  downloads: {
+    /** Search YouTube for downloadable tracks via yt-dlp. */
+    search(query: string): Promise<{
+      ok: boolean
+      results?: DownloadSearchResult[]
+      error?: string
+    }>
+    /** Download one search result into the chosen folder and add it to the library. */
+    start(request: DownloadRequest): Promise<DownloadStartResult>
+    /** Stop the active download, if any. */
+    cancel(): Promise<boolean>
+    /** Pick a destination folder for downloads. */
+    pickFolder(): Promise<string | null>
+    /** Resolve the effective default download folder. */
+    defaultFolder(): Promise<string>
+    /** Check whether the bundled/system yt-dlp is usable. */
+    toolStatus(): Promise<DownloadToolStatus>
+  }
   pins: {
     get(): Promise<PinnedItem[]>
     set(pinned: PinnedItem[]): Promise<PinnedItem[]>
@@ -209,6 +239,8 @@ export interface LaguApi {
     onRefresh(cb: () => void): () => void
     /** Progress for online artwork lookups. */
     onArtworkProgress(cb: (p: { done: number; total: number }) => void): () => void
+    /** Download search / download job updates. */
+    onDownloadProgress(cb: (status: DownloadJobStatus) => void): () => void
     /** Fired when the OS opens one or more audio files with Lagu. */
     onOpenFiles(cb: (paths: string[]) => void): () => void
   }

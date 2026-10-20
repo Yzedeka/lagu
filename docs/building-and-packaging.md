@@ -14,7 +14,14 @@ npm run dist:mac        # .app + .zip
 npm run dist:all        # all three desktop platforms
 npm run dist:flatpak    # Flatpak bundle
 npm run build:apk       # Android placeholder (see below)
+npm run fetch:ytdlp     # bundle the standalone yt-dlp binary
 ```
+
+`dist` and the platform targets fetch yt-dlp first into `resources/bin/`
+(git-ignored); electron-builder ships the whole folder. Cross-builds fetch the
+target platform into a subfolder (`win32/`, `darwin/`), and the app resolves the
+right binary at runtime. Set `--force` on the fetch script to refresh to the
+latest release.
 
 ## Artifacts
 

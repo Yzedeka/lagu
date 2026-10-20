@@ -55,6 +55,74 @@ export type Density = 'comfortable' | 'compact'
 
 export type AlbumSort = 'artist' | 'name' | 'year' | 'added' | 'tracks'
 
+/** Audio container used when downloading from an online source. */
+export type DownloadFormat = 'mp3' | 'm4a' | 'opus'
+
+/** Requested audio quality for lossy download formats. */
+export type DownloadQuality = 'best' | '320' | '192' | '128'
+
+/** One search hit returned by yt-dlp. */
+export interface DownloadSearchResult {
+  id: string
+  title: string
+  uploader: string
+  duration?: number
+  thumbnail?: string
+  url: string
+}
+
+export interface DownloadRequest {
+  url: string
+  title: string
+  /** Destination folder override; falls back to the configured default. */
+  folder?: string
+  format?: DownloadFormat
+  quality?: DownloadQuality
+  /** Download every entry of a playlist/album link. Auto-detected when omitted. */
+  playlist?: boolean
+}
+
+export type DownloadPhase =
+  | 'idle'
+  | 'searching'
+  | 'downloading'
+  | 'processing'
+  | 'done'
+  | 'error'
+  | 'cancelled'
+
+export interface DownloadJobStatus {
+  phase: DownloadPhase
+  title?: string
+  /** 0-100 while downloading (overall for playlists). */
+  percent?: number
+  /** Entries finished / total entries when downloading a playlist. */
+  completed?: number
+  total?: number
+  message?: string
+  file?: string
+  track?: Track
+}
+
+export interface DownloadStartResult {
+  ok: boolean
+  track?: Track
+  tracks?: Track[]
+  error?: string
+  cancelled?: boolean
+}
+
+export interface DownloadToolStatus {
+  available: boolean
+  /** Absolute path or command used to run yt-dlp. */
+  command?: string
+  version?: string
+  bundled: boolean
+  /** ffmpeg is required to convert downloads to MP3/M4A/Opus. */
+  ffmpeg: boolean
+  error?: string
+}
+
 /** An item pinned to the sidebar for quick access. */
 export interface PinnedItem {
   id: string
@@ -141,6 +209,12 @@ export interface AppSettings {
   queueWidth: number
   /** Look up missing album art online (opt-in network feature). */
   fetchArtworkOnline: boolean
+  /** Default destination for downloaded music ('' = first library folder). */
+  downloadFolder: string
+  /** Default audio container for downloads. */
+  downloadFormat: DownloadFormat
+  /** Default quality for lossy download formats. */
+  downloadQuality: DownloadQuality
   /** Album grid sort field. */
   albumSort: AlbumSort
   /** Album grid sort direction (true = descending). */

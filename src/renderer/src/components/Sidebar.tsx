@@ -5,6 +5,7 @@ import {
   ArtistIcon,
   ChevronDownIcon,
   CloseIcon,
+  CloudDownloadIcon,
   CreateFolderIcon,
   DiscIcon,
   FolderIcon,
@@ -55,6 +56,7 @@ interface SidebarProps {
   onRescan: () => void
   onRemoveFolder: (id: string) => void
   onAddUrl: () => void
+  onDownloadMusic: () => void
 }
 
 const NAV: { id: BrowseSection; label: string; icon: typeof GraphicEqIcon }[] = [
@@ -84,7 +86,8 @@ export function Sidebar({
   onAddFolder,
   onRescan,
   onRemoveFolder,
-  onAddUrl
+  onAddUrl,
+  onDownloadMusic
 }: SidebarProps) {
   const startX = useRef(0)
   const startWidth = useRef(width)
@@ -230,6 +233,9 @@ export function Sidebar({
           </button>
           <button type="button" className="icon-btn" title="Add stream URL" onClick={onAddUrl}>
             <LinkIcon size={16} />
+          </button>
+          <button type="button" className="icon-btn" title="Download music" onClick={onDownloadMusic}>
+            <CloudDownloadIcon size={16} />
           </button>
         </div>
       </div>
