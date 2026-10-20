@@ -3,7 +3,7 @@
 A minimalist, fast desktop music player for your local library - artwork-driven
 theming, a real queue, crossfade, 8D audio and synchronized lyrics.
 
-> Version 0.1.0 - MIT licensed - **still in beta**.
+> Version 0.4.0 - MIT licensed - **still in beta**.
 
 ## Repository layout
 
