@@ -46,6 +46,9 @@ export class LibraryService {
   private tracks = new Map<string, Track>()
   private folders: LibraryFolder[] = []
   private scanning = false
+  /** Scans requested while another scan was running; run once it finishes. */
+  private queuedScan: { all: boolean; ids: Set<string>; done: Promise<void>; resolve: () => void } | null =
+    null
   private listeners: LibraryListeners | null = null
   private readonly watchers = new Map<string, FSWatcher>()
   private readonly changeTimers = new Map<string, NodeJS.Timeout>()
@@ -722,7 +725,9 @@ export class LibraryService {
     this.folders = [...this.folders, folder]
     this.store.setFolders(this.folders)
     this.startWatching(folder)
-    await this.scan(folder.id)
+    // Tracks stream in through scan events; don't hold the folder back until
+    // the scan (which may be queued behind a running one) finishes.
+    void this.scan(folder.id)
     return folder
   }
 
@@ -743,7 +748,7 @@ export class LibraryService {
   }
 
   async scan(folderId?: string): Promise<void> {
-    if (this.scanning) return
+    if (this.scanning) return this.queueScan(folderId)
     const targets = folderId ? this.folders.filter((f) => f.id === folderId) : this.folders
     if (targets.length === 0) return
 
@@ -807,6 +812,8 @@ export class LibraryService {
         await mapPool(files, SCAN_CONCURRENCY, async (filePath) => {
           try {
             const track = await readTrack(filePath, folder.path, this.store)
+            // The folder may have been removed while this scan was running.
+            if (!this.folders.some((f) => f.id === folder.id)) return
             this.registerTrack(track)
             registered.add(track.id)
             buffer.push(track)
@@ -841,7 +848,41 @@ export class LibraryService {
       this.scanning = false
       this.listeners?.progress({ scanning: false, scanned, total: discovered })
       this.listeners?.done({ total: this.tracks.size, unsupported, errors })
+      this.runQueuedScan()
     }
+  }
+
+  /**
+   * Remember a scan requested mid-scan (e.g. a folder added while the library
+   * is being scanned) and resolve once it has actually run.
+   */
+  private queueScan(folderId?: string): Promise<void> {
+    if (!this.queuedScan) {
+      let resolve: () => void = () => undefined
+      const done = new Promise<void>((r) => {
+        resolve = r
+      })
+      this.queuedScan = { all: false, ids: new Set(), done, resolve }
+    }
+    if (folderId) this.queuedScan.ids.add(folderId)
+    else this.queuedScan.all = true
+    return this.queuedScan.done
+  }
+
+  private runQueuedScan(): void {
+    const queued = this.queuedScan
+    if (!queued) return
+    this.queuedScan = null
+    const run = async (): Promise<void> => {
+      if (queued.all) {
+        await this.scan()
+        return
+      }
+      for (const id of queued.ids) await this.scan(id)
+    }
+    void run()
+      .catch((err) => console.error('[lagu] queued scan failed', err))
+      .finally(queued.resolve)
   }
 
   private persist(): void {
