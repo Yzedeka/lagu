@@ -33,7 +33,9 @@ export function BigDownload() {
     >
       <Icon size={22} />
       <span className="big-dl__text">
-        <span className="big-dl__label">Download for {OS_LABEL[os]}</span>
+        <span className="big-dl__label">
+          Download for {os === 'macos' ? primary.label : OS_LABEL[os]}
+        </span>
         <span className="big-dl__detail">{formatSize(primary.size)}</span>
       </span>
       <DownloadIcon size={20} />
