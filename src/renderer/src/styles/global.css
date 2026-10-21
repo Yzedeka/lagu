@@ -497,6 +497,7 @@ button,
 }
 
 .nav-item {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 11px;
@@ -2018,7 +2019,10 @@ button,
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 7px 0;
+  /* Bleed the hover background past the text so it doesn't hug the edges. */
+  margin: 0 -12px;
+  padding: 7px 12px;
+  border-radius: var(--radius);
 }
 
 .settings__label {
@@ -2218,40 +2222,9 @@ button,
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 12px 8px;
+  padding: 12px 0;
   border-right: 1px solid var(--border);
   overflow-y: auto;
-}
-
-.settings-nav__item {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 8px 10px;
-  border-radius: var(--radius);
-  color: var(--text-dim);
-  font-weight: 500;
-  text-align: left;
-}
-
-.settings-nav__item .material-symbols-rounded {
-  opacity: 0.85;
-}
-
-.settings-nav__item:hover {
-  background: var(--bg-hover);
-  color: var(--text);
-}
-
-.settings-nav__item--active {
-  background: var(--accent-soft);
-  color: var(--text);
-}
-
-.settings-nav__item--active .material-symbols-rounded {
-  color: var(--accent-bright);
-  opacity: 1;
 }
 
 .settings-view__search {
@@ -3441,27 +3414,14 @@ button,
   transform: scale(1.12);
 }
 
-.settings-nav__item {
-  transition: background-color 0.16s var(--ease), color 0.16s var(--ease),
-    transform 0.14s var(--ease);
-}
-
-.settings-nav__item:active {
-  transform: scale(0.98);
-}
-
-.settings-nav__item--active {
-  position: relative;
-}
-
-.settings-nav__item--active::before {
+.nav-item--active::before {
   content: '';
   position: absolute;
   left: 0;
   top: 6px;
   bottom: 6px;
   width: 3px;
-  border-radius: 2px;
+  border-radius: 0 2px 2px 0;
   background: var(--accent);
   transform-origin: center;
   animation: accentBar 0.24s var(--ease);
@@ -3753,7 +3713,6 @@ button,
 .shortcut-row,
 .nav-item,
 .brand-now,
-.settings-nav__item,
 .sidebar__section-toggle,
 .segmented button,
 .icon-btn,
