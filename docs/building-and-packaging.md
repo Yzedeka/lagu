@@ -72,14 +72,14 @@ Fix it one of three ways:
 2. Run it without FUSE (extracts to a temp dir first):
 
    ```bash
-   APPIMAGE_EXTRACT_AND_RUN=1 ./Lagu-0.2.0.AppImage
+   APPIMAGE_EXTRACT_AND_RUN=1 ./Lagu-<version>.AppImage
    ```
 
 3. Use the **portable tarball** instead - extract and run, no FUSE at all:
 
    ```bash
-   tar -xzf lagu-music-player-0.2.0.tar.gz
-   ./lagu-music-player-0.2.0/lagu-music-player
+   tar -xzf lagu-music-player-<version>.tar.gz
+   ./lagu-music-player-<version>/lagu-music-player
    ```
 
 ## Icons
@@ -134,7 +134,7 @@ and write the `~/Lagu` data folder).
 `build/Lagu-<version>.flatpak`. Install it with:
 
 ```bash
-flatpak install --user build/Lagu-0.2.0.flatpak
+flatpak install --user build/Lagu-<version>.flatpak
 flatpak run com.lagu.musicplayer
 ```
 
