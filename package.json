@@ -7,7 +7,7 @@
     "name": "Lagu",
     "email": "lagu@localhost"
   },
-  "license": "UNLICENSED",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "main": "./out/main/index.js",
   "desktopName": "lagu.desktop",
   "scripts": {
