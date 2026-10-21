@@ -18,6 +18,7 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "fetch:ytdlp": "node scripts/fetch-ytdlp.mjs",
+    "icons:subset": "python3 scripts/subset-icons.py",
     "dist": "npm run fetch:ytdlp && electron-vite build && electron-builder",
     "dist:linux": "npm run fetch:ytdlp && electron-vite build && electron-builder --linux",
     "dist:win": "npm run fetch:ytdlp -- --platform=win32 --arch=x64 && electron-vite build && electron-builder --win",
