@@ -58,6 +58,7 @@ interface SidebarProps {
   onRemoveFolder: (id: string) => void
   onAddUrl: () => void
   onDownloadMusic: () => void
+  onSearchYouTube: (query: string) => void
 }
 
 const NAV: NavEntry<BrowseSection>[] = [
@@ -88,7 +89,8 @@ export function Sidebar({
   onRescan,
   onRemoveFolder,
   onAddUrl,
-  onDownloadMusic
+  onDownloadMusic,
+  onSearchYouTube
 }: SidebarProps) {
   const startX = useRef(0)
   const startWidth = useRef(width)
@@ -204,6 +206,7 @@ export function Sidebar({
           tracks={tracks}
           playlists={playlists}
           onSelect={onSearchSelect}
+          onSearchYouTube={onSearchYouTube}
         />
         <div className="footer-tools">
           <button
@@ -297,7 +300,8 @@ function SidebarSearch({
   onSubmit,
   tracks,
   playlists,
-  onSelect
+  onSelect,
+  onSearchYouTube
 }: {
   value: string
   onChange: (value: string) => void
@@ -305,6 +309,7 @@ function SidebarSearch({
   tracks: Track[]
   playlists: Playlist[]
   onSelect: (target: SearchTarget) => void
+  onSearchYouTube: (query: string) => void
 }) {
   const [open, setOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -504,6 +509,26 @@ function SidebarSearch({
               </span>
             </button>
           ))}
+
+          <div className="searchdrop__label">YouTube</div>
+          <button
+            type="button"
+            className="searchdrop__row"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => {
+              onSearchYouTube(value.trim())
+              onChange('')
+              setOpen(false)
+            }}
+          >
+            <span className="searchdrop__thumb art--fallback">
+              <CloudDownloadIcon size={14} />
+            </span>
+            <span className="searchdrop__main">
+              <span className="searchdrop__title">Search YouTube for “{value.trim()}”</span>
+              <span className="searchdrop__sub">Find it and download it to your library</span>
+            </span>
+          </button>
         </div>
       )}
     </>
