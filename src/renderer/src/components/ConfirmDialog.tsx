@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { CloseIcon, WarningIcon } from '@renderer/icons'
 
 interface ConfirmDialogProps {
@@ -18,6 +18,17 @@ export function ConfirmDialog({
   onConfirm,
   onClose
 }: ConfirmDialogProps) {
+  // Capture Escape before the app-wide shortcuts see it (e.g. leaving fullscreen).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key !== 'Escape') return
+      e.stopPropagation()
+      onClose()
+    }
+    window.addEventListener('keydown', onKey, true)
+    return () => window.removeEventListener('keydown', onKey, true)
+  }, [onClose])
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal modal--narrow" onClick={(e) => e.stopPropagation()}>
@@ -39,6 +50,7 @@ export function ConfirmDialog({
           <button
             type="button"
             className={danger ? 'danger-btn' : 'primary-btn'}
+            autoFocus
             onClick={() => {
               onConfirm()
               onClose()
