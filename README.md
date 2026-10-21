@@ -3,7 +3,7 @@
 A minimalist, fast desktop music player for your local library - artwork-driven
 theming, a real queue, crossfade, 8D audio and synchronized lyrics.
 
-> Version 0.4.1 - PolyForm Noncommercial 1.0.0 - **still in beta**.
+> Version 0.5.0 - PolyForm Noncommercial 1.0.0 - **still in beta**.
 
 ## Repository layout
 

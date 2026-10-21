@@ -28,6 +28,8 @@ a consistent default accent is used.
 - **Show sidebar** / **Show queue** - toggle the secondary panels.
 - **Queue style** - **Normal** (default) or **Compact** row density.
 - **Queue width** - set the queue width without dragging (drag its edge too).
+  The minimum is 140px; below 180px the queue hides artwork and metadata so it
+  stays readable, and its scrollbar is hidden while scrolling still works.
 - **Audio visualizer** - show or hide the spectrum.
 
 ## Playback

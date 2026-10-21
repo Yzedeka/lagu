@@ -48,6 +48,8 @@
 - Play/pause, previous/next, seek, and volume with mute.
 - A **persistent Queue** you can reorder by dragging and prune with a click; it
   is restored between sessions. Its total runtime is shown in the panel header.
+- The queue has **no visible scrollbar**; the narrowest layouts drop artwork and
+  metadata instead of clipping the title.
 - Three queue densities in Settings - **Normal** (default) and **Compact** - plus
   a **resizable width** (drag its edge).
 - **Shuffle** and **repeat** (off / all / one).

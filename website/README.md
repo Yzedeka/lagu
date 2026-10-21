@@ -50,9 +50,9 @@ The installers are served from **the site itself** at `/downloads/<file>`:
 
   | OS | File |
   | --- | --- |
-  | Windows | `Lagu-0.1.0-setup.exe` |
-  | macOS | `Lagu-0.1.0-mac.zip` |
-  | Linux | `Lagu-0.1.0.AppImage`, `lagu-music-player_0.1.0_amd64.deb`, `lagu-music-player-0.1.0.x86_64.rpm`, `Lagu-0.1.0.flatpak`, `lagu-music-player-0.1.0.tar.gz` |
+  | Windows | `Lagu-<version>-setup.exe` |
+  | macOS | `Lagu-<version>-mac-arm64.zip`, `Lagu-<version>-mac-x64.zip` |
+  | Linux | `Lagu-<version>.AppImage`, `lagu-music-player_<version>_amd64.deb`, `lagu-music-player-<version>.x86_64.rpm`, `Lagu-<version>.flatpak`, `lagu-music-player-<version>.tar.gz` |
 
 ## The download counter
 

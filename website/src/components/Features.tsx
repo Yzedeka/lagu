@@ -1,69 +1,82 @@
 import {
-  AlbumIcon,
-  ArtistIcon,
+  CloudDownloadIcon,
   EditIcon,
   GraphicEqIcon,
+  LibraryIcon,
   LyricsIcon,
   PaletteIcon,
+  PlaylistIcon,
   QueueIcon,
-  SearchIcon
 } from '@/icons'
 
 const FEATURES = [
   {
+    icon: LibraryIcon,
+    title: 'A library that stays yours',
+    text: 'Add any folders, scan once, and browse a local index. Files are never moved, renamed or rewritten.'
+  },
+  {
     icon: PaletteIcon,
-    title: 'Theming from your artwork',
-    text: 'The cover of whatever is playing tints the interface. Four themes, and an accent you can fix.'
+    title: 'Colour from the cover',
+    text: 'The playing artwork sets the accent, panels and text contrast. Four themes, or pin one colour.'
   },
   {
     icon: QueueIcon,
-    title: 'A real queue',
-    text: 'A persistent Up Next you can reorder and prune, with shuffle and repeat.'
+    title: 'A queue you can edit',
+    text: 'Reorder, remove, play next or add to queue. Shuffle keeps the order you can return to.'
   },
   {
     icon: LyricsIcon,
-    title: 'Synchronized lyrics',
-    text: 'Line-by-line and word-by-word from .lrc files, with a per-track timing offset.'
+    title: 'Lyrics that follow',
+    text: 'Line-level and word-level LRC, embedded tags, per-track offsets and optional online lookup.'
+  },
+  {
+    icon: CloudDownloadIcon,
+    title: 'Find it, download it',
+    text: 'Search YouTube through yt-dlp, download single tracks or full playlists straight into your library.'
+  },
+  {
+    icon: PlaylistIcon,
+    title: 'Playlists and pins',
+    text: 'Build collections with their own covers, then pin artists, albums, tracks and playlists to the sidebar.'
   },
   {
     icon: GraphicEqIcon,
-    title: 'Crossfade and 8D audio',
-    text: 'Blend tracks into each other, or rotate the sound around your head. Both optional.'
+    title: 'Crossfade, 8D and a visualizer',
+    text: 'Blend tracks sample-accurately, rotate the sound, or watch a slim spectrum move with the audio.'
   },
   {
     icon: EditIcon,
-    title: 'Fix your tags',
-    text: 'Right-click to correct a title, artist or year, or fetch the right cover online.'
-  },
-  {
-    icon: SearchIcon,
-    title: 'Search and pins',
-    text: 'Find anything fast, and pin artists, albums and tracks to the sidebar.'
-  },
-  {
-    icon: AlbumIcon,
-    title: 'Albums and artists',
-    text: 'Browse by library, album, artist or folder, with artwork everywhere.'
-  },
-  {
-    icon: ArtistIcon,
-    title: 'Your files stay on disk',
-    text: 'Lagu reads your music where it lives and never rewrites it. Plays offline.'
+    title: 'Fix the details',
+    text: 'Correct tags, pick a cover or rename an artist. Edits live in Lagu; the original files are untouched.'
   }
 ]
 
 export function Features() {
   return (
-    <section className="features">
-      {FEATURES.map(({ icon: Icon, title, text }) => (
-        <article className="feature" key={title}>
-          <span className="feature__icon">
-            <Icon size={18} />
-          </span>
-          <h3 className="feature__title">{title}</h3>
-          <p className="feature__text">{text}</p>
-        </article>
-      ))}
+    <section className="section section--features">
+      <header className="section__head">
+        <span className="section__kicker">Features</span>
+        <h2 className="section__title">Small player. Serious about your library.</h2>
+        <p className="section__lead">
+          Everything is built around local files and a clean listening flow - not feeds,
+          recommendations or accounts.
+        </p>
+      </header>
+
+      <div className="feature-list">
+        {FEATURES.map(({ icon: Icon, title, text }) => (
+          <article className="feature" key={title}>
+            <span className="feature__icon">
+              <Icon size={17} />
+            </span>
+            <div>
+              <h3 className="feature__title">{title}</h3>
+              <p className="feature__text">{text}</p>
+            </div>
+          </article>
+        ))}
+      </div>
     </section>
   )
 }

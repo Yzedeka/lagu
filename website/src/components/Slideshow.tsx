@@ -36,31 +36,37 @@ export function Slideshow() {
       onMouseLeave={() => setPaused(false)}
     >
       <div className="showcase__frame">
-        {SLIDES.map((s, i) => (
-          <img
-            key={s.src}
-            className={`showcase__img${i === index ? ' is-active' : ''}`}
-            src={s.src}
-            alt={s.label}
-            draggable={false}
-            loading={i === 0 ? 'eager' : 'lazy'}
-          />
-        ))}
-
-        <div className="showcase__dots">
+        <header className="showcase__bar">
+          <span className="showcase__bar-title">
+            <span className="showcase__dotmark" />
+            Lagu
+          </span>
+          <span className="showcase__bar-label">{SLIDES[index].label}</span>
+          <div className="showcase__dots">
+            {SLIDES.map((s, i) => (
+              <button
+                key={s.src}
+                type="button"
+                className={`showcase__dot${i === index ? ' is-active' : ''}`}
+                aria-label={`Show ${s.label}`}
+                onClick={() => setIndex(i)}
+              />
+            ))}
+          </div>
+        </header>
+        <div className="showcase__screen">
           {SLIDES.map((s, i) => (
-            <button
+            <img
               key={s.src}
-              type="button"
-              className={`showcase__dot${i === index ? ' is-active' : ''}`}
-              aria-label={`Show ${s.label}`}
-              onClick={() => setIndex(i)}
+              className={`showcase__img${i === index ? ' is-active' : ''}`}
+              src={s.src}
+              alt={s.label}
+              draggable={false}
+              loading={i === 0 ? 'eager' : 'lazy'}
             />
           ))}
         </div>
       </div>
-
-      <p className="showcase__label">{SLIDES[index].label}</p>
     </section>
   )
 }

@@ -14,7 +14,6 @@ export function App() {
   return (
     <DownloadProvider>
       <div className="page">
-        <div className="page__glow" aria-hidden />
         <Nav />
         <main>
           {route.name === 'home' && (
