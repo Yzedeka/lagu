@@ -1,243 +1,131 @@
-JET ARNDT LICENSE v1.0 (JAL v1.0)
-October 2026
+# PolyForm Noncommercial License 1.0.0
 
-Copyright (C) 2026 Jet Arndt / Zeax, INC.
-https://zeax.org/
-Everyone is permitted to copy and distribute verbatim copies of this license document, but changing it is not allowed.
+<https://polyformproject.org/licenses/noncommercial/1.0.0>
 
+## Acceptance
 
-PREAMBLE
+In order to get any license under these terms, you must agree
+to them as both strict obligations and conditions to all
+your licenses.
 
-The Jet Arndt License (JAL) is a source-available, non-commercial software license. It permits users to study, use, modify, fork, and redistribute software for non-commercial purposes, subject to the conditions stated below.
-This license is intended for use by any software copyright holder who wishes to distribute their work under its terms.
-To apply this license, the copyright holder must include an appropriate copyright notice identifying themselves and include an unmodified copy of this license with the software.
+## Copyright License
 
+The licensor grants you a copyright license for the
+software to do everything you might do with the software
+that would otherwise infringe the licensor's copyright
+in it for any permitted purpose.  However, you may
+only distribute the software according to [Distribution
+License](#distribution-license) and make changes or new works
+based on the software according to [Changes and New Works
+License](#changes-and-new-works-license).
 
-1. DEFINITIONS
+## Distribution License
 
-For the purposes of this License:
+The licensor grants you an additional copyright license
+to distribute copies of the software.  Your license
+to distribute covers distributing the software with
+changes and new works permitted by [Changes and New Works
+License](#changes-and-new-works-license).
 
-“License” means the Jet Arndt License v1.0.
-“Licensor” means the copyright holder or other person legally authorized to grant the rights provided by this License for a particular Software project.
-“Software” means the source code, object code, documentation, assets, and other materials that the Licensor makes available under this License.
-“Original Software” means the Software as originally published by the Licensor.
-“Derivative Work” means a work based upon, incorporating, modifying, adapting, translating, extending, or otherwise containing copyrightable material from the Software.
-“Distribution” means making the Software or a Derivative Work available to another person or entity by download, physical media, repository, hosting service, package manager, or any other method.
-“Commercial Use” means use primarily intended for, or reasonably connected with, obtaining revenue, payment, profit, compensation, or another commercial advantage. Commercial Use includes use within a commercial product, service, or business, even when the Software itself is provided without a separate charge.
-“Non-Commercial Use” means use that does not constitute Commercial Use.
+## Notices
 
+You must ensure that anyone who gets a copy of any part of
+the software from you also gets a copy of these terms or the
+URL for them above, as well as copies of any plain-text lines
+beginning with `Required Notice:` that the licensor provided
+with the software.  For example:
 
-2. GRANT OF PERMISSION
+> Required Notice: Copyright Yoyodyne, Inc. (http://example.com)
 
-Subject to the terms and conditions of this License, the Licensor grants you a worldwide, non-exclusive, royalty-free license to use, copy, study, modify, fork, and distribute the Software solely for Non-Commercial Use.
-This permission does not transfer ownership of the Software or its copyright to you.
-The permissions granted under this License apply only to rights that the Licensor is legally entitled to license.
+## Changes and New Works License
 
+The licensor grants you an additional copyright license to
+make changes and new works based on the software for any
+permitted purpose.
 
-3. NON-COMMERCIAL RESTRICTION
+## Patent License
 
-You may not use the Software or any Derivative Work for Commercial Use without prior Written Permission from the relevant Licensor.
-This restriction applies whether the Software or Derivative Work is provided directly or indirectly, for payment or without payment as part of a commercial offering, or as part of another product or service.
-Without Written Permission, the following activities are prohibited:
+The licensor grants you a patent license for the software that
+covers patent claims the licensor can license, or becomes able
+to license, that you would infringe by using the software.
 
-a. Selling the Software or a Derivative Work.
+## Noncommercial Purposes
 
-b. Renting, leasing, or licensing the Software or a Derivative Work for payment.
+Any noncommercial purpose is a permitted purpose.
 
-c. Charging a fee to provide access to the Software or a Derivative Work.
+## Personal Uses
 
-d. Using the Software or a Derivative Work as part of a paid product, service, subscription, platform, application, or business.
+Personal use for research, experiment, and testing for
+the benefit of public knowledge, personal study, private
+entertainment, hobby projects, amateur pursuits, or religious
+observance, without any anticipated commercial application,
+is use for a permitted purpose.
 
-e. Using the Software or a Derivative Work to provide a paid hosting, cloud, API, software-as-a-service (SaaS), or similar service.
+## Noncommercial Organizations
 
-f. Using the Software or a Derivative Work to generate advertising revenue, subscription income, or other commercial revenue.
+Use by any charitable organization, educational institution,
+public research organization, public safety or health
+organization, environmental protection organization,
+or government institution is use for a permitted purpose
+regardless of the source of funding or obligations resulting
+from the funding.
 
-g. Selling access, support, features, hosted instances, or functionality primarily provided by the Software or a Derivative Work.
+## Fair Use
 
-h. Including the Software or a Derivative Work in a product that is sold, licensed, rented, or otherwise commercially distributed.
+You may have "fair use" rights for the software under the
+law. These terms do not limit them.
 
-i. Using the Software or a Derivative Work as an internal component of a commercial operation where that use contributes to the operation's commercial activities.
+## No Other Rights
 
+These terms do not allow you to sublicense or transfer any of
+your licenses to anyone else, or prevent the licensor from
+granting licenses to anyone else.  These terms do not imply
+any other licenses.
 
-4. NO CIRCUMVENTION
+## Patent Defense
 
-You may not knowingly circumvent, evade, or attempt to evade the Commercial Use restrictions of this License.
-Changing the name, branding, user interface, distribution method, ownership structure, business model, or other characteristics of the Software does not, by itself, remove these restrictions.
-A use that constitutes Commercial Use when performed directly remains Commercial Use when performed indirectly through another person, entity, project, service, or product.
-The substance of an activity, rather than its label or method of delivery, determines whether it constitutes Commercial Use under this License.
+If you make any written claim that the software infringes or
+contributes to infringement of any patent, your patent license
+for the software granted under these terms ends immediately. If
+your company makes such a claim, your patent license ends
+immediately for work on behalf of your company.
 
+## Violations
 
-5. DERIVATIVE WORKS
+The first time you are notified in writing that you have
+violated any of these terms, or done anything with the software
+not covered by your licenses, your licenses can nonetheless
+continue if you come into full compliance with these terms,
+and take practical steps to correct past violations, within
+32 days of receiving notice.  Otherwise, all your licenses
+end immediately.
 
-You may modify the Software and create Derivative Works for Non-Commercial Use.
-Derivative Works remain subject to this License to the extent that they contain or are based upon copyrightable material covered by this License.
-Changing, rewriting, reorganizing, translating, renaming, or substantially modifying the Software does not, by itself, remove the restrictions applicable to material derived from it.
-This section does not claim ownership over independently created material that is not covered by the Licensor's copyright.
+## No Liability
 
+***As far as the law allows, the software comes as is, without
+any warranty or condition, and the licensor will not be liable
+to you for any damages arising out of these terms or the use
+or nature of the software, under any kind of legal claim.***
 
-6. FORKS AND INDEPENDENT PROJECTS
+## Definitions
 
-You may fork the Software and use it as the basis for your own Non-Commercial projects.
-You may rename, redesign, extend, or substantially modify a fork, provided that the portions derived from the Software remain subject to this License.
-Creating a new repository, project name, organization, or distribution channel does not grant permission for Commercial Use.
-A genuinely independent work that does not incorporate material covered by this License is not restricted by this License merely because it performs a similar function.
+The **licensor** is the individual or entity offering these
+terms, and the **software** is the software the licensor makes
+available under these terms.
 
+**You** refers to the individual or entity agreeing to these
+terms.
 
-7. DISTRIBUTION
+**Your company** is any legal entity, sole proprietorship,
+or other kind of organization that you work for, plus all
+organizations that have control over, are under the control of,
+or are under common control with that organization.  **Control**
+means ownership of substantially all the assets of an entity,
+or the power to direct its management and policies by vote,
+contract, or otherwise.  Control can be direct or indirect.
 
-You may distribute the Software and Derivative Works for Non-Commercial purposes.
-Any distribution containing the Software or a substantial portion of its copyrightable material must include:
+**Your licenses** are all the licenses granted to you for the
+software under these terms.
 
-a. Appropriate attribution to the relevant copyright holder.
-
-b. A complete, unmodified copy of this License.
-
-c. A clear indication of substantial modifications made to the Software.
-
-d. Any existing copyright and license notices applicable to the included material.
-
-You may not remove, obscure, or alter copyright or license notices in a manner that misrepresents ownership or removes required attribution.
-You may not impose additional restrictions on recipients that conflict with the rights granted by this License.
-
-
-8. CONTRIBUTIONS
-
-Contributions, including GitHub Pull Requests, patches, bug fixes, documentation, and other submissions, are permitted and encouraged.
-By submitting a contribution, you represent that you have the legal right to submit it and that, to the best of your knowledge, it does not infringe another person's rights.
-Unless a separate written agreement provides otherwise, a contribution accepted into the Software may be distributed under this License.
-Submission of a contribution does not, by itself, transfer copyright ownership of that contribution to the Licensor.
-Contributors retain ownership of their contributions while granting the rights necessary for their contributions to be incorporated and distributed under this License.
-
-
-9. ATTRIBUTION
-
-Redistributions and Derivative Works must retain reasonable attribution to the relevant copyright holder and preserve applicable copyright notices.
-Attribution must not falsely suggest that the original copyright holder endorses, sponsors, or created modifications made by another person.
-Attribution does not confer ownership of the Software or grant permission to use another person's trademarks or branding beyond the rights expressly provided by this License.
-
-
-10. NO SUBLICENSING
-
-You may not sublicense, relicense, or grant additional rights to material covered by this License in a manner that removes or conflicts with its restrictions.
-You may not apply another license to covered material for the purpose of permitting Commercial Use that this License prohibits.
-You may distribute Derivative Works under additional terms for your own independent material, provided that those terms do not restrict rights already granted under this License or remove the restrictions applicable to the covered material.
-
-
-11. SEPARATE COMPONENTS
-
-This License applies to material covered by the Software's copyright and to Derivative Works to the extent they incorporate that material.
-Independent code that is genuinely unrelated to the Software may be distributed under separate terms.
-The mere presence of independently developed components in the same repository or application does not automatically subject those components to this License.
-
-However, separating, reorganizing, or packaging covered material with other components does not remove the restrictions applicable to the covered material.
-
-
-12. THIRD-PARTY COMPONENTS
-
-The Software may contain or depend upon components distributed under separate licenses.
-Those components remain subject to their respective licenses and applicable legal requirements.
-Nothing in this License is intended to remove, override, or restrict rights that you independently receive under a third-party license.
-
-The Licensor is responsible for ensuring that they have the necessary rights to distribute third-party material under the terms they claim to offer.
-
-
-13. COMMERCIAL PERMISSION
-
-The relevant Licensor may grant Written Permission for Commercial Use.
-Such permission may apply to particular individuals, organizations, products, versions, or activities and may contain additional conditions.
-Commercial permission granted by one copyright holder applies only to rights that holder controls.
-No commercial permission is granted merely because the Licensor has not objected to a particular use, has not enforced this License, or has previously allowed a different use.
-
-
-14. TRADEMARK AND BRANDING
-
-This License does not grant permission to use the names, trademarks, logos, project names, or branding of the Licensor or the original project except where reasonably necessary to provide attribution or accurately identify the origin of the Software.
-You may not falsely represent a modified or derivative version as an official release or imply endorsement by the original copyright holder without authorization.
-
-The name “Jet Arndt License” and the designation “JAL” identify this license document and do not imply that Jet Arndt or Zeax, INC. owns or endorses software released by third parties under its terms.
-
-
-15. OWNERSHIP
-
-The Software remains the property of its respective copyright holder or holders.
-This License grants permissions to use the Software but does not transfer copyright ownership, intellectual property ownership, or any other ownership interest.
-Copyright in modifications and contributions remains with their respective owners, subject to the permissions granted under this License.
-No ownership claim is made over independently created material that is not protected by the Licensor's rights.
-
-
-16. TERMINATION
-
-Your rights under this License automatically terminate if you materially violate its terms.
-Upon termination, you must cease activities that are no longer authorized by this License and, where legally required, cease distribution or use of affected copies.
-Your rights may be reinstated if the relevant Licensor expressly agrees in writing or if reinstatement is required by applicable law.
-
-Termination does not eliminate rights or obligations that applicable law provides must survive termination.
-
-
-17. DISCLAIMER OF WARRANTY
-
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
-
-TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE RELEVANT LICENSOR DISCLAIMS ALL WARRANTIES, INCLUDING WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
-
-THE LICENSOR DOES NOT GUARANTEE THAT THE SOFTWARE WILL BE ERROR-FREE, SECURE, AVAILABLE, OR SUITABLE FOR ANY PARTICULAR PURPOSE.
-
-
-18. LIMITATION OF LIABILITY
-
-TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE RELEVANT LICENSOR SHALL NOT BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM OR RELATING TO THE SOFTWARE OR THIS LICENSE.
-
-THIS INCLUDES DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, AND EXEMPLARY DAMAGES, WHERE SUCH EXCLUSIONS ARE PERMITTED BY LAW.
-
-NOTHING IN THIS SECTION EXCLUDES OR LIMITS LIABILITY THAT CANNOT LAWFULLY BE EXCLUDED OR LIMITED.
-
-
-19. NO GUARANTEE OF SUPPORT
-
-This License does not require the Licensor or any contributor to provide support, maintenance, updates, security fixes, documentation, hosting, or future versions of the Software.
-
-Any such services may be provided separately at the discretion of the relevant party.
-
-
-20. NO ADDITIONAL RIGHTS
-
-Except for the permissions expressly granted by this License, no additional rights are granted.
-
-No patent, trademark, or other intellectual property rights are granted except where expressly stated or necessarily required by applicable law.
-
-
-21. INTERPRETATION AND SEVERABILITY
-
-This License shall be interpreted in accordance with applicable law.
-
-If any provision is found to be invalid or unenforceable, that provision shall be limited or modified only to the minimum extent necessary to make it enforceable, where legally permitted.
-
-The remaining provisions shall continue in effect to the fullest extent permitted by law.
-
-Nothing in this License overrides mandatory rights or protections provided by applicable law.
-
-
-22. ENTIRE LICENSE
-
-This License constitutes the terms governing the use, modification, and distribution of Software released under it, unless the relevant Licensor expressly provides different written terms for a particular use or distribution.
-
-Any exception or additional permission must be authorized by the relevant rights holder.
-
-A change to the terms governing a particular Software project does not change the text or official version of this license document.
-
-
-23. LICENSE IDENTIFICATION
-
-This License is identified as:
-
-Jet Arndt License v1.0
-Abbreviation: JAL v1.0
-Publication date: October 2026
-License author: Jet Arndt / Zeax, INC.
-
-Official website: https://zeax.org/
-
-The text of this License may be copied and redistributed verbatim, but may not be modified or redistributed as an altered version of the official JAL v1.0 text.
-Each project applying this License must identify its own copyright holder in its copyright notice.
-
-Copyright (C) 2026 Jet Arndt / Zeax, INC. All rights reserved in the text of this License, subject to the express permission to copy and redistribute it verbatim.
+**Use** means anything you do with the software requiring one
+of your licenses.
