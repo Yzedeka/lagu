@@ -26,6 +26,12 @@ export interface LibraryListeners {
 }
 
 const SCAN_CONCURRENCY = 8
+
+/** Whether `target` is `root` or lives somewhere beneath it. */
+function isWithin(root: string, target: string): boolean {
+  const rel = path.relative(path.resolve(root), path.resolve(target))
+  return rel !== '..' && !rel.startsWith(`..${path.sep}`) && !path.isAbsolute(rel)
+}
 const BATCH_SIZE = 25
 
 export class LibraryService {
@@ -597,7 +603,23 @@ export class LibraryService {
 
   /** Renderer-safe URL for a stored playlist cover file. */
   playlistCoverUrl(file: string): string {
+    // Covers are always plain file names inside the artwork cache.
+    if (path.basename(file) !== file) return ''
     return mediaUrlFor(path.join(this.store.artworkDir, file))
+  }
+
+  /**
+   * Whether the media protocol may serve `filePath`: cached artwork, anything
+   * inside a library folder, or a loose file the user opened.
+   */
+  canServe(filePath: string): boolean {
+    if (isWithin(this.store.artworkDir, filePath)) return true
+    if (this.folders.some((folder) => isWithin(folder.path, filePath))) return true
+    const resolved = path.resolve(filePath)
+    for (const track of this.tracks.values()) {
+      if (track.source === 'file' && path.resolve(track.locator) === resolved) return true
+    }
+    return false
   }
 
   setPinned(pinned: PinnedItem[]): PinnedItem[] {

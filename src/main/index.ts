@@ -72,7 +72,7 @@ function createWindow(): void {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: true
     }
   })
 
@@ -133,11 +133,11 @@ app.on('second-instance', (_e, argv) => {
 
 app.whenReady().then(async () => {
   if (!gotLock) return
-  handleMediaProtocol()
-
   store = new Store()
   await store.init()
   library = new LibraryService(store)
+  const service = library
+  handleMediaProtocol((filePath) => service.canServe(filePath))
 
   registerIpc(getWindow, store, library)
   wireLibraryEvents(getWindow, library)
