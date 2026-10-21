@@ -9,7 +9,14 @@ import type {
   Track,
   UnsupportedFile
 } from '@shared/types'
-import { buildAlbums, buildArtists, buildFolders, sortAlbums, type Album } from '@renderer/lib/album'
+import {
+  buildAlbums,
+  buildArtists,
+  buildFolders,
+  findAlbum,
+  sortAlbums,
+  type Album
+} from '@renderer/lib/album'
 import { AlbumGrid } from './AlbumGrid'
 import {
   ChevronLeftIcon,
@@ -210,10 +217,11 @@ export function Browse({
   }, [tracks, libNeedle])
 
   const artistTracksFor = (name: string): Track[] =>
+    artists.find((a) => a.name === name)?.tracks ??
     tracks.filter((t) => (t.albumArtist || t.artist) === name)
 
-  const selectedAlbum = albumKey ? albums.find((a) => a.key === albumKey) ?? null : null
-  const artistTracks = artist ? tracks.filter((t) => (t.albumArtist || t.artist) === artist) : []
+  const selectedAlbum = albumKey ? findAlbum(albums, albumKey) : null
+  const artistTracks = artist ? artistTracksFor(artist) : []
   const folderTracks = folderPath ? tracks.filter((t) => (t.folder || '(streams)') === folderPath) : []
   const selectedPlaylist = playlistId ? playlists.find((p) => p.id === playlistId) ?? null : null
   const playlistTracks = selectedPlaylist
@@ -622,7 +630,6 @@ export function Browse({
     body = (
       <ArtistGrid
         artists={artists}
-        tracks={tracks}
         bios={bios}
         currentTrackId={currentTrackId}
         playing={playing}

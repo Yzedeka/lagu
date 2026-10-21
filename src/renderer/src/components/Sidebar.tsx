@@ -20,10 +20,9 @@ import {
 } from '@renderer/icons'
 import { AlbumArt } from './AlbumArt'
 import { ContextMenu } from './ContextMenu'
-import { buildAlbums, buildArtists } from '@renderer/lib/album'
+import { buildAlbums, buildArtists, findAlbum, type Album } from '@renderer/lib/album'
 import appIconUrl from '@renderer/icons/app_icon.png'
 import { folderName } from '@renderer/lib/format'
-import { albumKeyOf } from '@renderer/lib/album'
 import { useArtistImage } from '@renderer/state/useArtistImage'
 
 export type BrowseSection = 'library' | 'albums' | 'artists' | 'playlists' | 'folders'
@@ -93,6 +92,10 @@ export function Sidebar({
   const startWidth = useRef(width)
   const [foldersOpen, setFoldersOpen] = useState(true)
   const [folderMenu, setFolderMenu] = useState<{ x: number; y: number } | null>(null)
+  const albums = useMemo(
+    () => (pinned.some((p) => p.kind === 'album') ? buildAlbums(tracks) : []),
+    [pinned, tracks]
+  )
 
   const clamp = (value: number): number => Math.min(440, Math.max(150, value))
 
@@ -143,6 +146,7 @@ export function Sidebar({
                 key={pin.id}
                 pin={pin}
                 tracks={tracks}
+                albums={albums}
                 playlists={playlists}
                 onActivate={onActivatePin}
                 onUnpin={onUnpin}
@@ -541,12 +545,14 @@ function PinThumb({
 function PinRow({
   pin,
   tracks,
+  albums,
   playlists,
   onActivate,
   onUnpin
 }: {
   pin: PinnedItem
   tracks: Track[]
+  albums: Album[]
   playlists: Playlist[]
   onActivate: (pin: PinnedItem) => void
   onUnpin: (id: string) => void
@@ -557,7 +563,7 @@ function PinRow({
   if (pin.kind === 'track') {
     artTrackId = tracks.find((t) => t.id === pin.ref)?.id ?? null
   } else if (pin.kind === 'album') {
-    const list = tracks.filter((t) => albumKeyOf(t) === pin.ref)
+    const list = findAlbum(albums, pin.ref)?.tracks ?? []
     artTrackId = (list.find((t) => t.hasArtwork) ?? list[0])?.id ?? null
   } else if (pin.kind === 'playlist') {
     const playlist = playlists.find((p) => p.id === pin.ref)

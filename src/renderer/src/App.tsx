@@ -14,7 +14,7 @@ import {
 import { Sidebar, type SidebarSelection, type SearchTarget } from '@renderer/components/Sidebar'
 import type { PinnedItem } from '@shared/types'
 import { KEYBIND_IDS, normalizeKey } from '@shared/keybinds'
-import { albumKeyOf } from '@renderer/lib/album'
+import { buildAlbums, findAlbum } from '@renderer/lib/album'
 import { Browse } from '@renderer/components/Browse'
 import type { MetadataActions } from '@renderer/components/Browse'
 import { NowPlaying } from '@renderer/components/NowPlaying'
@@ -341,7 +341,7 @@ export function App() {
         return
       }
       if (pin.kind === 'album') {
-        const list = library.tracks.filter((t) => albumKeyOf(t) === pin.ref)
+        const list = findAlbum(buildAlbums(library.tracks), pin.ref)?.tracks ?? []
         setSelection('albums')
         setBrowseFocus({ kind: 'album', ref: pin.ref, token: ++focusToken.current })
         // Don't hijack playback if something is already playing.
