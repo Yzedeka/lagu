@@ -65,13 +65,18 @@ function corsHeaders(extra: Record<string, string> = {}): Record<string, string>
  * Serve `lagu://local/<encoded-absolute-path>` with explicit HTTP range support.
  * Chromium needs real 206 responses to treat media as seekable - without this,
  * seeking can reset playback to the start.
+ *
+ * `canServe` gates every request so the scheme only exposes library media and
+ * cached artwork, never arbitrary files on disk.
  */
-export function handleMediaProtocol(): void {
+export function handleMediaProtocol(canServe: (filePath: string) => boolean): void {
   protocol.handle(MEDIA_SCHEME, async (request) => {
     try {
       const url = new URL(request.url)
       const filePath = decodeURIComponent(url.pathname.replace(/^\//, ''))
-      if (!filePath) return new Response('Not found', { status: 404, headers: corsHeaders() })
+      if (!filePath || !path.isAbsolute(filePath) || !canServe(filePath)) {
+        return new Response('Not found', { status: 404, headers: corsHeaders() })
+      }
 
       let size: number
       try {
@@ -87,6 +92,11 @@ export function handleMediaProtocol(): void {
         const match = /bytes=(\d*)-(\d*)/.exec(rangeHeader)
         let start = match && match[1] ? Number(match[1]) : 0
         let end = match && match[2] ? Number(match[2]) : size - 1
+        // `bytes=-N` asks for the final N bytes.
+        if (match && !match[1] && match[2]) {
+          start = Math.max(0, size - Number(match[2]))
+          end = size - 1
+        }
         if (!Number.isFinite(start) || start < 0) start = 0
         if (!Number.isFinite(end) || end >= size) end = size - 1
         if (start > end) {
