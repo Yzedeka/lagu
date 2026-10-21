@@ -6,7 +6,8 @@
  * The installers are attached to GitHub Releases in `Yzedeka/laguversions`
  * (they are far too large for the Pages bundle). Any request to
  * `/downloads/<file>` is sent to the matching asset on the latest release, so
- * the site's download buttons always serve the real binaries.
+ * the site's download buttons always serve the real binaries. The app's
+ * auto-updater reads `latest*.yml` through the same path.
  */
 const RELEASE_BASE = 'https://github.com/Yzedeka/laguversions/releases/latest/download'
 
@@ -16,3 +17,6 @@ export const onRequestGet: PagesFunction = ({ params }) => {
   if (!file) return Response.redirect('https://lagu.yzedeka.com/#/download', 302)
   return Response.redirect(`${RELEASE_BASE}/${file}`, 302)
 }
+
+// HEAD would otherwise fall through to the static site and answer 200 text/html.
+export const onRequestHead = onRequestGet

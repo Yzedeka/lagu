@@ -61,11 +61,12 @@ fileAssociations:
     mimeType: audio/mp4
 
 # Where the app looks for updates (electron-updater "generic" provider).
-# Serve latest-linux.yml / latest.yml / latest-mac.yml next to the installers.
-# Change this to your site's domain (it is baked into the packaged app).
+# /downloads/* on the site redirects to the latest GitHub release, so
+# latest-linux.yml / latest.yml / latest-mac.yml must be uploaded to every
+# release next to the installers. This URL is baked into the packaged app.
 publish:
   provider: generic
-  url: https://lagu.app/downloads
+  url: https://lagu.yzedeka.com/downloads
 
 # --- Linux ---------------------------------------------------------------
 linux:
