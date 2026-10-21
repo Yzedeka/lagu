@@ -1,10 +1,13 @@
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import type { RepeatMode, Track } from '@shared/types'
 import { AlbumArt } from './AlbumArt'
+import { ContextMenu, type MenuItem } from './ContextMenu'
 import {
   EditIcon,
   FullscreenExitIcon,
   FullscreenIcon,
   LyricsIcon,
+  MoreIcon,
   NextIcon,
   PauseIcon,
   PlayIcon,
@@ -49,6 +52,46 @@ interface BottomBarProps {
   onToggleFullscreen: () => void
 }
 
+/**
+ * Width tiers for the bar. Each step down hides something; anything hidden
+ * moves into the overflow menu so it stays reachable.
+ */
+type BarSize = 'wide' | 'regular' | 'compact' | 'narrow' | 'tiny' | 'micro'
+
+const BAR_SIZES: [number, BarSize][] = [
+  [1280, 'wide'],
+  [1100, 'regular'],
+  [900, 'compact'],
+  [720, 'narrow'],
+  [600, 'tiny']
+]
+
+function barSizeFor(width: number): BarSize {
+  return BAR_SIZES.find(([min]) => width >= min)?.[1] ?? 'micro'
+}
+
+const RANK: Record<BarSize, number> = {
+  wide: 5,
+  regular: 4,
+  compact: 3,
+  narrow: 2,
+  tiny: 1,
+  micro: 0
+}
+
+function useBarSize(): [RefObject<HTMLElement | null>, BarSize] {
+  const ref = useRef<HTMLElement | null>(null)
+  const [size, setSize] = useState<BarSize>('wide')
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new ResizeObserver(([entry]) => setSize(barSizeFor(entry.contentRect.width)))
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  return [ref, size]
+}
+
 export function BottomBar({
   track,
   playing,
@@ -78,9 +121,55 @@ export function BottomBar({
   onToggleFullscreen
 }: BottomBarProps) {
   const effectiveDuration = track?.duration && track.duration > 0 ? track.duration : duration || 0
+  const [barRef, size] = useBarSize()
+  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null)
+  const below = (tier: BarSize): boolean => RANK[size] < RANK[tier]
+
+  const overflow: MenuItem[] = [
+    ...(below('tiny')
+      ? [
+          {
+            label: 'Lyrics',
+            icon: <LyricsIcon size={15} />,
+            disabled: !track || (!lyricsAvailable && !lyricsOpen),
+            onClick: onToggleLyrics
+          },
+          { label: 'Queue', icon: <QueueIcon size={15} />, onClick: onToggleQueue }
+        ]
+      : []),
+    ...(below('narrow')
+      ? [
+          {
+            label: shuffle ? 'Shuffle: on' : 'Shuffle: off',
+            icon: <ShuffleIcon size={15} />,
+            onClick: onToggleShuffle
+          },
+          {
+            label: `Repeat: ${repeat}`,
+            icon: repeat === 'one' ? <RepeatOneIcon size={15} /> : <RepeatIcon size={15} />,
+            onClick: onCycleRepeat
+          }
+        ]
+      : []),
+    ...(below('compact')
+      ? [
+          {
+            label: isFullscreen ? 'Exit fullscreen' : 'Fullscreen',
+            icon: isFullscreen ? <FullscreenExitIcon size={15} /> : <FullscreenIcon size={15} />,
+            onClick: onToggleFullscreen
+          }
+        ]
+      : []),
+    {
+      label: 'Import / edit lyrics',
+      icon: <EditIcon size={15} />,
+      disabled: !track,
+      onClick: onEditLyrics
+    }
+  ]
 
   return (
-    <footer className="bottom-bar">
+    <footer className="bottom-bar" ref={barRef} data-size={size}>
       <div className="bottom-bar__content">
         {/* Left: now playing + transport */}
         <div className="bb-side bb-side--left">
@@ -111,7 +200,7 @@ export function BottomBar({
           <div className="bb-transport">
             <button
               type="button"
-              className={`icon-btn ${shuffle ? 'icon-btn--active' : ''}`}
+              className={`icon-btn bb-opt--mode ${shuffle ? 'icon-btn--active' : ''}`}
               title="Shuffle (S)"
               onClick={onToggleShuffle}
             >
@@ -125,7 +214,7 @@ export function BottomBar({
             </button>
             <button
               type="button"
-              className={`icon-btn ${repeat !== 'off' ? 'icon-btn--active' : ''}`}
+              className={`icon-btn bb-opt--mode ${repeat !== 'off' ? 'icon-btn--active' : ''}`}
               title={`Repeat: ${repeat}`}
               onClick={onCycleRepeat}
             >
@@ -176,7 +265,7 @@ export function BottomBar({
 
             <button
               type="button"
-              className={`icon-btn ${lyricsOpen ? 'icon-btn--active' : ''}`}
+              className={`icon-btn bb-opt--panel ${lyricsOpen ? 'icon-btn--active' : ''}`}
               title={lyricsAvailable ? 'Lyrics (L)' : 'No lyrics for this track'}
               onClick={onToggleLyrics}
               disabled={!track || (!lyricsAvailable && !lyricsOpen)}
@@ -185,7 +274,7 @@ export function BottomBar({
             </button>
             <button
               type="button"
-              className="icon-btn"
+              className="icon-btn bb-opt--edit"
               title="Lyrics - import / edit .lrc"
               onClick={onEditLyrics}
               disabled={!track}
@@ -194,7 +283,7 @@ export function BottomBar({
             </button>
             <button
               type="button"
-              className={`icon-btn ${isFullscreen ? 'icon-btn--active' : ''}`}
+              className={`icon-btn bb-opt--fullscreen ${isFullscreen ? 'icon-btn--active' : ''}`}
               title={isFullscreen ? 'Exit fullscreen (F)' : 'Fullscreen (F)'}
               onClick={onToggleFullscreen}
             >
@@ -202,15 +291,35 @@ export function BottomBar({
             </button>
             <button
               type="button"
-              className={`icon-btn ${queueOpen ? 'icon-btn--active' : ''}`}
+              className={`icon-btn bb-opt--panel ${queueOpen ? 'icon-btn--active' : ''}`}
               title="Toggle queue"
               onClick={onToggleQueue}
             >
               <QueueIcon size={17} />
             </button>
+            {below('regular') && (
+              <button
+                type="button"
+                className={`icon-btn ${menu ? 'icon-btn--active' : ''}`}
+                title="More"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  if (menu) {
+                    setMenu(null)
+                    return
+                  }
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  setMenu({ x: rect.right - 224, y: rect.top - overflow.length * 34 - 18 })
+                }}
+              >
+                <MoreIcon size={17} />
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {menu && <ContextMenu x={menu.x} y={menu.y} items={overflow} onClose={() => setMenu(null)} />}
     </footer>
   )
 }

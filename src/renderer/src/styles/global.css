@@ -1750,7 +1750,9 @@ button,
 
 .bottom-bar__content {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  /* Sides never shrink below their content; the timeline takes what is left
+   * (up to 760px) and stays centred whenever there is room. */
+  grid-template-columns: minmax(max-content, 1fr) minmax(120px, 760px) minmax(max-content, 1fr);
   align-items: center;
   gap: 16px;
   width: 100%;
@@ -1764,7 +1766,7 @@ button,
 }
 
 .bb-side--left {
-  gap: 18px;
+  gap: 14px;
   justify-content: flex-start;
 }
 
@@ -1839,13 +1841,15 @@ button,
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
 }
 
 .bb-timeline {
   display: flex;
   align-items: center;
   gap: 12px;
-  width: clamp(300px, 44vw, 760px);
+  width: 100%;
+  min-width: 0;
 }
 
 .bb-time {
@@ -1888,16 +1892,55 @@ button,
   margin-left: -6px;
 }
 
-@media (max-width: 1100px) {
-  .bb-visualizer {
-    display: none;
-  }
+/* Width tiers (data-size, set from BottomBar). Hidden controls move into the
+ * overflow menu. */
+.bottom-bar:not([data-size='wide']) .bb-visualizer {
+  display: none;
 }
 
-@media (max-width: 860px) {
-  .bb-volume .range--volume {
-    display: none;
-  }
+.bottom-bar[data-size='compact'] .bb-track__meta,
+.bottom-bar[data-size='narrow'] .bb-track__meta {
+  max-width: 130px;
+}
+
+.bottom-bar[data-size='compact'] .bb-opt--edit,
+.bottom-bar[data-size='narrow'] .bb-opt--edit,
+.bottom-bar[data-size='narrow'] .bb-opt--fullscreen,
+.bottom-bar[data-size='narrow'] .bb-volume .range--volume {
+  display: none;
+}
+
+.bottom-bar[data-size='tiny'] .bb-track__meta {
+  max-width: 96px;
+}
+
+.bottom-bar[data-size='tiny'] :is(.bb-opt--edit, .bb-opt--fullscreen, .bb-opt--mode),
+.bottom-bar[data-size='micro'] :is(.bb-opt--edit, .bb-opt--fullscreen, .bb-opt--mode),
+.bottom-bar[data-size='tiny'] .bb-volume .range--volume,
+.bottom-bar[data-size='micro'] .bb-volume .range--volume {
+  display: none;
+}
+
+.bottom-bar[data-size='micro'] :is(.bb-art, .bb-time, .bb-opt--panel) {
+  display: none;
+}
+
+.bottom-bar[data-size='micro'] .bottom-bar__content {
+  grid-template-columns: minmax(max-content, 1fr) minmax(96px, 760px) minmax(max-content, 1fr);
+  gap: 10px;
+}
+
+.bottom-bar[data-size='micro'] .bb-track__meta {
+  max-width: 80px;
+}
+
+.bottom-bar[data-size='tiny'] .bb-timeline,
+.bottom-bar[data-size='micro'] .bb-timeline {
+  gap: 8px;
+}
+
+.bottom-bar[data-size='tiny'] .bb-time {
+  min-width: 0;
 }
 
 /* Modal ------------------------------------------------------------- */

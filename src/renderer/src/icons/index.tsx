@@ -54,6 +54,23 @@ export const PauseIcon = ({ size = 18, className, style }: IconProps) => (
   </svg>
 )
 
+/** Three dots for overflow menus (custom SVG). */
+export const MoreIcon = ({ size = 18, className, style }: IconProps) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    className={className}
+    style={style}
+    fill="currentColor"
+    aria-hidden
+  >
+    <circle cx="5.5" cy="12" r="2" />
+    <circle cx="12" cy="12" r="2" />
+    <circle cx="18.5" cy="12" r="2" />
+  </svg>
+)
+
 export const StopIcon = (p: IconProps) => <Icon name="stop" filled {...p} />
 export const PrevIcon = (p: IconProps) => <Icon name="skip_previous" filled {...p} />
 export const NextIcon = (p: IconProps) => <Icon name="skip_next" filled {...p} />
