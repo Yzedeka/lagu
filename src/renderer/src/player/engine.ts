@@ -30,6 +30,8 @@ export class PlayerEngine {
   private nextTrack: Track | null = null
   private crossfadeSeconds = 0
   private crossfading = false
+  private crossfadeTimer: number | null = null
+  private crossfadeOutSlot: number | null = null
   private loadToken = 0
   private ticker: number | null = null
   private readonly handlers = new Map<EngineEvent, Set<() => void>>()
@@ -231,7 +233,7 @@ export class PlayerEngine {
 
   async load(track: Track, autoplay: boolean): Promise<void> {
     const token = ++this.loadToken
-    this.crossfading = false
+    this.cancelCrossfade()
     this.nextTrack = null
     this.stopAll()
 
@@ -276,6 +278,9 @@ export class PlayerEngine {
   }
 
   pause(): void {
+    // Mid-crossfade the outgoing track is still audible on the other element;
+    // finish the fade now so pausing silences everything.
+    if (this.crossfading) this.finishCrossfade()
     this.active().pause()
     this.stopTicker()
   }
@@ -293,7 +298,7 @@ export class PlayerEngine {
 
   stop(): void {
     this.stopAll()
-    this.crossfading = false
+    this.cancelCrossfade()
     this.nextTrack = null
     this.loadToken += 1
     this.currentId = null
@@ -383,6 +388,7 @@ export class PlayerEngine {
   private async startCrossfade(next: Track): Promise<void> {
     if (this.crossfading) return
     if (!this.ctx) return
+    const token = this.loadToken
     this.crossfading = true
     this.nextTrack = null
 
@@ -415,13 +421,37 @@ export class PlayerEngine {
       await inEl.play()
     } catch (err) {
       console.error('[lagu] crossfade play failed', err)
+      if (token !== this.loadToken) return
+      // Keep the current track playing; it will advance normally when it ends.
+      try {
+        inEl.pause()
+      } catch {
+        /* ignore */
+      }
+      this.resetGain(outSlot)
+      this.crossfading = false
+      return
     }
+    // A load/stop happened while waiting for play(); it owns playback now.
+    if (token !== this.loadToken) return
 
     this.slot = inSlot
     this.currentId = next.id
+    this.crossfadeOutSlot = outSlot
     this.crossfadeHandlers.forEach((cb) => cb(next.id))
 
-    window.setTimeout(() => {
+    this.crossfadeTimer = window.setTimeout(() => this.finishCrossfade(), duration * 1000 + 60)
+  }
+
+  /** Stop the outgoing element and settle both gains at full volume. */
+  private finishCrossfade(): void {
+    if (this.crossfadeTimer != null) {
+      window.clearTimeout(this.crossfadeTimer)
+      this.crossfadeTimer = null
+    }
+    const outSlot = this.crossfadeOutSlot
+    this.crossfadeOutSlot = null
+    if (outSlot != null) {
       try {
         const out = this.fileEls[outSlot]
         out.pause()
@@ -430,13 +460,32 @@ export class PlayerEngine {
       } catch {
         /* ignore */
       }
-      const g = this.gains[outSlot]
-      if (g && this.ctx) {
-        g.gain.cancelScheduledValues(this.ctx.currentTime)
-        g.gain.setValueAtTime(1, this.ctx.currentTime)
-      }
-      this.crossfading = false
-    }, duration * 1000 + 60)
+      this.resetGain(outSlot)
+    }
+    this.resetGain(this.slot)
+    this.crossfading = false
+  }
+
+  /**
+   * Drop a pending crossfade cleanup without touching the element sources, so
+   * a track preloaded into the other slot after a skip is not wiped.
+   */
+  private cancelCrossfade(): void {
+    if (this.crossfadeTimer != null) {
+      window.clearTimeout(this.crossfadeTimer)
+      this.crossfadeTimer = null
+    }
+    if (this.crossfadeOutSlot != null) this.resetGain(this.crossfadeOutSlot)
+    this.crossfadeOutSlot = null
+    this.crossfading = false
+  }
+
+  private resetGain(slot: number): void {
+    const g = this.gains[slot]
+    if (g && this.ctx) {
+      g.gain.cancelScheduledValues(this.ctx.currentTime)
+      g.gain.setValueAtTime(1, this.ctx.currentTime)
+    }
   }
 }
 
