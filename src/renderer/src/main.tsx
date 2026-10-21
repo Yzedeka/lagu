@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@fontsource-variable/inter'
-import 'material-symbols/rounded.css'
+import './styles/icons.css'
 import { App } from './App'
 import './styles/global.css'
 

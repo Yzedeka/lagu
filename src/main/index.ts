@@ -153,7 +153,7 @@ app.whenReady().then(async () => {
 
   // Optionally rescan the library folders on launch.
   if (store.settings.scanOnStartup && store.folders.length > 0) {
-    void library.scan()
+    void library.scan(undefined, { incremental: true })
   }
 
 

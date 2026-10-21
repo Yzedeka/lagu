@@ -17,13 +17,12 @@ import {
   VolumeMuteIcon
 } from '@renderer/icons'
 import { Range } from './Range'
+import { SeekBar } from './SeekBar'
 import { Visualizer } from './Visualizer'
-import { formatTime } from '@renderer/lib/format'
 
 interface BottomBarProps {
   track: Track | null
   playing: boolean
-  currentTime: number
   duration: number
   volume: number
   muted: boolean
@@ -52,7 +51,6 @@ interface BottomBarProps {
 export function BottomBar({
   track,
   playing,
-  currentTime,
   duration,
   volume,
   muted,
@@ -137,16 +135,12 @@ export function BottomBar({
         {/* Center: timeline */}
         <div className="bb-center">
           <div className="bb-timeline">
-            <span className="bb-time">{formatTime(currentTime)}</span>
-            <Range
-              className="range--progress"
-              value={currentTime}
-              max={effectiveDuration || 1}
-              onChange={onSeek}
-              ariaLabel="Seek"
+            <SeekBar
+              timeClass="bb-time"
+              duration={effectiveDuration}
+              onSeek={onSeek}
               disabled={!track || effectiveDuration <= 0}
             />
-            <span className="bb-time bb-time--right">{formatTime(effectiveDuration)}</span>
           </div>
         </div>
 

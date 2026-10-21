@@ -1,14 +1,12 @@
 import type { ReactNode } from 'react'
 import type { Track } from '@shared/types'
 import { AlbumArt } from './AlbumArt'
-import { Range } from './Range'
+import { SeekBar } from './SeekBar'
 import { Visualizer } from './Visualizer'
-import { formatTime } from '@renderer/lib/format'
 
 interface NowPlayingProps {
   track: Track | null
   playing: boolean
-  currentTime: number
   duration: number
   error: string | null
   visualizer: boolean
@@ -23,7 +21,6 @@ interface NowPlayingProps {
 export function NowPlaying({
   track,
   playing,
-  currentTime,
   duration,
   error,
   visualizer,
@@ -81,16 +78,12 @@ export function NowPlaying({
       </div>
 
       <div className="np-progress">
-        <span className="np-time">{formatTime(currentTime)}</span>
-        <Range
-          className="range--progress"
-          value={currentTime}
-          max={effectiveDuration || 1}
-          onChange={onSeek}
-          ariaLabel="Seek"
+        <SeekBar
+          timeClass="np-time"
+          duration={effectiveDuration}
+          onSeek={onSeek}
           disabled={!track || effectiveDuration <= 0}
         />
-        <span className="np-time np-time--right">{formatTime(effectiveDuration)}</span>
       </div>
 
       {error && <div className="np-error">{error}</div>}

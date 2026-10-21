@@ -200,7 +200,9 @@ export async function readTrack(filePath: string, folder: string, store: Store):
     genre: [],
     hasArtwork: false,
     folder,
-    addedAt: stat.birthtimeMs || stat.mtimeMs || Date.now()
+    addedAt: stat.birthtimeMs || stat.mtimeMs || Date.now(),
+    fileMtime: stat.mtimeMs,
+    fileSize: stat.size
   }
 
   try {

@@ -1,8 +1,15 @@
-import { useRef, useState, type DragEvent, type PointerEvent as ReactPointerEvent } from 'react'
+import { useMemo, useRef, useState, type DragEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import type { QueueMode, QueueState, Track } from '@shared/types'
 import { AlbumArt } from './AlbumArt'
+import { VirtualList } from './VirtualList'
 import { CloseIcon, GripIcon, QueueIcon } from '@renderer/icons'
 import { formatTime, formatTotalDuration } from '@renderer/lib/format'
+
+// Must match the `.queue--normal/.queue--compact .queue-row` heights in global.css.
+const ROW_HEIGHT = 34
+const COMPACT_ROW_HEIGHT = 28
+
+type QueueEntry = { id: string; index: number; track: Track }
 
 interface QueuePanelProps {
   queue: QueueState
@@ -50,11 +57,18 @@ export function QueuePanel({
     window.addEventListener('pointerup', up)
   }
 
-  const items = queue.order
-    .map((id, index) => ({ id, index, track: resolve(id) }))
-    .filter((entry): entry is { id: string; index: number; track: Track } => Boolean(entry.track))
+  const items = useMemo(
+    () =>
+      queue.order
+        .map((id, index) => ({ id, index, track: resolve(id) }))
+        .filter((entry): entry is QueueEntry => Boolean(entry.track)),
+    [queue.order, resolve]
+  )
 
-  const total = items.reduce((sum, entry) => sum + (entry.track.duration ?? 0), 0)
+  const total = useMemo(
+    () => items.reduce((sum, entry) => sum + (entry.track.duration ?? 0), 0),
+    [items]
+  )
 
   const handleDrop = (event: DragEvent, to: number): void => {
     event.preventDefault()
@@ -77,53 +91,61 @@ export function QueuePanel({
         <span className="queue__total">{formatTotalDuration(total)}</span>
       </header>
 
-      <div className="queue__list">
-        {items.length === 0 && <div className="empty-state">Queue is empty.</div>}
-        {items.map((entry) => {
-          const isCurrent = entry.index === queue.index
-          return (
-            <div
-              key={`${entry.id}:${entry.index}`}
-              className={`queue-row ${isCurrent ? 'queue-row--current' : ''} ${
-                overIndex === entry.index && dragIndex !== entry.index ? 'queue-row--over' : ''
-              }`}
-              draggable
-              onDragStart={() => setDragIndex(entry.index)}
-              onDragOver={(e) => {
-                e.preventDefault()
-                setOverIndex(entry.index)
-              }}
-              onDragEnd={() => {
-                setDragIndex(null)
-                setOverIndex(null)
-              }}
-              onDrop={(e) => handleDrop(e, entry.index)}
-              onClick={() => onJump(entry.index)}
-            >
-              <span className="queue-grip" title="Drag to reorder">
-                <GripIcon size={14} />
-              </span>
-              <AlbumArt trackId={entry.track.id} className="queue-art" iconSize={14} />
-              <div className="queue-main">
-                <span className="queue-title-text">{entry.track.title}</span>
-                <span className="queue-sub">{entry.track.artist}</span>
-              </div>
-              <span className="queue-dur">{formatTime(entry.track.duration)}</span>
-              <button
-                type="button"
-                className="icon-btn"
-                title="Remove from queue"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onRemove(entry.index)
+      {items.length === 0 ? (
+        <div className="queue__list">
+          <div className="empty-state">Queue is empty.</div>
+        </div>
+      ) : (
+        <VirtualList
+          className="queue__list"
+          items={items}
+          rowHeight={mode === 'compact' ? COMPACT_ROW_HEIGHT : ROW_HEIGHT}
+          getKey={(entry) => `${entry.id}:${entry.index}`}
+          renderRow={(entry) => {
+            const isCurrent = entry.index === queue.index
+            return (
+              <div
+                className={`queue-row ${isCurrent ? 'queue-row--current' : ''} ${
+                  overIndex === entry.index && dragIndex !== entry.index ? 'queue-row--over' : ''
+                }`}
+                draggable
+                onDragStart={() => setDragIndex(entry.index)}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  setOverIndex(entry.index)
                 }}
+                onDragEnd={() => {
+                  setDragIndex(null)
+                  setOverIndex(null)
+                }}
+                onDrop={(e) => handleDrop(e, entry.index)}
+                onClick={() => onJump(entry.index)}
               >
-                <CloseIcon size={13} />
-              </button>
-            </div>
-          )
-        })}
-      </div>
+                <span className="queue-grip" title="Drag to reorder">
+                  <GripIcon size={14} />
+                </span>
+                <AlbumArt trackId={entry.track.id} className="queue-art" iconSize={14} />
+                <div className="queue-main">
+                  <span className="queue-title-text">{entry.track.title}</span>
+                  <span className="queue-sub">{entry.track.artist}</span>
+                </div>
+                <span className="queue-dur">{formatTime(entry.track.duration)}</span>
+                <button
+                  type="button"
+                  className="icon-btn"
+                  title="Remove from queue"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onRemove(entry.index)
+                  }}
+                >
+                  <CloseIcon size={13} />
+                </button>
+              </div>
+            )
+          }}
+        />
+      )}
     </aside>
   )
 }

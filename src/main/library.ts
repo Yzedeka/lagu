@@ -745,7 +745,12 @@ export class LibraryService {
     return this.folders
   }
 
-  async scan(folderId?: string): Promise<void> {
+  /**
+   * Scan library folders. With `incremental`, files whose mtime and size are
+   * unchanged since the last read keep their stored metadata instead of being
+   * re-parsed (used for the startup scan; manual rescans re-read everything).
+   */
+  async scan(folderId?: string, { incremental = false }: { incremental?: boolean } = {}): Promise<void> {
     if (this.scanning) return
     const targets = folderId ? this.folders.filter((f) => f.id === folderId) : this.folders
     if (targets.length === 0) return
@@ -782,8 +787,11 @@ export class LibraryService {
     try {
       for (const folder of targets) {
         // Fresh scan for this folder: drop its previous tracks first.
+        const previous = new Map<string, Track>()
         for (const [trackId, track] of this.tracks) {
           if (track.folder === folder.path) {
+        const base = this.baseTracks.get(trackId)
+        if (base) previous.set(trackId, base)
         this.tracks.delete(trackId)
         this.baseTracks.delete(trackId)
       }
@@ -805,7 +813,11 @@ export class LibraryService {
 
         await mapPool(files, SCAN_CONCURRENCY, async (filePath) => {
           try {
-            const track = await readTrack(filePath, folder.path, this.store)
+            const known = incremental ? previous.get(filePath) : undefined
+            const track =
+              known && (await this.isUnchanged(known, filePath))
+                ? known
+                : await readTrack(filePath, folder.path, this.store)
             this.registerTrack(track)
             buffer.push(track)
             if (buffer.length >= BATCH_SIZE) flush()
@@ -825,6 +837,19 @@ export class LibraryService {
       this.scanning = false
       this.listeners?.progress({ scanning: false, scanned, total: discovered })
       this.listeners?.done({ total: this.tracks.size, unsupported, errors })
+    }
+  }
+
+  /** True when a stored track still matches its file and its cached artwork exists. */
+  private async isUnchanged(track: Track, filePath: string): Promise<boolean> {
+    if (track.fileMtime == null || track.fileSize == null) return false
+    try {
+      const stat = await fs.stat(filePath)
+      if (stat.mtimeMs !== track.fileMtime || stat.size !== track.fileSize) return false
+      if (track.artworkFile) await fs.access(path.join(this.store.artworkDir, track.artworkFile))
+      return true
+    } catch {
+      return false
     }
   }
 

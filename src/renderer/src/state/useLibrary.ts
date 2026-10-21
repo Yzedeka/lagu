@@ -1,9 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AddUrlResult, LibraryFolder, PinnedItem, ScanError, ScanProgress, Track, UnsupportedFile } from '@shared/types'
 import { compareTracks } from '@shared/sort'
 import { bumpArtworkVersion } from '@renderer/state/useArtwork'
 
 const api = window.lagu
+
+/** Scan batches arriving within this window are merged into one re-sort. */
+const BATCH_FLUSH_MS = 250
 
 export interface LibraryModel {
   tracks: Track[]
@@ -48,6 +51,25 @@ export function useLibrary(): LibraryModel {
     })
   }, [])
 
+  // Buffer scan batches so a large scan re-sorts the library a few times a
+  // second instead of once per 25-track batch.
+  const pendingRef = useRef<Track[]>([])
+  const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const flushPending = useCallback(() => {
+    if (flushTimerRef.current) clearTimeout(flushTimerRef.current)
+    flushTimerRef.current = null
+    const incoming = pendingRef.current
+    pendingRef.current = []
+    if (incoming.length > 0) mergeTracks(incoming)
+  }, [mergeTracks])
+
+  const dropPending = useCallback(() => {
+    if (flushTimerRef.current) clearTimeout(flushTimerRef.current)
+    flushTimerRef.current = null
+    pendingRef.current = []
+  }, [])
+
   useEffect(() => {
     let cancelled = false
     void api.library.state().then((state) => {
@@ -64,9 +86,12 @@ export function useLibrary(): LibraryModel {
       setScanning(p.scanning)
     })
     const offBatch = api.events.onBatch((batch) => {
-      mergeTracks(batch.tracks)
+      pendingRef.current.push(...batch.tracks)
+      if (!flushTimerRef.current) flushTimerRef.current = setTimeout(flushPending, BATCH_FLUSH_MS)
     })
     const offDone = api.events.onDone((done) => {
+      // The full state fetched below supersedes anything still buffered.
+      dropPending()
       setScanning(false)
       setProgress(null)
       setUnsupported(done.unsupported)
@@ -99,8 +124,9 @@ export function useLibrary(): LibraryModel {
       offDone()
       offRefresh()
       offArtwork()
+      dropPending()
     }
-  }, [mergeTracks])
+  }, [flushPending, dropPending])
 
   const addFolder = useCallback(async () => {
     const picked = await api.library.pickFolder()

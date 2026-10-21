@@ -9,6 +9,7 @@ import {
   prevIndex,
   shuffleArray
 } from '@renderer/player/queue'
+import { resetPlaybackTime } from '@renderer/state/usePlaybackTime'
 
 const api = window.lagu
 
@@ -16,7 +17,6 @@ export interface PlayerModel {
   queue: QueueState
   currentTrack: Track | null
   playing: boolean
-  currentTime: number
   duration: number
   error: string | null
   playContext: (tracks: Track[], startIndex: number) => void
@@ -44,7 +44,6 @@ export function usePlayer(
 ): PlayerModel {
   const [queue, setQueue] = useState<QueueState>({ order: [], index: -1 })
   const [playing, setPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
@@ -74,7 +73,7 @@ export function usePlayer(
 
     loadedIdRef.current = trackId
     setError(null)
-    setCurrentTime(0)
+    resetPlaybackTime()
     setDuration(track.duration ?? 0)
     const autoplay = autoplayRef.current
     autoplayRef.current = true
@@ -104,12 +103,8 @@ export function usePlayer(
     const offs = [
       engine.on('play', () => setPlaying(true)),
       engine.on('pause', () => setPlaying(false)),
-      engine.on('time', () => setCurrentTime(engine.currentTime)),
       engine.on('duration', () => setDuration(engine.duration)),
-      engine.on('loaded', () => {
-        setDuration(engine.duration)
-        setCurrentTime(engine.currentTime)
-      }),
+      engine.on('loaded', () => setDuration(engine.duration)),
       engine.on('error', () => {
         setError('This file could not be played - unsupported format or unavailable source.')
         setPlaying(false)
@@ -230,7 +225,6 @@ export function usePlayer(
 
   const seek = useCallback((seconds: number) => {
     engine.seek(seconds)
-    setCurrentTime(seconds)
   }, [])
 
   const jumpTo = useCallback((index: number) => {
@@ -324,7 +318,6 @@ export function usePlayer(
     queue,
     currentTrack,
     playing,
-    currentTime,
     duration,
     error,
     playContext,
