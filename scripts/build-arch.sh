@@ -24,6 +24,7 @@ trap 'rm -rf "$WORK"' EXIT
 
 cp -a "$APPDIR" "$WORK/app"
 cp build/icon.png "$WORK/icon.png"
+cp LICENSE "$WORK/LICENSE"
 
 cat > "$WORK/lagu.desktop" <<'EOF'
 [Desktop Entry]
@@ -47,7 +48,7 @@ pkgrel=1
 pkgdesc="A minimalist desktop music player for your local music library"
 arch=('x86_64')
 url="https://lagu.yzedeka.com"
-license=('custom')
+license=('LicenseRef-PolyForm-Noncommercial-1.0.0')
 depends=('gtk3' 'nss' 'libxss' 'libxtst' 'alsa-lib' 'libnotify' 'libsecret' 'xdg-utils' 'at-spi2-core' 'libcups')
 options=('!strip' '!debug')
 package() {
@@ -57,6 +58,7 @@ package() {
   ln -sf /opt/Lagu/lagu-music-player "\$pkgdir/usr/bin/lagu"
   install -Dm644 "\$startdir/lagu.desktop" "\$pkgdir/usr/share/applications/lagu.desktop"
   install -Dm644 "\$startdir/icon.png" "\$pkgdir/usr/share/icons/hicolor/512x512/apps/lagu.png"
+  install -Dm644 "\$startdir/LICENSE" "\$pkgdir/usr/share/licenses/lagu/LICENSE"
 }
 EOF
 
