@@ -8,13 +8,13 @@
 #
 #   curl -fsSL https://lagu.yzedeka.com/install.sh | sh
 #
-# Override the download host or install location with:
-#   LAGU_BASE=https://example.com/downloads LAGU_DIR=~/.local/opt/lagu sh install.sh
+# Installs the latest release. Override the version, download host or install
+# location with:
+#   LAGU_VERSION=0.4.0 LAGU_BASE=https://example.com/downloads LAGU_DIR=~/.local/opt/lagu sh install.sh
 set -eu
 
-VERSION="0.2.2"
 BASE="${LAGU_BASE:-https://lagu.yzedeka.com/downloads}"
-APP_NAME="Lagu-${VERSION}.AppImage"
+RELEASES_API="https://api.github.com/repos/Yzedeka/laguversions/releases/latest"
 APP_DIR="${LAGU_DIR:-$HOME/.local/opt/lagu}"
 BIN_DIR="$HOME/.local/bin"
 DESKTOP_DIR="$HOME/.local/share/applications"
@@ -27,20 +27,33 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
 if have curl; then
-  DL="curl -fL"
+  fetch() { curl -fsSL "$1"; }
+  download() { curl -fL "$1" -o "$2"; }
 elif have wget; then
-  DL="wget -O"
+  fetch() { wget -qO- "$1"; }
+  download() { wget -O "$2" "$1"; }
 else
   say "Need curl or wget to download. Aborting."
   exit 1
 fi
 
-say "Downloading $APP_NAME ..."
-if have curl; then
-  curl -fL "$BASE/$APP_NAME" -o "$TMP/lagu.AppImage"
-else
-  wget -O "$TMP/lagu.AppImage" "$BASE/$APP_NAME"
+# Work out the latest version: the updater manifest published with each
+# release first, then the GitHub API.
+VERSION="${LAGU_VERSION:-}"
+if [ -z "$VERSION" ]; then
+  VERSION="$(fetch "$BASE/latest-linux.yml" 2>/dev/null | sed -n 's/^version: *//p' | head -n 1 || true)"
 fi
+if [ -z "$VERSION" ]; then
+  VERSION="$(fetch "$RELEASES_API" 2>/dev/null | sed -n 's/.*"tag_name": *"v\{0,1\}\([^"]*\)".*/\1/p' | head -n 1 || true)"
+fi
+if [ -z "$VERSION" ]; then
+  say "Could not determine the latest Lagu version. Set LAGU_VERSION and retry."
+  exit 1
+fi
+APP_NAME="Lagu-${VERSION}.AppImage"
+
+say "Downloading $APP_NAME ..."
+download "$BASE/$APP_NAME" "$TMP/lagu.AppImage"
 chmod +x "$TMP/lagu.AppImage"
 
 say "Extracting to $APP_DIR ..."
