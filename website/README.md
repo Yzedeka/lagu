@@ -88,7 +88,8 @@ settings.
 index.html
 src/
   App.tsx                 routes (home / linux / docs)
-  config.ts               app metadata, download list, /downloads base
+  releases.ts             app version + download list (also the counter allowlist)
+  config.ts               links, /downloads base, helpers
   styles.css              shared design language with the app
   icons/                  the app's icon set (Material Symbols)
   assets/                 app icon, framed icon, wordmark
@@ -96,6 +97,7 @@ src/
   lib/                    router, download counter, docs, markdown
 functions/
   api/downloads.ts        Pages Function (counter + rate limiting)
+  downloads/[[path]].ts   redirect to the release asset (installers, latest*.yml)
 schema.sql                D1 tables
 wrangler.toml             Pages + D1 binding
 ```

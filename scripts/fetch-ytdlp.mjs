@@ -6,6 +6,10 @@
  *   node scripts/fetch-ytdlp.mjs                    # current platform
  *   node scripts/fetch-ytdlp.mjs --platform=win32 --arch=x64
  *   node scripts/fetch-ytdlp.mjs --force            # refresh everything
+ *   node scripts/fetch-ytdlp.mjs --version=2026.08.19 # another yt-dlp release
+ *
+ * yt-dlp is pinned (YTDLP_VERSION) and checked against that release's
+ * SHA2-256SUMS before it is bundled. Bump the constant to update.
  *
  * yt-dlp is public domain; the ffmpeg builds come from ffmpeg-static
  * (eugeneware/ffmpeg-static). Binaries are not committed. Running from source
@@ -16,6 +20,9 @@ import { chmod, mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/pro
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { gunzipSync } from 'node:zlib'
+
+/** Pinned yt-dlp release tag. */
+const YTDLP_VERSION = '2026.08.19'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const BIN = path.join(ROOT, 'resources', 'bin')
@@ -28,6 +35,7 @@ function option(name) {
   return index >= 0 ? process.argv[index + 1] : undefined
 }
 
+const ytdlpVersion = option('--version') ?? YTDLP_VERSION
 const platform = option('--platform') ?? process.platform
 const arch = option('--arch') ?? (platform === process.platform ? process.arch : 'x64')
 const windows = platform === 'win32'
@@ -59,23 +67,34 @@ async function exists(file) {
   }
 }
 
-async function download(url, target, { gzip = false, label } = {}) {
-  await mkdir(path.dirname(target), { recursive: true })
-  const partial = `${target}.download`
-  await rm(partial, { force: true })
-
-  console.log(`[lagu] Downloading ${label ?? path.basename(target)}…`)
+async function fetchOk(url) {
   const response = await fetch(url, {
     redirect: 'follow',
     headers: { 'User-Agent': 'Lagu build script' }
   })
   if (!response.ok || !response.body) {
-    throw new Error(`download failed: ${response.status} ${response.statusText}`)
+    throw new Error(`download failed: ${url} ${response.status} ${response.statusText}`)
   }
+  return response
+}
+
+async function download(url, target, { gzip = false, label, sha256 } = {}) {
+  await mkdir(path.dirname(target), { recursive: true })
+  const partial = `${target}.download`
+  await rm(partial, { force: true })
+
+  console.log(`[lagu] Downloading ${label ?? path.basename(target)}…`)
+  const response = await fetchOk(url)
 
   let buffer = Buffer.from(await response.arrayBuffer())
   if (buffer.byteLength < 1_000_000) {
     throw new Error(`download looked too small (${buffer.byteLength} bytes)`)
+  }
+  if (sha256) {
+    const actual = createHash('sha256').update(buffer).digest('hex')
+    if (actual !== sha256) {
+      throw new Error(`checksum mismatch for ${label ?? url}: expected ${sha256}, got ${actual}`)
+    }
   }
   if (gzip) buffer = gunzipSync(buffer)
   await writeFile(partial, buffer)
@@ -84,22 +103,42 @@ async function download(url, target, { gzip = false, label } = {}) {
 
   const digest = createHash('sha256').update(await readFile(target)).digest('hex').slice(0, 12)
   console.log(
-    `[lagu] Bundled ${path.relative(ROOT, target)} (${(buffer.byteLength / 1024 / 1024).toFixed(1)} MB, sha256 ${digest}…)`
+    `[lagu] Bundled ${path.relative(ROOT, target)} (${(buffer.byteLength / 1024 / 1024).toFixed(1)} MB, sha256 ${digest}…${sha256 ? ' verified' : ''})`
   )
+}
+
+async function readStamp(file) {
+  try {
+    return (await readFile(file, 'utf8')).trim()
+  } catch {
+    return ''
+  }
+}
+
+/** Expected sha256 for `asset`, from the release's SHA2-256SUMS. */
+async function ytdlpDigest(releaseBase, asset) {
+  const sums = await (await fetchOk(`${releaseBase}/SHA2-256SUMS`)).text()
+  for (const line of sums.split('\n')) {
+    const [digest, name] = line.trim().split(/\s+\*?/)
+    if (name === asset && /^[0-9a-f]{64}$/.test(digest)) return digest
+  }
+  throw new Error(`no checksum for ${asset} in yt-dlp ${ytdlpVersion} SHA2-256SUMS`)
 }
 
 async function fetchYtdlp() {
   const target = path.join(toolDir, ytdlpName)
-  if (!FORCE && (await exists(target))) {
-    console.log(`[lagu] yt-dlp already bundled at ${path.relative(ROOT, target)}`)
+  const stamp = `${target}.version`
+  if (!FORCE && (await exists(target)) && (await readStamp(stamp)) === ytdlpVersion) {
+    console.log(`[lagu] yt-dlp ${ytdlpVersion} already bundled at ${path.relative(ROOT, target)}`)
     return
   }
   const asset = ytdlpAsset()
-  await download(
-    `https://github.com/yt-dlp/yt-dlp/releases/latest/download/${asset}`,
-    target,
-    { label: asset }
-  )
+  const releaseBase = `https://github.com/yt-dlp/yt-dlp/releases/download/${ytdlpVersion}`
+  await download(`${releaseBase}/${asset}`, target, {
+    label: `yt-dlp ${ytdlpVersion} (${asset})`,
+    sha256: await ytdlpDigest(releaseBase, asset)
+  })
+  await writeFile(stamp, `${ytdlpVersion}\n`)
 }
 
 async function fetchFfmpeg() {

@@ -1,5 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
+import { DOWNLOADS } from '../../src/releases'
+
 interface Env {
   /** D1 database binding (see wrangler.toml). */
   DB: D1Database
@@ -7,6 +9,9 @@ interface Env {
 
 /** Minimum gap between counted downloads, per visitor. */
 const WINDOW_MS = 5_000
+
+/** Only the files the site actually offers are counted per file. */
+const KNOWN_FILES = new Set(DOWNLOADS.map((d) => d.file))
 
 interface DownloadState {
   /** Total downloads across every file. */
@@ -34,7 +39,9 @@ async function readState(env: Env): Promise<DownloadState> {
     count: number
   }>()
   const files: Record<string, number> = {}
-  for (const row of rows.results ?? []) files[row.file] = row.count
+  for (const row of rows.results ?? []) {
+    if (KNOWN_FILES.has(row.file)) files[row.file] = row.count
+  }
   return { count: total?.count ?? 0, files }
 }
 
@@ -51,7 +58,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
 /**
  * POST /api/downloads  { file?: string }
  * Adds one download (for the given file, if provided) unless this visitor has
- * already been counted in the last 5 seconds.
+ * already been counted in the last 5 seconds. Unknown file names are rejected.
  */
 export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown'
@@ -60,10 +67,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   let file = ''
   try {
     const body = (await request.json()) as { file?: unknown }
-    if (typeof body?.file === 'string') file = body.file.slice(0, 200)
+    if (typeof body?.file === 'string') file = body.file
   } catch {
     /* no body */
   }
+  if (file && !KNOWN_FILES.has(file)) return json({ error: 'unknown file' }, 400)
 
   try {
     const recent = await env.DB.prepare('SELECT ts FROM rate WHERE ip = ?')
@@ -75,6 +83,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     }
 
     const statements = [
+      env.DB.prepare('DELETE FROM rate WHERE ts < ?').bind(now - WINDOW_MS),
       env.DB.prepare(
         'INSERT INTO rate (ip, ts) VALUES (?, ?) ON CONFLICT(ip) DO UPDATE SET ts = excluded.ts'
       ).bind(ip, now),
