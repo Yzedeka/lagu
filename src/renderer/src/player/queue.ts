@@ -5,29 +5,23 @@ export function currentId(queue: QueueState): string | null {
   return queue.order[queue.index] ?? null
 }
 
-/** Index to play after the current one, or null to stop. */
-export function nextIndex(queue: QueueState, repeat: RepeatMode, shuffle: boolean): number | null {
+/**
+ * Index to play after the current one, or null to stop. Shuffle is applied to
+ * `order` itself when it is turned on, so stepping is linear in both modes.
+ */
+export function nextIndex(queue: QueueState, repeat: RepeatMode): number | null {
   const { index, order } = queue
   if (order.length === 0) return null
-  if (shuffle) return randomOtherIndex(order.length, index)
   if (index + 1 < order.length) return index + 1
   return repeat === 'all' ? 0 : null
 }
 
 /** Index to play before the current one, or null to stay. */
-export function prevIndex(queue: QueueState, repeat: RepeatMode, shuffle: boolean): number | null {
+export function prevIndex(queue: QueueState, repeat: RepeatMode): number | null {
   const { index, order } = queue
   if (order.length === 0) return null
-  if (shuffle) return randomOtherIndex(order.length, index)
   if (index - 1 >= 0) return index - 1
   return repeat === 'all' ? order.length - 1 : null
-}
-
-function randomOtherIndex(length: number, avoid: number): number {
-  if (length <= 1) return 0
-  let candidate = avoid
-  while (candidate === avoid) candidate = Math.floor(Math.random() * length)
-  return candidate
 }
 
 export function shuffleArray<T>(items: T[]): T[] {

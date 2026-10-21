@@ -47,6 +47,9 @@ export function usePlayer(
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  // Bumped by next/prev so moving to an entry with the same track id (repeat
+  // all on a one-track queue, consecutive duplicates) still reloads it.
+  const [advanceGen, setAdvanceGen] = useState(0)
 
   const queueRef = useRef(queue)
   queueRef.current = queue
@@ -56,10 +59,12 @@ export function usePlayer(
   resolveRef.current = resolve
   const autoplayRef = useRef(true)
   const loadedIdRef = useRef<string | null>(null)
+  const loadedGenRef = useRef(0)
   const queueLoadedRef = useRef(false)
 
   const trackId = currentId(queue)
   const currentTrack = trackId ? resolve(trackId) ?? null : null
+  const currentResolved = currentTrack != null
 
   // --- load the current queue entry into the engine -------------------------
   useEffect(() => {
@@ -68,11 +73,14 @@ export function usePlayer(
       loadedIdRef.current = null
       return
     }
-    if (trackId === loadedIdRef.current) return
+    if (trackId === loadedIdRef.current && advanceGen === loadedGenRef.current) return
+    // A restored queue can arrive before the library; this re-runs once the
+    // track resolves.
     const track = resolveRef.current(trackId)
     if (!track) return
 
     loadedIdRef.current = trackId
+    loadedGenRef.current = advanceGen
     setError(null)
     setCurrentTime(0)
     setDuration(track.duration ?? 0)
@@ -82,13 +90,13 @@ export function usePlayer(
       setError(err instanceof Error ? err.message : 'Unable to play this track.')
       setPlaying(false)
     })
-  }, [trackId])
+  }, [trackId, advanceGen, currentResolved])
 
   // --- engine event bridge --------------------------------------------------
   const advance = useCallback((dir: 1 | -1) => {
     const q = queueRef.current
     const s = settingsRef.current
-    const idx = dir === 1 ? nextIndex(q, s.repeat, s.shuffle) : prevIndex(q, s.repeat, s.shuffle)
+    const idx = dir === 1 ? nextIndex(q, s.repeat) : prevIndex(q, s.repeat)
     if (idx == null) {
       if (dir === 1) {
         engine.pause()
@@ -98,6 +106,7 @@ export function usePlayer(
     }
     autoplayRef.current = true
     setQueue((prev) => ({ ...prev, index: idx }))
+    setAdvanceGen((g) => g + 1)
   }, [])
 
   useEffect(() => {
@@ -135,8 +144,8 @@ export function usePlayer(
   // --- crossfade ------------------------------------------------------------
   const nextIdx = useMemo(() => {
     if (settings.repeat === 'one' || queue.order.length === 0) return null
-    return nextIndex(queue, settings.repeat, settings.shuffle)
-  }, [queue, settings.repeat, settings.shuffle])
+    return nextIndex(queue, settings.repeat)
+  }, [queue, settings.repeat])
 
   const nextIdxRef = useRef<number | null>(null)
   nextIdxRef.current = nextIdx
