@@ -83,7 +83,11 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: 'Which platforms does it run on?',
-    a: 'Windows, macOS and Linux - AppImage, .deb, .rpm, a portable tarball and an Arch package.'
+    a: 'Windows, macOS (Apple Silicon and Intel) and Linux - AppImage, .deb, .rpm, Flatpak, a portable tarball and an Arch package.'
+  },
+  {
+    q: 'Can I download music with it?',
+    a: 'Yes. Lagu searches YouTube through yt-dlp and can save single tracks or full playlists into your library, with a folder, format and quality you choose.'
   },
   {
     q: 'What audio formats work?',
