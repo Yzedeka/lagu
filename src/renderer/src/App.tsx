@@ -111,7 +111,7 @@ export function App() {
   }, [loaded, settings.sidebarWidth])
 
   useEffect(() => {
-    if (loaded) setQueueWidth(settings.queueWidth)
+    if (loaded) setQueueWidth(Math.max(140, settings.queueWidth))
   }, [loaded, settings.queueWidth])
 
   const onZoom = useCallback((delta: number) => {

@@ -1,6 +1,7 @@
 import type { Track } from '@shared/types'
 import type { Album } from '@renderer/lib/album'
 import { AlbumArt } from './AlbumArt'
+import { PlayIcon } from '@renderer/icons'
 
 interface AlbumGridProps {
   albums: Album[]
@@ -44,12 +45,13 @@ export function AlbumGrid({ albums, onOpen, onPlay, onContextMenu }: AlbumGridPr
               type="button"
               className="album-tile__play"
               title="Play album"
+              aria-label={`Play ${album.name}`}
               onClick={(e) => {
                 e.stopPropagation()
                 onPlay(album)
               }}
             >
-              Play
+              <PlayIcon size={13} filled />
             </button>
           </div>
           <div className="album-tile__name" title={album.name}>

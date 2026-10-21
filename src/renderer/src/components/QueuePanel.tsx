@@ -39,12 +39,13 @@ export function QueuePanel({
   const startX = useRef(0)
   const startWidth = useRef(width)
 
-  const clamp = (value: number): number => Math.min(560, Math.max(64, value))
+  const clamp = (value: number): number => Math.min(560, Math.max(140, value))
+  const narrow = width < 180
 
   const beginResize = (e: ReactPointerEvent): void => {
     e.preventDefault()
     startX.current = e.clientX
-    startWidth.current = width
+    startWidth.current = Math.max(140, width)
     const move = (ev: PointerEvent): void => {
       onResize(clamp(startWidth.current - (ev.clientX - startX.current)))
     }
@@ -78,7 +79,11 @@ export function QueuePanel({
   }
 
   return (
-    <aside className={`queue queue--${mode}`} style={{ width }}>
+    <aside
+      className={`queue queue--${mode}`}
+      style={{ width: Math.max(140, width) }}
+      data-narrow={narrow ? 'true' : undefined}
+    >
       <div
         className="queue__resizer"
         title="Drag to resize"
@@ -87,7 +92,10 @@ export function QueuePanel({
         aria-orientation="vertical"
       />
       <header className="queue__header">
-        <QueueIcon size={14} className="queue__icon" />
+        <span className="queue__title">
+          <QueueIcon size={14} className="queue__icon" />
+          <span className="queue__label">Up Next</span>
+        </span>
         <span className="queue__total">{formatTotalDuration(total)}</span>
       </header>
 

@@ -349,12 +349,6 @@ button,
   background: var(--accent-soft);
 }
 
-@media (max-width: 940px) {
-  .queue {
-    display: none;
-  }
-}
-
 @media (max-width: 680px) {
   .sidebar {
     display: none;
@@ -940,16 +934,18 @@ button,
 /* Album grid -------------------------------------------------------- */
 .album-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 34px;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 26px 22px;
   align-content: start;
-  padding: 24px;
+  align-items: start;
+  padding: 20px 22px 28px;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
 }
 
 .album-tile {
+  min-width: 0;
   cursor: pointer;
   border-radius: var(--radius);
 }
@@ -978,14 +974,14 @@ button,
   bottom: 8px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 5px 11px;
-  border-radius: var(--radius);
-  background: rgba(0, 0, 0, 0.66);
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.68);
   border: 1px solid rgba(255, 255, 255, 0.16);
   color: #fff;
-  font-size: 11px;
-  font-weight: 600;
   opacity: 0;
   transform: translateY(4px);
 }
@@ -996,7 +992,7 @@ button,
 }
 
 .album-tile__name {
-  margin-top: 10px;
+  margin-top: 8px;
   font-size: 13.5px;
   font-weight: 550;
   overflow: hidden;
@@ -1607,6 +1603,41 @@ button,
   overflow-y: auto;
   overflow-x: hidden;
   padding: 5px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.queue__list::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* Very narrow queue: drop the artwork and metadata instead of clipping. */
+.queue[data-narrow='true'] .queue__header {
+  padding: 10px;
+}
+
+.queue[data-narrow='true'] .queue__total,
+.queue[data-narrow='true'] .queue-art,
+.queue[data-narrow='true'] .queue-grip,
+.queue[data-narrow='true'] .queue-dur,
+.queue[data-narrow='true'] .queue-row .icon-btn {
+  display: none;
+}
+
+.queue[data-narrow='true'] .queue__title {
+  gap: 6px;
+  letter-spacing: 0.1em;
+}
+
+.queue[data-narrow='true'] .queue-row {
+  gap: 0;
+  padding: 0 8px;
+}
+
+.queue[data-narrow='true'] .queue-title-text {
+  font-size: 12px;
 }
 
 .queue-row {
