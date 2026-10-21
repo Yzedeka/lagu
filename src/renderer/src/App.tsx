@@ -25,6 +25,8 @@ import { LyricsDialog } from '@renderer/components/LyricsDialog'
 import { useLyricsAvailable } from '@renderer/state/useLyricsAvailable'
 import { AddUrlDialog } from '@renderer/components/AddUrlDialog'
 import { DownloadDialog } from '@renderer/components/DownloadDialog'
+import { ConfirmDialog } from '@renderer/components/ConfirmDialog'
+import { folderName } from '@renderer/lib/format'
 import { AddToPlaylistDialog } from '@renderer/components/AddToPlaylistDialog'
 import { SettingsView } from '@renderer/components/SettingsView'
 import { SearchView } from '@renderer/components/SearchView'
@@ -46,6 +48,7 @@ export function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [addUrlOpen, setAddUrlOpen] = useState(false)
   const [downloadOpen, setDownloadOpen] = useState(false)
+  const [removingFolderId, setRemovingFolderId] = useState<string | null>(null)
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [zoom, setZoom] = useState(0)
@@ -467,6 +470,13 @@ export function App() {
   }, [])
 
   // --- immersive fullscreen: reveal the bottom bar near the screen edge ------
+  const removingFolder = removingFolderId
+    ? library.folders.find((f) => f.id === removingFolderId) ?? null
+    : null
+  const removingFolderTracks = removingFolder
+    ? library.tracks.filter((t) => t.folder === removingFolder.path).length
+    : 0
+
   const immersive = isFullscreen && selection === 'now'
   const [barRevealed, setBarRevealed] = useState(false)
 
@@ -520,7 +530,7 @@ export function App() {
             onUnpin={(id) => void library.setPinned(library.pinned.filter((p) => p.id !== id))}
             onAddFolder={() => void library.addFolder()}
             onRescan={() => void library.rescan()}
-            onRemoveFolder={(id) => void library.removeFolder(id)}
+            onRemoveFolder={setRemovingFolderId}
             onAddUrl={() => setAddUrlOpen(true)}
             onDownloadMusic={() => setDownloadOpen(true)}
           />
@@ -602,7 +612,7 @@ export function App() {
               }
               onAddFolder={() => void library.addFolder()}
               onRescan={() => void library.rescan()}
-              onRemoveFolder={(id) => void library.removeFolder(id)}
+              onRemoveFolder={setRemovingFolderId}
               onCreatePlaylist={() => setPlaylistDialog({ trackIds: [], createOnly: true })}
               onRenamePlaylist={(id, name) => playlists.rename(id, name)}
               onDeletePlaylist={(id) => {
@@ -668,6 +678,27 @@ export function App() {
         onEditLyrics={() => setLyricsDialog(true)}
         onToggleFullscreen={toggleFullscreen}
       />
+
+      {removingFolder && (
+        <ConfirmDialog
+          title="Remove folder?"
+          confirmLabel="Remove folder"
+          danger
+          message={
+            <>
+              Remove <strong>{folderName(removingFolder.path)}</strong> from your library?{' '}
+              {removingFolderTracks === 0
+                ? 'It has no tracks in Lagu.'
+                : `Its ${removingFolderTracks} track${
+                    removingFolderTracks === 1 ? '' : 's'
+                  } will be removed from Lagu.`}{' '}
+              The files stay on disk, and you can add the folder again later.
+            </>
+          }
+          onConfirm={() => void library.removeFolder(removingFolder.id)}
+          onClose={() => setRemovingFolderId(null)}
+        />
+      )}
 
       {addUrlOpen && <AddUrlDialog onSubmit={library.addUrl} onClose={() => setAddUrlOpen(false)} />}
 
