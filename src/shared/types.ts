@@ -36,6 +36,9 @@ export interface Track {
   /** Library folder that produced this track (empty for URL tracks). */
   folder: string
   addedAt: number
+  /** File modification time (ms) and size when the tags were last read; lets rescans skip unchanged files. */
+  fileMtime?: number
+  fileSize?: number
 }
 
 export interface LibraryFolder {

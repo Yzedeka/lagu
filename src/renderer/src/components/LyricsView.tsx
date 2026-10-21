@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Lyrics } from '@shared/types'
+import { usePlaybackTime } from '@renderer/state/usePlaybackTime'
 
 const api = window.lagu
 
 interface LyricsViewProps {
   trackId: string | null
-  currentTime: number
   /** Effective timing offset in ms (per-track override or the global default). */
   offset: number
   /** Bump to force a reload (after importing via the pencil). */
@@ -13,7 +13,8 @@ interface LyricsViewProps {
 }
 
 /** Synchronized lyrics rendered on the background - no chrome, no boxes. */
-export function LyricsView({ trackId, currentTime, offset, revision = 0 }: LyricsViewProps) {
+export function LyricsView({ trackId, offset, revision = 0 }: LyricsViewProps) {
+  const currentTime = usePlaybackTime()
   const [lyrics, setLyrics] = useState<Lyrics | null>(null)
   const [loading, setLoading] = useState(false)
   const scrollerRef = useRef<HTMLDivElement | null>(null)

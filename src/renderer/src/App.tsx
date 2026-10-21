@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { useLibrary } from '@renderer/state/useLibrary'
 import { useSettings } from '@renderer/state/useSettings'
 import { usePlayer } from '@renderer/state/usePlayer'
+import { engine } from '@renderer/player/engine'
 import { useArtwork } from '@renderer/state/useArtwork'
 import { usePlaylists } from '@renderer/state/usePlaylists'
 import {
@@ -263,11 +264,11 @@ export function App() {
       switch (e.key) {
         case 'ArrowRight':
           e.preventDefault()
-          p.seek(Math.min(total, p.currentTime + 5))
+          p.seek(Math.min(total, engine.currentTime + 5))
           break
         case 'ArrowLeft':
           e.preventDefault()
-          p.seek(Math.max(0, p.currentTime - 5))
+          p.seek(Math.max(0, engine.currentTime - 5))
           break
         case 'ArrowUp':
           e.preventDefault()
@@ -313,7 +314,6 @@ export function App() {
     () => (
       <LyricsView
         trackId={player.currentTrack?.id ?? null}
-        currentTime={player.currentTime}
         offset={player.currentTrack?.lyricsOffset ?? settings.lyricsOffset}
         revision={lyricsRevision}
       />
@@ -321,7 +321,6 @@ export function App() {
     [
       player.currentTrack?.id,
       player.currentTrack?.lyricsOffset,
-      player.currentTime,
       settings.lyricsOffset,
       lyricsRevision
     ]
@@ -447,7 +446,7 @@ export function App() {
             title: track.title,
             artist: track.artist,
             album: track.album,
-            position: player.currentTime,
+            position: engine.currentTime,
             duration: player.duration,
             playing: player.playing
           }
@@ -531,7 +530,6 @@ export function App() {
             <NowPlaying
               track={player.currentTrack}
               playing={player.playing}
-              currentTime={player.currentTime}
               duration={player.duration}
               error={player.error}
               visualizer={settings.visualizer}
@@ -643,7 +641,6 @@ export function App() {
       <BottomBar
         track={player.currentTrack}
         playing={player.playing}
-        currentTime={player.currentTime}
         duration={player.duration}
         volume={settings.volume}
         muted={settings.muted}

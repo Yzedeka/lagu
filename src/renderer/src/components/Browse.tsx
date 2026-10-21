@@ -212,13 +212,26 @@ export function Browse({
   const artistTracksFor = (name: string): Track[] =>
     tracks.filter((t) => (t.albumArtist || t.artist) === name)
 
-  const selectedAlbum = albumKey ? albums.find((a) => a.key === albumKey) ?? null : null
-  const artistTracks = artist ? tracks.filter((t) => (t.albumArtist || t.artist) === artist) : []
-  const folderTracks = folderPath ? tracks.filter((t) => (t.folder || '(streams)') === folderPath) : []
+  const selectedAlbum = useMemo(
+    () => (albumKey ? albums.find((a) => a.key === albumKey) ?? null : null),
+    [albums, albumKey]
+  )
+  const artistTracks = useMemo(
+    () => (artist ? tracks.filter((t) => (t.albumArtist || t.artist) === artist) : []),
+    [tracks, artist]
+  )
+  const folderTracks = useMemo(
+    () => (folderPath ? tracks.filter((t) => (t.folder || '(streams)') === folderPath) : []),
+    [tracks, folderPath]
+  )
   const selectedPlaylist = playlistId ? playlists.find((p) => p.id === playlistId) ?? null : null
-  const playlistTracks = selectedPlaylist
-    ? selectedPlaylist.trackIds.map((id) => byId.get(id)).filter((t): t is Track => Boolean(t))
-    : []
+  const playlistTracks = useMemo(
+    () =>
+      selectedPlaylist
+        ? selectedPlaylist.trackIds.map((id) => byId.get(id)).filter((t): t is Track => Boolean(t))
+        : [],
+    [selectedPlaylist, byId]
+  )
 
   const showBack = Boolean(selectedAlbum || artist || folderPath || selectedPlaylist)
   const back = (): void => {
