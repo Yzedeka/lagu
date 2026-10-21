@@ -11,7 +11,7 @@ const CSP = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' lagu: data: blob:",
+  "img-src 'self' lagu: data: blob: https:",
   "font-src 'self' data:",
   "media-src 'self' lagu: blob: http: https:",
   "connect-src 'self' lagu:",

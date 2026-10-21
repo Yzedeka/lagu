@@ -434,6 +434,17 @@ export class PlayerEngine {
     }
     // A load/stop happened while waiting for play(); it owns playback now.
     if (token !== this.loadToken) return
+    // The user paused while the incoming element was starting; don't flip the
+    // active slot or resume a track they just stopped.
+    if (!this.crossfading) {
+      try {
+        inEl.pause()
+      } catch {
+        /* ignore */
+      }
+      this.resetGain(inSlot)
+      return
+    }
 
     this.slot = inSlot
     this.currentId = next.id

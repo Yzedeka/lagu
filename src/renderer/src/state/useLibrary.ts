@@ -104,7 +104,9 @@ export function useLibrary(): LibraryModel {
       })
     })
     const offRefresh = api.events.onRefresh(() => {
-      // Filesystem watcher / artwork lookups - pull fresh state.
+      // Filesystem watcher / artwork lookups - pull fresh state. Any queued
+      // batch is older than this snapshot.
+      dropPending()
       bumpArtworkVersion()
       void api.library.state().then((state) => {
         setFolders(state.folders)
