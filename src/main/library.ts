@@ -34,6 +34,17 @@ function isWithin(root: string, target: string): boolean {
 }
 const BATCH_SIZE = 25
 
+/** True only when a path is definitely missing (not merely unreadable). */
+async function isGone(filePath: string): Promise<boolean> {
+  try {
+    await fs.stat(filePath)
+    return false
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code
+    return code === 'ENOENT' || code === 'ENOTDIR'
+  }
+}
+
 export class LibraryService {
   /** Raw scanned tracks (file tags + derived assets). */
   private readonly baseTracks = new Map<string, Track>()
@@ -41,6 +52,9 @@ export class LibraryService {
   private tracks = new Map<string, Track>()
   private folders: LibraryFolder[] = []
   private scanning = false
+  /** Scans requested while another scan was running; run once it finishes. */
+  private queuedScan: { all: boolean; ids: Set<string>; done: Promise<void>; resolve: () => void } | null =
+    null
   private listeners: LibraryListeners | null = null
   private readonly watchers = new Map<string, FSWatcher>()
   private readonly changeTimers = new Map<string, NodeJS.Timeout>()
@@ -467,17 +481,23 @@ export class LibraryService {
   /** Move the given tracks' files to the OS trash, then drop them from the library. */
   async trashTracks(trackIds: string[]): Promise<number> {
     let moved = 0
+    const removed: string[] = []
     for (const id of trackIds) {
       const track = this.baseTracks.get(id) ?? this.tracks.get(id)
-      if (!track || track.source !== 'file') continue
+      if (!track || track.source !== 'file') {
+        removed.push(id)
+        continue
+      }
       try {
         await shell.trashItem(track.locator)
         moved += 1
+        removed.push(id)
       } catch (err) {
         console.error('[lagu] could not trash file', track.locator, err)
       }
     }
-    this.removeTracks(trackIds)
+    // Files that could not be trashed stay in the library.
+    this.removeTracks(removed)
     return moved
   }
 
@@ -523,11 +543,12 @@ export class LibraryService {
     return this.store.resetSettings()
   }
 
-  private async clearDir(dir: string): Promise<number> {
+  private async clearDir(dir: string, keep: Set<string> = new Set()): Promise<number> {
     let removed = 0
     try {
       const entries = await fs.readdir(dir)
       for (const entry of entries) {
+        if (keep.has(entry)) continue
         try {
           await fs.rm(path.join(dir, entry), { recursive: true, force: true })
           removed += 1
@@ -543,7 +564,8 @@ export class LibraryService {
 
   clearArtworkCache(): Promise<number> {
     clearMetadataCaches()
-    return this.clearDir(this.store.artworkDir)
+    // User-picked album/playlist covers live in the same folder; keep them.
+    return this.clearDir(this.store.artworkDir, this.store.referencedArtworkFiles())
   }
 
   clearLyricsCache(): Promise<number> {
@@ -725,7 +747,9 @@ export class LibraryService {
     this.folders = [...this.folders, folder]
     this.store.setFolders(this.folders)
     this.startWatching(folder)
-    await this.scan(folder.id)
+    // Tracks stream in through scan events; don't hold the folder back until
+    // the scan (which may be queued behind a running one) finishes.
+    void this.scan(folder.id)
     return folder
   }
 
@@ -751,7 +775,7 @@ export class LibraryService {
    * re-parsed (used for the startup scan; manual rescans re-read everything).
    */
   async scan(folderId?: string, { incremental = false }: { incremental?: boolean } = {}): Promise<void> {
-    if (this.scanning) return
+    if (this.scanning) return this.queueScan(folderId)
     const targets = folderId ? this.folders.filter((f) => f.id === folderId) : this.folders
     if (targets.length === 0) return
 
@@ -786,18 +810,29 @@ export class LibraryService {
 
     try {
       for (const folder of targets) {
-        // Fresh scan for this folder: drop its previous tracks first.
+        // An unplugged drive or unmounted share must not empty the library.
+        try {
+          await fs.readdir(folder.path)
+        } catch (err) {
+          errors.push({
+            path: folder.path,
+            message: `Folder is not available: ${err instanceof Error ? err.message : String(err)}`
+          })
+          continue
+        }
+
+        // Keep previous tracks for incremental reads, but don't drop them up
+        // front: tracks are reconciled after the walk (see `isGone` below).
         const previous = new Map<string, Track>()
         for (const [trackId, track] of this.tracks) {
           if (track.folder === folder.path) {
-        const base = this.baseTracks.get(trackId)
-        if (base) previous.set(trackId, base)
-        this.tracks.delete(trackId)
-        this.baseTracks.delete(trackId)
-      }
+            const base = this.baseTracks.get(trackId)
+            if (base) previous.set(trackId, base)
+          }
         }
 
         const files: string[] = []
+        const registered = new Set<string>()
         for await (const entry of walkFiles(folder.path, (count) => {
           discovered = count
           emitProgress(folder.path)
@@ -818,7 +853,10 @@ export class LibraryService {
               known && (await this.isUnchanged(known, filePath))
                 ? known
                 : await readTrack(filePath, folder.path, this.store)
+            // The folder may have been removed while this scan was running.
+            if (!this.folders.some((f) => f.id === folder.id)) return
             this.registerTrack(track)
+            registered.add(track.id)
             buffer.push(track)
             if (buffer.length >= BATCH_SIZE) flush()
             if (this.store.settings.fetchArtworkOnline && !track.hasArtwork) {
@@ -830,6 +868,20 @@ export class LibraryService {
           scanned += 1
           emitProgress(filePath)
         })
+
+        // Drop previously known tracks that are really gone. Files the walk
+        // could not reach (e.g. an unreadable subfolder) are kept.
+        const found = new Set(files)
+        for (const [trackId, track] of this.baseTracks) {
+          if (track.folder !== folder.path || track.source !== 'file') continue
+          if (found.has(track.locator)) {
+            if (registered.has(trackId)) continue
+          } else if (!(await isGone(track.locator))) {
+            continue
+          }
+          this.tracks.delete(trackId)
+          this.baseTracks.delete(trackId)
+        }
       }
     } finally {
       flush()
@@ -837,6 +889,7 @@ export class LibraryService {
       this.scanning = false
       this.listeners?.progress({ scanning: false, scanned, total: discovered })
       this.listeners?.done({ total: this.tracks.size, unsupported, errors })
+      this.runQueuedScan()
     }
   }
 
@@ -851,6 +904,39 @@ export class LibraryService {
     } catch {
       return false
     }
+  }
+
+  /**
+   * Remember a scan requested mid-scan (e.g. a folder added while the library
+   * is being scanned) and resolve once it has actually run.
+   */
+  private queueScan(folderId?: string): Promise<void> {
+    if (!this.queuedScan) {
+      let resolve: () => void = () => undefined
+      const done = new Promise<void>((r) => {
+        resolve = r
+      })
+      this.queuedScan = { all: false, ids: new Set(), done, resolve }
+    }
+    if (folderId) this.queuedScan.ids.add(folderId)
+    else this.queuedScan.all = true
+    return this.queuedScan.done
+  }
+
+  private runQueuedScan(): void {
+    const queued = this.queuedScan
+    if (!queued) return
+    this.queuedScan = null
+    const run = async (): Promise<void> => {
+      if (queued.all) {
+        await this.scan()
+        return
+      }
+      for (const id of queued.ids) await this.scan(id)
+    }
+    void run()
+      .catch((err) => console.error('[lagu] queued scan failed', err))
+      .finally(queued.resolve)
   }
 
   private persist(): void {
