@@ -49,3 +49,7 @@ Pages deployment (including the download counter).
 ## Documentation
 
 Start at [docs/index.md](docs/index.md).
+
+## License
+We use the [Polyform Noncommercial License](https://polyformproject.org/licenses/noncommercial/1.0.0)
+read here [LICENSE](LICENSE)
