@@ -6,7 +6,6 @@ import { useArtistImage } from '@renderer/state/useArtistImage'
 
 interface ArtistGridProps {
   artists: ArtistGroup[]
-  tracks: Track[]
   bios: Record<string, string>
   currentTrackId?: string | null
   playing: boolean
@@ -102,7 +101,6 @@ function ArtistCard({
 
 export function ArtistGrid({
   artists,
-  tracks,
   bios,
   currentTrackId,
   playing,
@@ -121,7 +119,7 @@ export function ArtistGrid({
         <ArtistCard
           key={group.name}
           group={group}
-          tracks={tracks.filter((t) => (t.albumArtist || t.artist) === group.name)}
+          tracks={group.tracks}
           bio={bios[group.name]}
           currentTrackId={currentTrackId}
           playing={playing}
