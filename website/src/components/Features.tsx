@@ -55,15 +55,6 @@ const FEATURES = [
 export function Features() {
   return (
     <section className="section section--features">
-      <header className="section__head">
-        <span className="section__kicker">Features</span>
-        <h2 className="section__title">Small player. Serious about your library.</h2>
-        <p className="section__lead">
-          Everything is built around local files and a clean listening flow - not feeds,
-          recommendations or accounts.
-        </p>
-      </header>
-
       <div className="feature-list">
         {FEATURES.map(({ icon: Icon, title, text }) => (
           <article className="feature" key={title}>

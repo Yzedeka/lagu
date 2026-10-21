@@ -112,6 +112,14 @@ img {
 .nav__brand {
   display: inline-flex;
   align-items: center;
+  gap: 9px;
+}
+
+.nav__icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  display: block;
 }
 
 .nav__wordmark {
@@ -211,10 +219,10 @@ img {
 
 .hero__title {
   margin: 0 0 20px;
-  font-size: clamp(42px, 5.8vw, 68px);
+  font-size: clamp(36px, 4.1vw, 52px);
   font-weight: 620;
   letter-spacing: -0.055em;
-  line-height: 0.98;
+  line-height: 1.05;
 }
 
 .hero__tagline {
@@ -274,6 +282,8 @@ img {
 }
 
 .hero__shot {
+  position: relative;
+  aspect-ratio: 16 / 9;
   border: 1px solid var(--border-strong);
   border-radius: 6px;
   overflow: hidden;
@@ -282,23 +292,44 @@ img {
 }
 
 .hero__shot img {
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.55s var(--ease);
 }
 
-.hero__visual figcaption {
+.hero__shot img.is-active {
+  opacity: 1;
+}
+
+.hero__dots {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 10px;
-  color: var(--text-faint);
-  font-size: 11px;
-  letter-spacing: 0.02em;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 14px;
 }
 
-.hero__visual figcaption span:first-child {
-  color: var(--text-dim);
+.hero__dots button {
+  width: 5px;
+  height: 5px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--border-strong);
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease), transform 0.15s var(--ease);
+}
+
+.hero__dots button:hover {
+  background: var(--text-faint);
+}
+
+.hero__dots button.is-active {
+  background: var(--accent);
+  transform: scale(1.35);
 }
 
 /* --- Big download ---------------------------------------------------- */
@@ -403,7 +434,8 @@ img {
 
 /* --- Features -------------------------------------------------------- */
 .section--features {
-  padding-top: 42px;
+  padding-top: 18px;
+  padding-bottom: 38px;
 }
 
 .feature-list {
@@ -433,16 +465,22 @@ img {
   flex-shrink: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--bg-panel);
-  color: var(--text-dim);
-  transition: color 0.15s var(--ease), border-color 0.15s var(--ease),
-    background-color 0.15s var(--ease);
+  background-image: url('./assets/lagu-frame-rounded.png');
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  transition: border-color 0.15s var(--ease), transform 0.15s var(--ease);
+}
+
+.feature__icon .material-symbols-rounded,
+.feature__icon svg {
+  color: #fff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.55));
 }
 
 .feature:hover .feature__icon {
-  color: var(--accent-bright);
-  border-color: color-mix(in srgb, var(--accent) 34%, var(--border));
-  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  transform: translateY(-1px);
 }
 
 .feature__title {

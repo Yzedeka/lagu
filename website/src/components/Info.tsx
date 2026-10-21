@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import appIcon from '@/assets/app_icon.png'
 import wordmark from '@/assets/lagu-wordmark.png'
 import { APP, DONATE_URL, REPO_URL, VERSIONS_REPO } from '@/config'
 
@@ -16,6 +17,7 @@ export function Nav() {
     <nav className={`nav${scrolled ? ' nav--scrolled' : ''}`}>
       <div className="nav__inner">
         <a className="nav__brand" href="#/" aria-label={APP.name}>
+          <img className="nav__icon" src={appIcon} alt="" draggable={false} />
           <img className="nav__wordmark" src={wordmark} alt={APP.name} draggable={false} />
         </a>
         <div className="nav__links">

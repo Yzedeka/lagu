@@ -1,41 +1,42 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { APP, OS_LABEL, detectOs, downloadUrl, primaryFor, type Os } from '@/config'
 import { useDownloads } from '@/lib/DownloadContext'
 import { BigDownload, Counter } from './Download'
 
 const OTHERS: Os[] = ['windows', 'macos', 'linux']
 
+const PREVIEWS = [
+  { src: '/screenshots/now-playing.png', label: 'Now Playing' },
+  { src: '/screenshots/library.png', label: 'Library' },
+  { src: '/screenshots/albums.png', label: 'Albums' },
+  { src: '/screenshots/artists.png', label: 'Artists' },
+  { src: '/screenshots/playlists.png', label: 'Playlists' },
+  { src: '/screenshots/settings.png', label: 'Settings' }
+]
+
+const INTERVAL = 5000
+
 export function Hero() {
   const os = useMemo(detectOs, [])
   const { register } = useDownloads()
   const others = OTHERS.filter((o) => o !== os)
+  const [index, setIndex] = useState(0)
+  const [paused, setPaused] = useState(false)
+
+  useEffect(() => {
+    if (paused) return
+    const timer = setInterval(() => setIndex((v) => (v + 1) % PREVIEWS.length), INTERVAL)
+    return () => clearInterval(timer)
+  }, [paused])
 
   return (
     <header className="hero">
       <div className="hero__copy">
-        <p className="eyebrow">
-          <span className="eyebrow__dot" />
-          Local music player
-          <span className="eyebrow__sep">/</span>
-          {APP.versionLabel} beta
-        </p>
-
-        <h1 className="hero__title">
-          Your music.
-          <br />
-          Your machine.
-        </h1>
-
-        <p className="hero__tagline">
-          A fast, quiet desktop player for the library you already own. Artwork-driven
-          colour, a real queue, synchronized lyrics and no cloud in the middle.
-        </p>
+        <h1 className="hero__title">{APP.name} Music Player</h1>
+        <p className="hero__tagline">{APP.tagline}</p>
 
         <div className="hero__actions">
           <BigDownload />
-          <a className="text-link" href="#/docs">
-            Read the docs <span aria-hidden>→</span>
-          </a>
         </div>
 
         <div className="hero__meta">
@@ -60,15 +61,35 @@ export function Hero() {
         </p>
       </div>
 
-      <figure className="hero__visual">
+      <div
+        className="hero__visual"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
         <div className="hero__shot">
-          <img src="/screenshots/albums.png" alt="Lagu album grid" draggable={false} />
+          {PREVIEWS.map((preview, i) => (
+            <img
+              key={preview.src}
+              className={i === index ? 'is-active' : ''}
+              src={preview.src}
+              alt={preview.label}
+              draggable={false}
+              loading={i === 0 ? 'eager' : 'lazy'}
+            />
+          ))}
         </div>
-        <figcaption>
-          <span>Albums</span>
-          <span>3D covers · artwork accent</span>
-        </figcaption>
-      </figure>
+        <div className="hero__dots">
+          {PREVIEWS.map((preview, i) => (
+            <button
+              key={preview.src}
+              type="button"
+              className={i === index ? 'is-active' : ''}
+              aria-label={preview.label}
+              onClick={() => setIndex(i)}
+            />
+          ))}
+        </div>
+      </div>
     </header>
   )
 }
