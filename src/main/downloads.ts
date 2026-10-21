@@ -15,6 +15,7 @@ import type { LibraryService } from './library'
 import type { Store } from './store'
 
 const EXE = process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp'
+const FFMPEG = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg'
 const SEARCH_LIMIT = 12
 const FORMATS = new Set<DownloadFormat>(['mp3', 'm4a', 'opus'])
 const QUALITIES = new Set<DownloadQuality>(['best', '320', '192', '128'])
@@ -45,6 +46,29 @@ function bundledCandidates(): string[] {
     candidates.push(path.join(root, process.platform, EXE))
     candidates.push(path.join(root, EXE))
   }
+  return candidates
+}
+
+function ffmpegCandidates(): string[] {
+  const candidates: string[] = []
+  const override = process.env['LAGU_FFMPEG_PATH']
+  if (override) {
+    candidates.push(override)
+    candidates.push(path.join(override, FFMPEG))
+  }
+
+  const roots = [
+    process.resourcesPath ? path.join(process.resourcesPath, 'bin') : '',
+    path.join(app.getAppPath(), 'resources', 'bin')
+  ].filter(Boolean)
+
+  for (const root of roots) {
+    // macOS builds have one ffmpeg per architecture; Windows/Linux share one.
+    candidates.push(path.join(root, 'darwin', process.arch, FFMPEG))
+    candidates.push(path.join(root, process.platform, FFMPEG))
+    candidates.push(path.join(root, FFMPEG))
+  }
+  candidates.push(FFMPEG)
   return candidates
 }
 
@@ -130,12 +154,14 @@ export class DownloadService {
       }
       const version = await tryExec(candidate, ['--version'])
       if (version) {
+        const ffmpegPath = await this.resolveFfmpeg()
         status = {
           available: true,
           command: candidate,
           version: version.split(/\r?\n/)[0],
           bundled: true,
-          ffmpeg: Boolean(await this.ffmpegVersion())
+          ffmpeg: Boolean(ffmpegPath),
+          ffmpegPath: ffmpegPath ?? undefined
         }
         break
       }
@@ -144,21 +170,25 @@ export class DownloadService {
     if (!status) {
       const version = await tryExec('yt-dlp', ['--version'])
       if (version) {
+        const ffmpegPath = await this.resolveFfmpeg()
         status = {
           available: true,
           command: 'yt-dlp',
           version: version.split(/\r?\n/)[0],
           bundled: false,
-          ffmpeg: Boolean(await this.ffmpegVersion())
+          ffmpeg: Boolean(ffmpegPath),
+          ffmpegPath: ffmpegPath ?? undefined
         }
       }
     }
 
     if (!status) {
+      const ffmpegPath = await this.resolveFfmpeg()
       status = {
         available: false,
         bundled: false,
-        ffmpeg: Boolean(await this.ffmpegVersion()),
+        ffmpeg: Boolean(ffmpegPath),
+        ffmpegPath: ffmpegPath ?? undefined,
         error:
           'yt-dlp was not found. Run "npm run fetch:ytdlp" for a source build, or reinstall Lagu.'
       }
@@ -168,8 +198,19 @@ export class DownloadService {
     return status
   }
 
-  private async ffmpegVersion(): Promise<string | null> {
-    return tryExec(process.env['LAGU_FFMPEG_PATH'] || 'ffmpeg', ['-version'])
+  private async resolveFfmpeg(): Promise<string | null> {
+    for (const candidate of ffmpegCandidates()) {
+      if (candidate !== FFMPEG) {
+        try {
+          await fs.access(candidate, fsConstants.X_OK)
+        } catch {
+          continue
+        }
+      }
+      const version = await tryExec(candidate, ['-version'])
+      if (version) return candidate
+    }
+    return null
   }
 
   async toolStatus(): Promise<DownloadToolStatus> {
@@ -299,6 +340,13 @@ export class DownloadService {
 
     const tool = await this.resolveTool()
     if (!tool.available || !tool.command) return { ok: false, error: tool.error }
+    if (!tool.ffmpeg) {
+      return {
+        ok: false,
+        error:
+          'ffmpeg was not found. Reinstall Lagu or set LAGU_FFMPEG_PATH to an ffmpeg binary.'
+      }
+    }
 
     let folder: string
     try {
@@ -352,6 +400,9 @@ export class DownloadService {
       'after_move:LAGU_FILE:%(filepath)s',
       ...(playlist
         ? ['--print', 'before_dl:LAGU_ITEM:%(playlist_index)s|%(n_entries)s|%(title)s']
+        : []),
+      ...(tool.ffmpegPath && path.isAbsolute(tool.ffmpegPath)
+        ? ['--ffmpeg-location', path.dirname(tool.ffmpegPath)]
         : []),
       '--socket-timeout',
       '20',

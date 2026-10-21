@@ -3,7 +3,7 @@
 A minimalist, fast desktop music player for your local library - artwork-driven
 theming, a real queue, crossfade, 8D audio and synchronized lyrics.
 
-> Version 0.4.0 - MIT licensed - **still in beta**.
+> Version 0.4.1 - MIT licensed - **still in beta**.
 
 ## Repository layout
 
@@ -23,11 +23,11 @@ npm install
 npm run dev        # run the app
 npm run build      # bundle
 npm run typecheck  # main + preload + renderer
-npm run fetch:ytdlp # optional: bundle yt-dlp for in-app downloads
+npm run fetch:ytdlp # optional: bundle yt-dlp + ffmpeg for downloads
 ```
 
-The download search uses `yt-dlp` (bundled by the packaging scripts, or a system
-install when running from source) and needs `ffmpeg` to convert audio.
+The download search uses `yt-dlp` and `ffmpeg` (both bundled by the packaging
+scripts; system installs are used when running from source).
 
 ## Packaging
 

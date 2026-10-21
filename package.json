@@ -1,6 +1,6 @@
 {
   "name": "lagu-music-player",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Lagu Music Player - a minimalist local desktop music player",
   "homepage": "https://lagu.app",
   "author": {
@@ -21,8 +21,8 @@
     "dist": "npm run fetch:ytdlp && electron-vite build && electron-builder",
     "dist:linux": "npm run fetch:ytdlp && electron-vite build && electron-builder --linux",
     "dist:win": "npm run fetch:ytdlp -- --platform=win32 --arch=x64 && electron-vite build && electron-builder --win",
-    "dist:mac": "npm run fetch:ytdlp -- --platform=darwin && electron-vite build && electron-builder --mac",
-    "dist:all": "npm run fetch:ytdlp && npm run fetch:ytdlp -- --platform=win32 --arch=x64 && npm run fetch:ytdlp -- --platform=darwin && electron-vite build && electron-builder -mwl",
+    "dist:mac": "npm run fetch:ytdlp -- --platform=darwin --arch=x64 && npm run fetch:ytdlp -- --platform=darwin --arch=arm64 && electron-vite build && electron-builder --mac",
+    "dist:all": "npm run fetch:ytdlp && npm run fetch:ytdlp -- --platform=win32 --arch=x64 && npm run fetch:ytdlp -- --platform=darwin --arch=x64 && npm run fetch:ytdlp -- --platform=darwin --arch=arm64 && electron-vite build && electron-builder -mwl",
     "build:apk": "node scripts/build-apk.mjs",
     "dist:flatpak": "bash scripts/build-flatpak.sh"
   },

@@ -1,8 +1,8 @@
 export const APP = {
   name: 'Lagu',
-  version: '0.4.0',
+  version: '0.4.1',
   /** Display label (the 'b' marks the beta). */
-  versionLabel: 'b0.4',
+  versionLabel: 'b0.4.1',
   beta: true,
   tagline: 'A minimalist desktop player for your local music library.'
 } as const
@@ -25,52 +25,58 @@ export const DOWNLOADS: Download[] = [
     os: 'windows',
     label: 'Windows',
     file: `Lagu-${APP.version}-setup.exe`,
-    size: 212664106,
+    size: 157803888,
     primary: true
   },
   {
     os: 'macos',
-    label: 'macOS',
-    file: `Lagu-${APP.version}-mac.zip`,
-    size: 466347997,
+    label: 'macOS (Apple Silicon)',
+    file: `Lagu-${APP.version}-mac-arm64.zip`,
+    size: 458164811,
     primary: true
+  },
+  {
+    os: 'macos',
+    label: 'macOS (Intel)',
+    file: `Lagu-${APP.version}-mac-x64.zip`,
+    size: 469515729
   },
   {
     os: 'linux',
     label: 'AppImage',
     file: `Lagu-${APP.version}.AppImage`,
-    size: 172098913,
+    size: 201871232,
     primary: true
   },
   {
     os: 'linux',
     label: 'Flatpak',
     file: `Lagu-${APP.version}.flatpak`,
-    size: 136411544
+    size: 157232928
   },
   {
     os: 'linux',
     label: 'Arch (pacman)',
     file: `lagu-${APP.version}-1-x86_64.pkg.tar.zst`,
-    size: 164928582
+    size: 192938868
   },
   {
     os: 'linux',
     label: '.deb',
     file: `lagu-music-player_${APP.version}_amd64.deb`,
-    size: 146462096
+    size: 169919992
   },
   {
     os: 'linux',
     label: '.rpm',
     file: `lagu-music-player-${APP.version}.x86_64.rpm`,
-    size: 134609962
+    size: 155665298
   },
   {
     os: 'linux',
     label: 'Portable tar.gz',
     file: `lagu-music-player-${APP.version}.tar.gz`,
-    size: 165928299
+    size: 194214043
   }
 ]
 

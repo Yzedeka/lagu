@@ -58,8 +58,7 @@ limited.
 ## Downloads
 
 - Searching and downloading uses **yt-dlp** and requires a network connection;
-  converting to MP3/M4A/Opus requires **ffmpeg**. Packaged builds bundle yt-dlp
-  but not ffmpeg.
+  converting to MP3/M4A/Opus uses **ffmpeg**. Packaged builds bundle both.
 - Downloads depend on the source site's availability and terms. Private,
   age-gated or region-locked tracks cannot be downloaded.
 - Downloads are added to the library when they finish; they do not autoplay.

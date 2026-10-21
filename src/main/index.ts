@@ -11,6 +11,8 @@ import { configureDiscord, destroyDiscord } from './discord'
 import { extensionOf, SUPPORTED_EXTENSIONS } from './metadata'
 
 app.setName('Lagu Music Player')
+// Windows taskbar grouping, notifications and jump lists.
+if (process.platform === 'win32') app.setAppUserModelId('com.lagu.musicplayer')
 
 // Pin the X11 WM_CLASS so a pinned taskbar/menu entry binds to the installed
 // desktop file (StartupWMClass=lagu) rather than the AppImage's mount path.
@@ -41,6 +43,19 @@ let store: Store | null = null
 let library: LibraryService | null = null
 
 const getWindow = (): BrowserWindow | null => mainWindow
+
+/** macOS "Open with Lagu" arrives as an open-file event, not argv. */
+app.on('open-file', (event, filePath) => {
+  event.preventDefault()
+  if (!mainWindow) {
+    pendingOpenFiles.push(filePath)
+    return
+  }
+  if (mainWindow.isMinimized()) mainWindow.restore()
+  mainWindow.focus()
+  if (mainWindow.webContents.isLoading()) pendingOpenFiles.push(filePath)
+  else mainWindow.webContents.send(IPC.evtOpenFiles, [filePath])
+})
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({

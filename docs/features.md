@@ -31,9 +31,9 @@
 - Choose a destination folder per download, or set a **default folder, format
   and quality** in **Settings → Downloads**.
 - Finished tracks are added to the library automatically and never start
-  playing on their own. Downloads need **ffmpeg** for conversion.
-- The yt-dlp binary is bundled with packaged builds; source builds fall back to
-  a system `yt-dlp`, or you can fetch one with `npm run fetch:ytdlp`.
+  playing on their own. **yt-dlp and ffmpeg are bundled** with packaged builds.
+- Source builds fall back to system tools, or you can fetch them with
+  `npm run fetch:ytdlp`.
 
 ## Playlists
 

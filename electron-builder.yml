@@ -128,14 +128,12 @@ nsis:
 # A .app bundle (dir target). Signing is disabled for local builds.
 mac:
   target:
-    - target: dir
-      arch: [x64]
     - target: zip
-      arch: [x64]
+      arch: [x64, arm64]
   icon: build/icon.png
   category: public.app-category.music
   identity: null
-  artifactName: ${productName}-${version}-mac.${ext}
+  artifactName: ${productName}-${version}-mac-${arch}.${ext}
 
 # --- Android (.apk) ------------------------------------------------------
 # Electron cannot produce an APK. Android support is a separate Capacitor

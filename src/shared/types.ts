@@ -120,6 +120,8 @@ export interface DownloadToolStatus {
   bundled: boolean
   /** ffmpeg is required to convert downloads to MP3/M4A/Opus. */
   ffmpeg: boolean
+  /** Absolute path (or PATH command) used for ffmpeg. */
+  ffmpegPath?: string
   error?: string
 }
 

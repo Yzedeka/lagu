@@ -8,7 +8,7 @@ cover tint the interface with its own accent colours.
 It is not a Spotify clone and not a web dashboard. It is a small, practical tool
 for people who keep their music on disk.
 
-> Version 0.4.0 (b0.4) - source available - built with Electron, React and TypeScript.
+> Version 0.4.1 (b0.4.1) - source available - built with Electron, React and TypeScript.
 
 ## What it does
 

@@ -675,7 +675,7 @@ export function SettingsView({
           : 'Checking…'}
       </span>,
       downloadTool?.available
-        ? `${downloadTool.bundled ? 'Bundled binary' : 'System install'}${downloadTool.ffmpeg ? '' : ' - ffmpeg not found, conversions may fail'}`
+        ? `yt-dlp ${downloadTool.version} - ${downloadTool.ffmpeg ? 'ffmpeg ready' : 'ffmpeg missing, conversions will fail'}`
         : downloadTool?.error ?? 'Required for searching and downloading.',
       'yt-dlp youtube download tool ffmpeg binary'
     ),
