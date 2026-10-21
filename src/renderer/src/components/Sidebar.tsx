@@ -20,6 +20,7 @@ import {
 } from '@renderer/icons'
 import { AlbumArt } from './AlbumArt'
 import { ContextMenu } from './ContextMenu'
+import { NavList, type NavEntry } from './NavList'
 import { buildAlbums, buildArtists } from '@renderer/lib/album'
 import appIconUrl from '@renderer/icons/app_icon.png'
 import { folderName } from '@renderer/lib/format'
@@ -59,7 +60,7 @@ interface SidebarProps {
   onDownloadMusic: () => void
 }
 
-const NAV: { id: BrowseSection; label: string; icon: typeof GraphicEqIcon }[] = [
+const NAV: NavEntry<BrowseSection>[] = [
   { id: 'library', label: 'Library', icon: LibraryIcon },
   { id: 'albums', label: 'Albums', icon: AlbumIcon },
   { id: 'artists', label: 'Artists', icon: ArtistIcon },
@@ -153,19 +154,12 @@ export function Sidebar({
       )}
 
       <div className="sidebar__label">Library</div>
-      <nav className="sidebar__nav">
-        {NAV.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            type="button"
-            className={`nav-item ${selection === id ? 'nav-item--active' : ''}`}
-            onClick={() => onSelect(id)}
-          >
-            <Icon size={16} />
-            <span>{label}</span>
-          </button>
-        ))}
-      </nav>
+      <NavList
+        className="sidebar__nav"
+        items={NAV}
+        active={NAV.some((n) => n.id === selection) ? (selection as BrowseSection) : null}
+        onSelect={onSelect}
+      />
 
       <div className="sidebar__label sidebar__label--row">
         <button

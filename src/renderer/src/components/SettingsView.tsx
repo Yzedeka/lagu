@@ -24,6 +24,7 @@ import {
   ZoomInIcon,
   ZoomOutIcon
 } from '@renderer/icons'
+import { NavList } from './NavList'
 import { Range } from './Range'
 import { SearchBar } from './SearchBar'
 import { KEYBIND_ACTIONS, defaultBindings, keyLabel, normalizeKey } from '@renderer/lib/keybinds'
@@ -892,21 +893,12 @@ export function SettingsView({
 
       <div className="settings-layout">
         {!q && (
-          <nav className="settings-nav">
-            {CATEGORIES.map((category) => (
-              <button
-                key={category.id}
-                type="button"
-                className={`settings-nav__item ${
-                  active === category.id ? 'settings-nav__item--active' : ''
-                }`}
-                onClick={() => setActive(category.id)}
-              >
-                <category.icon size={15} />
-                <span>{category.label}</span>
-              </button>
-            ))}
-          </nav>
+          <NavList
+            className="settings-nav"
+            items={CATEGORIES}
+            active={active}
+            onSelect={setActive}
+          />
         )}
 
         <div className="settings-view__body">
