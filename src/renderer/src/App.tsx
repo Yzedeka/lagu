@@ -46,6 +46,7 @@ export function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [addUrlOpen, setAddUrlOpen] = useState(false)
   const [downloadOpen, setDownloadOpen] = useState(false)
+  const [downloadQuery, setDownloadQuery] = useState('')
   const [shortcutsOpen, setShortcutsOpen] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [zoom, setZoom] = useState(0)
@@ -119,6 +120,11 @@ export function App() {
   // --- fullscreen ----------------------------------------------------------
   const settingsRef = useRef(settings)
   settingsRef.current = settings
+
+  const searchYouTube = useCallback((query: string) => {
+    setDownloadQuery(query)
+    setDownloadOpen(true)
+  }, [])
 
   const toggleFullscreen = useCallback(() => {
     void api.window.toggleFullscreen()
@@ -522,7 +528,11 @@ export function App() {
             onRescan={() => void library.rescan()}
             onRemoveFolder={(id) => void library.removeFolder(id)}
             onAddUrl={() => setAddUrlOpen(true)}
-            onDownloadMusic={() => setDownloadOpen(true)}
+            onDownloadMusic={() => {
+              setDownloadQuery('')
+              setDownloadOpen(true)
+            }}
+            onSearchYouTube={searchYouTube}
           />
         )}
 
@@ -555,6 +565,7 @@ export function App() {
               onPlayContext={player.playContext}
               onPlayNext={player.playNext}
               onAddToQueue={player.addToQueue}
+              onSearchYouTube={searchYouTube}
             />
           )}
 
@@ -676,6 +687,7 @@ export function App() {
           defaultFolder={settings.downloadFolder}
           defaultFormat={settings.downloadFormat}
           defaultQuality={settings.downloadQuality}
+          initialQuery={downloadQuery}
           onClose={() => setDownloadOpen(false)}
         />
       )}

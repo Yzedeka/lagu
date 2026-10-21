@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import type { Track } from '@shared/types'
 import { SongGrid } from './SongGrid'
+import { CloudDownloadIcon } from '@renderer/icons'
 
 interface SearchViewProps {
   query: string
@@ -9,6 +10,7 @@ interface SearchViewProps {
   onPlayContext: (tracks: Track[], index: number) => void
   onPlayNext: (track: Track) => void
   onAddToQueue: (track: Track) => void
+  onSearchYouTube: (query: string) => void
 }
 
 export function SearchView({
@@ -17,7 +19,8 @@ export function SearchView({
   currentTrackId,
   onPlayContext,
   onPlayNext,
-  onAddToQueue
+  onAddToQueue,
+  onSearchYouTube
 }: SearchViewProps) {
   const results = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -36,9 +39,18 @@ export function SearchView({
         <h2 className="browse__title">Search</h2>
         <div className="browse__actions">
           {query.trim() ? (
-            <span className="browse__count">
-              {results.length} result{results.length === 1 ? '' : 's'} for “{query.trim()}”
-            </span>
+            <>
+              <span className="browse__count">
+                {results.length} result{results.length === 1 ? '' : 's'} for “{query.trim()}”
+              </span>
+              <button
+                type="button"
+                className="ghost-btn"
+                onClick={() => onSearchYouTube(query.trim())}
+              >
+                <CloudDownloadIcon size={14} /> Search YouTube
+              </button>
+            </>
           ) : (
             <span className="browse__count">Type in the sidebar and press Enter</span>
           )}

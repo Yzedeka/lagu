@@ -34,6 +34,8 @@ interface DownloadDialogProps {
   defaultFolder: string
   defaultFormat: DownloadFormat
   defaultQuality: DownloadQuality
+  /** Pre-filled search, run as soon as the dialog opens. */
+  initialQuery?: string
   onClose: () => void
 }
 
@@ -57,9 +59,10 @@ export function DownloadDialog({
   defaultFolder,
   defaultFormat,
   defaultQuality,
+  initialQuery,
   onClose
 }: DownloadDialogProps) {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(initialQuery ?? '')
   const [link, setLink] = useState('')
   const [results, setResults] = useState<DownloadSearchResult[]>([])
   const [searching, setSearching] = useState(false)
@@ -103,6 +106,12 @@ export function DownloadDialog({
       setSearchError(response.error ?? 'The search failed.')
     }
   }
+
+  useEffect(() => {
+    if (initialQuery?.trim()) void search()
+    // Only for the query the dialog was opened with.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const chooseFolder = async (): Promise<void> => {
     const picked = await api.downloads.pickFolder()
