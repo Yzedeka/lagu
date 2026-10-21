@@ -56,6 +56,61 @@ export const defaultSettings: AppSettings = {
   discordClientId: ''
 }
 
+/**
+ * Crash-safe JSON file writes: data goes to a temp file first and is renamed
+ * over the target, and the previous good version is kept as `<file>.bak`.
+ * Writes to the same file are serialised so they can never interleave.
+ */
+const writeChains = new Map<string, Promise<void>>()
+
+function writeFileAtomic(file: string, data: string): Promise<void> {
+  const previous = writeChains.get(file) ?? Promise.resolve()
+  const next = previous.then(async () => {
+    const tmp = `${file}.tmp`
+    const handle = await fs.open(tmp, 'w')
+    try {
+      await handle.writeFile(data, 'utf8')
+      await handle.sync()
+    } finally {
+      await handle.close()
+    }
+    try {
+      await fs.rename(file, `${file}.bak`)
+    } catch {
+      /* first write - nothing to back up */
+    }
+    await fs.rename(tmp, file)
+  })
+  const settled = next.catch(() => undefined)
+  writeChains.set(file, settled)
+  void settled.then(() => {
+    if (writeChains.get(file) === settled) writeChains.delete(file)
+  })
+  return next
+}
+
+/**
+ * Read a JSON file written by `writeFileAtomic`, falling back to its `.bak`.
+ * A file that exists but does not parse is moved aside (never overwritten)
+ * so the user's data can still be recovered by hand.
+ */
+async function readJsonSafe<T>(file: string): Promise<T | null> {
+  try {
+    return JSON.parse(await fs.readFile(file, 'utf8')) as T
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+      const aside = `${file}.corrupt-${Date.now()}`
+      console.error(`[lagu] could not read ${file}; moved it to ${aside}`, err)
+      await fs.rename(file, aside).catch(() => undefined)
+    }
+  }
+  try {
+    return JSON.parse(await fs.readFile(`${file}.bak`, 'utf8')) as T
+  } catch {
+    return null
+  }
+}
+
 function emptyState(): PersistedState {
   return {
     folders: [],
@@ -83,6 +138,7 @@ export class Store {
   private state: PersistedState = emptyState()
   private overrides: Record<string, TrackOverride> = {}
   private saveTimer: NodeJS.Timeout | null = null
+  private indexTimer: NodeJS.Timeout | null = null
 
   constructor() {
     this.legacyDir = app.getPath('userData')
@@ -208,39 +264,38 @@ export class Store {
 
   private async load(): Promise<void> {
     const base = emptyState()
-    try {
-      const raw = await fs.readFile(this.statePath, 'utf8')
-      const parsed = JSON.parse(raw) as Partial<PersistedState>
-      this.state = {
-        folders: parsed.folders ?? base.folders,
-        settings: { ...base.settings, ...(parsed.settings ?? {}) },
-        tracks: parsed.tracks ?? base.tracks,
-        queue: parsed.queue ?? base.queue,
-        hidden: parsed.hidden ?? base.hidden,
-        pinned: parsed.pinned ?? base.pinned,
-        artistBio: parsed.artistBio ?? base.artistBio,
-        playlists: parsed.playlists ?? base.playlists
-      }
-    } catch {
-      this.state = base
-    }
+    const parsed = await readJsonSafe<Partial<PersistedState>>(this.statePath)
+    this.state = parsed
+      ? {
+          folders: parsed.folders ?? base.folders,
+          settings: { ...base.settings, ...(parsed.settings ?? {}) },
+          tracks: parsed.tracks ?? base.tracks,
+          queue: parsed.queue ?? base.queue,
+          hidden: parsed.hidden ?? base.hidden,
+          pinned: parsed.pinned ?? base.pinned,
+          artistBio: parsed.artistBio ?? base.artistBio,
+          playlists: parsed.playlists ?? base.playlists
+        }
+      : base
     // The track index can be large; keep it separate from the small state file.
-    try {
-      const raw = await fs.readFile(this.indexPath, 'utf8')
-      const parsed = JSON.parse(raw) as { tracks?: Track[] }
-      if (Array.isArray(parsed.tracks) && parsed.tracks.length > 0) {
-        this.state.tracks = parsed.tracks
-      }
-    } catch {
-      /* no cached index yet */
+    const index = await readJsonSafe<{ tracks?: Track[] }>(this.indexPath)
+    if (index && Array.isArray(index.tracks) && index.tracks.length > 0) {
+      this.state.tracks = index.tracks
     }
     // User metadata edits (kept out of the user's files).
-    try {
-      const raw = await fs.readFile(this.overridesPath, 'utf8')
-      this.overrides = JSON.parse(raw) as Record<string, TrackOverride>
-    } catch {
-      this.overrides = {}
+    this.overrides = (await readJsonSafe<Record<string, TrackOverride>>(this.overridesPath)) ?? {}
+  }
+
+  /** Artwork-folder files that user edits point at (must survive cache clears). */
+  referencedArtworkFiles(): Set<string> {
+    const files = new Set<string>()
+    for (const override of Object.values(this.overrides)) {
+      if (override.coverFile) files.add(override.coverFile)
     }
+    for (const playlist of this.state.playlists) {
+      if (playlist.cover) files.add(playlist.cover)
+    }
+    return files
   }
 
   getOverride(trackId: string): TrackOverride | undefined {
@@ -265,7 +320,7 @@ export class Store {
 
   private async writeOverrides(): Promise<void> {
     try {
-      await fs.writeFile(this.overridesPath, JSON.stringify(this.overrides, null, 2), 'utf8')
+      await writeFileAtomic(this.overridesPath, JSON.stringify(this.overrides, null, 2))
     } catch (err) {
       console.error('[lagu] failed to persist metadata overrides', err)
     }
@@ -347,7 +402,12 @@ export class Store {
 
   setTracks(tracks: Track[]): void {
     this.state.tracks = tracks
-    void this.writeIndex()
+    // The index is rewritten in full, so coalesce bursts (scans, artwork lookups).
+    if (this.indexTimer) clearTimeout(this.indexTimer)
+    this.indexTimer = setTimeout(() => {
+      this.indexTimer = null
+      void this.writeIndex()
+    }, 1000)
   }
 
   updateSettings(patch: Partial<AppSettings>): AppSettings {
@@ -393,8 +453,13 @@ export class Store {
       clearTimeout(this.saveTimer)
       this.saveTimer = null
     }
+    if (this.indexTimer) {
+      clearTimeout(this.indexTimer)
+      this.indexTimer = null
+    }
     await this.writeState()
     await this.writeIndex()
+    await this.writeOverrides()
   }
 
   private async writeState(): Promise<void> {
@@ -408,7 +473,7 @@ export class Store {
       playlists: this.state.playlists
     }
     try {
-      await fs.writeFile(this.statePath, JSON.stringify(rest, null, 2), 'utf8')
+      await writeFileAtomic(this.statePath, JSON.stringify(rest, null, 2))
     } catch (err) {
       console.error('[lagu] failed to persist state', err)
     }
@@ -416,7 +481,7 @@ export class Store {
 
   private async writeIndex(): Promise<void> {
     try {
-      await fs.writeFile(this.indexPath, JSON.stringify({ tracks: this.state.tracks }), 'utf8')
+      await writeFileAtomic(this.indexPath, JSON.stringify({ tracks: this.state.tracks }))
     } catch (err) {
       console.error('[lagu] failed to persist index', err)
     }

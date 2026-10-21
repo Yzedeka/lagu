@@ -28,6 +28,17 @@ export interface LibraryListeners {
 const SCAN_CONCURRENCY = 8
 const BATCH_SIZE = 25
 
+/** True only when a path is definitely missing (not merely unreadable). */
+async function isGone(filePath: string): Promise<boolean> {
+  try {
+    await fs.stat(filePath)
+    return false
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code
+    return code === 'ENOENT' || code === 'ENOTDIR'
+  }
+}
+
 export class LibraryService {
   /** Raw scanned tracks (file tags + derived assets). */
   private readonly baseTracks = new Map<string, Track>()
@@ -461,17 +472,23 @@ export class LibraryService {
   /** Move the given tracks' files to the OS trash, then drop them from the library. */
   async trashTracks(trackIds: string[]): Promise<number> {
     let moved = 0
+    const removed: string[] = []
     for (const id of trackIds) {
       const track = this.baseTracks.get(id) ?? this.tracks.get(id)
-      if (!track || track.source !== 'file') continue
+      if (!track || track.source !== 'file') {
+        removed.push(id)
+        continue
+      }
       try {
         await shell.trashItem(track.locator)
         moved += 1
+        removed.push(id)
       } catch (err) {
         console.error('[lagu] could not trash file', track.locator, err)
       }
     }
-    this.removeTracks(trackIds)
+    // Files that could not be trashed stay in the library.
+    this.removeTracks(removed)
     return moved
   }
 
@@ -517,11 +534,12 @@ export class LibraryService {
     return this.store.resetSettings()
   }
 
-  private async clearDir(dir: string): Promise<number> {
+  private async clearDir(dir: string, keep: Set<string> = new Set()): Promise<number> {
     let removed = 0
     try {
       const entries = await fs.readdir(dir)
       for (const entry of entries) {
+        if (keep.has(entry)) continue
         try {
           await fs.rm(path.join(dir, entry), { recursive: true, force: true })
           removed += 1
@@ -537,7 +555,8 @@ export class LibraryService {
 
   clearArtworkCache(): Promise<number> {
     clearMetadataCaches()
-    return this.clearDir(this.store.artworkDir)
+    // User-picked album/playlist covers live in the same folder; keep them.
+    return this.clearDir(this.store.artworkDir, this.store.referencedArtworkFiles())
   }
 
   clearLyricsCache(): Promise<number> {
@@ -759,15 +778,19 @@ export class LibraryService {
 
     try {
       for (const folder of targets) {
-        // Fresh scan for this folder: drop its previous tracks first.
-        for (const [trackId, track] of this.tracks) {
-          if (track.folder === folder.path) {
-        this.tracks.delete(trackId)
-        this.baseTracks.delete(trackId)
-      }
+        // An unplugged drive or unmounted share must not empty the library.
+        try {
+          await fs.readdir(folder.path)
+        } catch (err) {
+          errors.push({
+            path: folder.path,
+            message: `Folder is not available: ${err instanceof Error ? err.message : String(err)}`
+          })
+          continue
         }
 
         const files: string[] = []
+        const registered = new Set<string>()
         for await (const entry of walkFiles(folder.path, (count) => {
           discovered = count
           emitProgress(folder.path)
@@ -785,6 +808,7 @@ export class LibraryService {
           try {
             const track = await readTrack(filePath, folder.path, this.store)
             this.registerTrack(track)
+            registered.add(track.id)
             buffer.push(track)
             if (buffer.length >= BATCH_SIZE) flush()
             if (this.store.settings.fetchArtworkOnline && !track.hasArtwork) {
@@ -796,6 +820,20 @@ export class LibraryService {
           scanned += 1
           emitProgress(filePath)
         })
+
+        // Drop previously known tracks that are really gone. Files the walk
+        // could not reach (e.g. an unreadable subfolder) are kept.
+        const found = new Set(files)
+        for (const [trackId, track] of this.baseTracks) {
+          if (track.folder !== folder.path || track.source !== 'file') continue
+          if (found.has(track.locator)) {
+            if (registered.has(trackId)) continue
+          } else if (!(await isGone(track.locator))) {
+            continue
+          }
+          this.tracks.delete(trackId)
+          this.baseTracks.delete(trackId)
+        }
       }
     } finally {
       flush()

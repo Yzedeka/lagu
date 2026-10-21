@@ -166,8 +166,14 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })
 
-app.on('before-quit', () => {
+let flushedForQuit = false
+
+app.on('before-quit', (event) => {
   destroyDiscord()
   library?.stopWatchingAll()
-  void store?.flush()
+  if (!store || flushedForQuit) return
+  // Hold the quit until pending settings/library writes are on disk.
+  event.preventDefault()
+  flushedForQuit = true
+  void store.flush().finally(() => app.quit())
 })

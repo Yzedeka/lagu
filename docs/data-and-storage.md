@@ -33,6 +33,15 @@ away in an app cache:
 - **catalog/** - a plain, human-readable snapshot of your library, regenerated
   whenever the library changes.
 
+`settings.json`, `metadata.json` and `library.json` are written to a temporary
+file and swapped in, so a crash or power cut mid-save can't truncate them. The
+previous version is kept next to each as `<name>.bak`. If a file can't be read
+on launch, Lagu moves it aside as `<name>.corrupt-<timestamp>` (so nothing is
+lost) and loads the `.bak` instead.
+
+Clearing the artwork cache from Settings keeps covers you chose yourself for
+albums and playlists.
+
 ## The catalog
 
 `catalog/albums.json` groups your music into albums:
