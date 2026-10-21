@@ -7,7 +7,8 @@ import {
   moveItem,
   nextIndex,
   prevIndex,
-  shuffleArray
+  shuffleArray,
+  unshuffleOrder
 } from '@renderer/player/queue'
 
 const api = window.lagu
@@ -197,17 +198,16 @@ export function usePlayer(
     if (tracks.length === 0) return
     const ids = tracks.map((t) => t.id)
     const s = settingsRef.current
-    let order = ids
-    let index = Math.max(0, Math.min(startIndex, ids.length - 1))
+    const index = Math.max(0, Math.min(startIndex, ids.length - 1))
+    autoplayRef.current = true
+    setError(null)
     if (s.shuffle) {
       const selected = ids[index]
       const rest = ids.filter((_, i) => i !== index)
-      order = [selected, ...shuffleArray(rest)]
-      index = 0
+      setQueue({ order: [selected, ...shuffleArray(rest)], index: 0, original: ids })
+    } else {
+      setQueue(makeQueue(ids, index))
     }
-    autoplayRef.current = true
-    setError(null)
-    setQueue(makeQueue(order, index))
   }, [])
 
   const playTrack = useCallback((track: Track) => {
@@ -217,7 +217,7 @@ export function usePlayer(
     if (idx >= 0) {
       setQueue((prev) => ({ ...prev, index: idx }))
     } else {
-      setQueue(makeQueue([...q.order, track.id], q.order.length))
+      setQueue((prev) => ({ ...prev, order: [...prev.order, track.id], index: prev.order.length }))
     }
   }, [])
 
@@ -256,7 +256,7 @@ export function usePlayer(
       const at = prev.index < 0 ? prev.order.length : prev.index + 1
       const order = [...prev.order]
       order.splice(at, 0, track.id)
-      return { order, index: prev.index }
+      return { ...prev, order }
     })
   }, [])
 
@@ -266,7 +266,7 @@ export function usePlayer(
         autoplayRef.current = true
         return makeQueue([track.id], 0)
       }
-      return { order: [...prev.order, track.id], index: prev.index }
+      return { ...prev, order: [...prev.order, track.id] }
     })
   }, [])
 
@@ -282,7 +282,7 @@ export function usePlayer(
         autoplayRef.current = true
         idx = order.length === 0 ? -1 : Math.min(idx, order.length - 1)
       }
-      return { order, index: idx }
+      return { ...prev, order, index: idx }
     })
   }, [])
 
@@ -292,7 +292,7 @@ export function usePlayer(
       const currentTrackId = prev.order[prev.index]
       const order = moveItem(prev.order, from, to)
       const index = currentTrackId ? order.indexOf(currentTrackId) : prev.index
-      return { order, index }
+      return { ...prev, order, index }
     })
   }, [])
 
@@ -318,7 +318,15 @@ export function usePlayer(
         const cur = prev.order[prev.index]
         if (!cur) return prev
         const rest = prev.order.filter((_, i) => i !== prev.index)
-        return { order: [cur, ...shuffleArray(rest)], index: 0 }
+        return { order: [cur, ...shuffleArray(rest)], index: 0, original: prev.order }
+      })
+    } else {
+      setQueue((prev) => {
+        if (!prev.original) return prev
+        const cur = prev.order[prev.index]
+        const order = unshuffleOrder(prev.order, prev.original)
+        const index = cur ? order.indexOf(cur) : prev.index
+        return { order, index }
       })
     }
   }, [update])

@@ -256,6 +256,8 @@ export interface QueueState {
   order: string[]
   /** Index into `order` of the current track, or -1 when idle. */
   index: number
+  /** Order before shuffle was applied, so turning shuffle off can restore it. */
+  original?: string[]
 }
 
 export interface PersistedState {
